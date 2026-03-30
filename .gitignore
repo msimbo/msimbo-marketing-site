@@ -1,4 +1,5 @@
 .sales
 .env
+.claude/skills/
 # Local Netlify folder
 .netlify
