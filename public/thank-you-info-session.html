@@ -10,13 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NNJGS59F');</script>
-
   <link rel="stylesheet" href="/styles.css">
   <style>
     .thankyou {
@@ -88,8 +81,6 @@
   </style>
 </head>
 <body>
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NNJGS59F" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
   <section class="thankyou">
     <div class="thankyou__inner">
       <img src="/assets/ulem-logo.png" alt="ULEM" width="48" height="48" style="margin: 0 auto 24px; opacity: 0.6;">
@@ -118,14 +109,20 @@
   </section>
 
   <script>
-    // Fire conversion event on page load (for GTM-based tracking)
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'info_session_registered' });
-
-    // Meta Pixel
-    if (typeof window.fbq !== 'undefined') {
-      window.fbq('track', 'Lead', { value: 0, currency: 'USD', content_name: 'info_session' });
-    }
+    // Secondary Meta conversion — info-session RSVP.
+    // Zaraz forwards this to Meta Pixel + Conversions API (server-side).
+    (function () {
+      function fire() {
+        if (typeof window.zaraz === 'undefined' || !window.zaraz.track) return;
+        window.zaraz.track('Lead', {
+          content_name: 'info_session',
+          currency: 'USD',
+          value: 0,
+        });
+      }
+      if (document.readyState === 'complete') fire();
+      else window.addEventListener('load', fire);
+    })();
   </script>
 </body>
 </html>

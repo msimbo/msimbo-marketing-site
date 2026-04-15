@@ -13,7 +13,7 @@
   const INFO_SESSION_DATES = [
     { label: 'Fri, April 17', time: '12:00 PM', value: '2026-04-17T12:00:00' },
     { label: 'Tue, April 21', time: '6:00 PM', value: '2026-04-21T18:00:00' },
-    { label: 'Tue, April 24', time: '12:00 PM', value: '2026-04-24T12:00:00' },
+    { label: 'Fri, April 24', time: '12:00 PM', value: '2026-04-24T12:00:00' },
   ];
 
   // Serverless function endpoint
@@ -40,6 +40,19 @@
   }
 
   captureUTM();
+
+  // ──────────────────────────────────────────────
+  // ZARAZ TRACKING HELPER
+  // Zaraz is loaded by Cloudflare (domain proxied).
+  // window.zaraz may briefly be undefined on first paint.
+  // ──────────────────────────────────────────────
+  function track(event, params) {
+    try {
+      if (window.zaraz && typeof window.zaraz.track === 'function') {
+        window.zaraz.track(event, params || {});
+      }
+    } catch (e) { /* noop */ }
+  }
 
   // ──────────────────────────────────────────────
   // DATE PICKER
@@ -239,8 +252,10 @@
         return res.json();
       })
       .then(function () {
-        // Fire conversion events before redirect
-        fireConversionEvents(signupType);
+        // Fire conversion events before redirect.
+        // The thank-you page fires the primary Meta event; this is a safety net
+        // with richer user data for Conversions API match quality.
+        fireConversionEvents(signupType, payload);
 
         // Redirect to thank-you page
         var thankYouPage = signupType === 'info_session'
@@ -257,24 +272,31 @@
   }
 
   // ──────────────────────────────────────────────
-  // CONVERSION TRACKING
+  // CONVERSION TRACKING (via Cloudflare Zaraz → Meta Pixel + CAPI)
   // ──────────────────────────────────────────────
-  function fireConversionEvents(signupType) {
-    var eventName = signupType === 'info_session' ? 'info_session_registered' : 'application_submitted';
+  function fireConversionEvents(signupType, payload) {
+    // Meta standard event:
+    //   - Application submission → CompleteRegistration (primary ad-optimization goal)
+    //   - Info-session RSVP → Lead (secondary)
+    var metaEvent = signupType === 'application' ? 'CompleteRegistration' : 'Lead';
 
-    // GA4 via dataLayer
-    if (typeof window.dataLayer !== 'undefined') {
-      window.dataLayer.push({ event: eventName });
-    }
-
-    // Meta Pixel
-    if (typeof window.fbq !== 'undefined') {
-      window.fbq('track', 'Lead', {
-        value: 0,
-        currency: 'USD',
-        content_name: signupType,
-      });
-    }
+    // User data improves Meta Conversions API match quality.
+    // Zaraz hashes email/phone automatically before forwarding to Meta.
+    track(metaEvent, {
+      content_name: signupType,
+      currency: 'USD',
+      value: 0,
+      email: payload.email,
+      phone: payload.phone,
+      first_name: payload.firstName,
+      last_name: payload.lastName,
+      zip_code: payload.zipCode,
+      utm_source: payload.utmSource,
+      utm_medium: payload.utmMedium,
+      utm_campaign: payload.utmCampaign,
+      utm_content: payload.utmContent,
+      utm_term: payload.utmTerm,
+    });
   }
 
   // ──────────────────────────────────────────────
@@ -289,11 +311,9 @@
       submitForm(infoForm, 'info', 'info_session');
     });
 
-    // Track form start
+    // Track form start → Meta InitiateCheckout
     infoForm.addEventListener('focusin', function handler() {
-      if (typeof window.dataLayer !== 'undefined') {
-        window.dataLayer.push({ event: 'form_start_info_session' });
-      }
+      track('InitiateCheckout', { content_name: 'info_session' });
       infoForm.removeEventListener('focusin', handler);
     });
   }
@@ -305,9 +325,7 @@
     });
 
     appForm.addEventListener('focusin', function handler() {
-      if (typeof window.dataLayer !== 'undefined') {
-        window.dataLayer.push({ event: 'form_start_application' });
-      }
+      track('InitiateCheckout', { content_name: 'application' });
       appForm.removeEventListener('focusin', handler);
     });
   }
@@ -317,9 +335,9 @@
   // ──────────────────────────────────────────────
   document.querySelectorAll('.accordion__item').forEach(function (item) {
     item.addEventListener('toggle', function () {
-      if (item.open && typeof window.dataLayer !== 'undefined') {
+      if (item.open) {
         var q = item.querySelector('summary span');
-        window.dataLayer.push({ event: 'faq_expanded', faq_question: q ? q.textContent : '' });
+        track('faq_expanded', { faq_question: q ? q.textContent : '' });
       }
     });
   });
@@ -373,26 +391,5 @@
     });
   });
 
-  // ──────────────────────────────────────────────
-  // 50% SCROLL DEPTH TRACKING
-  // ──────────────────────────────────────────────
-  var scrollTracked = false;
-  function trackScrollDepth() {
-    if (scrollTracked) return;
-    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (docHeight > 0 && scrollTop / docHeight >= 0.5) {
-      scrollTracked = true;
-      if (typeof window.dataLayer !== 'undefined') {
-        window.dataLayer.push({ event: 'scroll_50' });
-      }
-      if (typeof window.fbq !== 'undefined') {
-        window.fbq('track', 'ViewContent');
-      }
-      window.removeEventListener('scroll', trackScrollDepth);
-    }
-  }
-
-  window.addEventListener('scroll', trackScrollDepth, { passive: true });
 
 })();
