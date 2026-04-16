@@ -70,6 +70,30 @@ em { font-family: var(--font-display); font-style: italic; }
 
 .section-headline--white { color: var(--white); }
 
+.section-headline[title] {
+  position: relative;
+}
+
+.section-headline[title]::after {
+  content: ' #';
+  opacity: 0;
+  color: var(--gray-mid);
+  transition: opacity 0.2s ease;
+}
+
+.section-headline[title]:hover::after {
+  opacity: 0.4;
+}
+
+.section-headline.link-copied::after {
+  content: ' Copied!';
+  opacity: 1;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--red);
+}
+
 /* Red divider rule */
 .learn__rule, .qualify__rule, .form-card__rule,
 .timeline__rule, .instructor__rule, .faq__rule {
@@ -892,6 +916,14 @@ em { font-family: var(--font-display); font-style: italic; }
   padding: 6px 14px;
 }
 
+
+/* ============================================
+   APPLICATION PROCESS
+   ============================================ */
+.apply-process {
+  background: var(--white);
+  padding: 64px 0;
+}
 
 /* ============================================
    SECTION 9: FAQ

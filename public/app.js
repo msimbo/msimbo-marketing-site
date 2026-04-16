@@ -373,6 +373,37 @@
   initScrollReveal();
 
   // ──────────────────────────────────────────────
+  // CLICK-TO-COPY SECTION LINKS
+  // Click any section headline to copy its anchor URL
+  // ──────────────────────────────────────────────
+  document.querySelectorAll('.section-headline').forEach(function (headline) {
+    var section = headline.closest('section[id]');
+    if (!section) return;
+
+    headline.style.cursor = 'pointer';
+    headline.setAttribute('title', 'Click to copy link to this section');
+
+    headline.addEventListener('click', function () {
+      var url = window.location.origin + window.location.pathname + '#' + section.id;
+
+      navigator.clipboard.writeText(url).then(function () {
+        headline.classList.add('link-copied');
+        setTimeout(function () { headline.classList.remove('link-copied'); }, 1500);
+      }).catch(function () {
+        // Fallback for older browsers
+        var input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        headline.classList.add('link-copied');
+        setTimeout(function () { headline.classList.remove('link-copied'); }, 1500);
+      });
+    });
+  });
+
+  // ──────────────────────────────────────────────
   // SMOOTH SCROLL (for CTA links)
   // ──────────────────────────────────────────────
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
