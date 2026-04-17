@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Internet_Barrier__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Applicant has self-reported an internet or device barrier.</description>
+    <externalId>false</externalId>
+    <label>Internet/Device Barrier</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

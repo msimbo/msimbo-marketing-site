@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Open - Not Contacted</fullName>
+        <default>true</default>
+        <label>Open - Not Contacted</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Working - Contacted</fullName>
+        <default>false</default>
+        <label>Working - Contacted</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Working - Onboarding</fullName>
+        <default>false</default>
+        <label>Working - Onboarding</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Working - Qualified</fullName>
+        <default>false</default>
+        <label>Working - Qualified</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Working - Unqualified</fullName>
+        <default>false</default>
+        <label>Working - Unqualified</label>
+        <converted>true</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Closed - Admitted</fullName>
+        <default>false</default>
+        <label>Closed - Admitted</label>
+        <converted>true</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Closed - Not Converted</fullName>
+        <default>false</default>
+        <label>Closed - Not Converted</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Closed - Converted</fullName>
+        <default>false</default>
+        <label>Closed - Converted</label>
+        <converted>true</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Assessment Pending</fullName>
+        <default>false</default>
+        <label>RTS - Assessment Pending</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Under Review</fullName>
+        <default>false</default>
+        <label>RTS - Under Review</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Assessment Complete</fullName>
+        <default>false</default>
+        <label>RTS - Assessment Complete</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 1 Requested</fullName>
+        <default>false</default>
+        <label>RTS - Interview 1 Requested</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 1 Scheduled</fullName>
+        <default>false</default>
+        <label>RTS - Interview 1 Scheduled</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 1 Complete</fullName>
+        <default>false</default>
+        <label>RTS - Interview 1 Complete</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 2 Requested</fullName>
+        <default>false</default>
+        <label>RTS - Interview 2 Requested</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 2 Scheduled</fullName>
+        <default>false</default>
+        <label>RTS - Interview 2 Scheduled</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Interview 2 Complete</fullName>
+        <default>false</default>
+        <label>RTS - Interview 2 Complete</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Accepted - Offer Sent</fullName>
+        <default>false</default>
+        <label>RTS - Accepted - Offer Sent</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Accepted - Confirmed</fullName>
+        <default>false</default>
+        <label>RTS - Accepted - Confirmed</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Waitlisted</fullName>
+        <default>false</default>
+        <label>RTS - Waitlisted</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Declined - Not Qualified</fullName>
+        <default>false</default>
+        <label>RTS - Declined - Not Qualified</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Declined - Withdrew</fullName>
+        <default>false</default>
+        <label>RTS - Declined - Withdrew</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Converted</fullName>
+        <default>false</default>
+        <label>RTS - Converted</label>
+        <converted>true</converted>
+    </standardValue>
+</StandardValueSet>

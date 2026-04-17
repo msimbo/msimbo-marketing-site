@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Childcare_Granted__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Case Manager approved childcare support for this applicant.</description>
+    <externalId>false</externalId>
+    <label>Childcare Granted</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

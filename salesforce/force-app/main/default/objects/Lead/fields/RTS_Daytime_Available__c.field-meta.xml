@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Daytime_Available__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Applicant can attend Mon-Wed 10 AM to 4 PM in-person. Required for program.</description>
+    <externalId>false</externalId>
+    <label>Available Daytime (M-W)</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

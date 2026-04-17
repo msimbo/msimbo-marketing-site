@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Transportation_Granted__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Case Manager approved transportation support for this applicant.</description>
+    <externalId>false</externalId>
+    <label>Transportation Granted</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

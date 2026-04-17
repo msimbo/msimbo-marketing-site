@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Wraparound_Notes__c</fullName>
+    <description>Case Manager wraparound notes (carried over from Lead).</description>
+    <externalId>false</externalId>
+    <label>RTS Wraparound Notes</label>
+    <length>2000</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

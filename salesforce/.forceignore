@@ -1,0 +1,7 @@
+# Ignore retrieved NPSP + PMM managed-package metadata on pull
+**/*.profile-meta.xml
+**/npsp__*
+**/pmdm__*
+
+# OS cruft
+.DS_Store
