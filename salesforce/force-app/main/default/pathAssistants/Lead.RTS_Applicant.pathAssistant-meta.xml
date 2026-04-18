@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead.RTS_Applicant</fullName>
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>RTS Applicant Path</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Assessment_Status__c</fieldNames>
+        <info>Applicant just submitted. They should have received the assessment link in the confirmation email.</info>
+        <picklistValueName>RTS - Assessment Pending</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Assessment_Status__c</fieldNames>
+        <fieldNames>RTS_Assessment_Notes__c</fieldNames>
+        <info>Coordinator review of application plus assessment scores.</info>
+        <picklistValueName>RTS - Under Review</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_CLIK_Score__c</fieldNames>
+        <fieldNames>RTS_CCAT_Score__c</fieldNames>
+        <fieldNames>RTS_CBST2_Score__c</fieldNames>
+        <info>All three Criteria Core assessments scored. Verify thresholds before advancing.</info>
+        <picklistValueName>RTS - Assessment Complete</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Instructor invitation email sent automatically. Waiting for applicant to book via Lunacal.</info>
+        <picklistValueName>RTS - Interview 1 Requested</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Instructor_Interview_DateTime__c</fieldNames>
+        <info>Applicant booked via Lunacal. DateTime auto-populated by n8n.</info>
+        <picklistValueName>RTS - Interview 1 Scheduled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Instructor_Interview_Outcome__c</fieldNames>
+        <fieldNames>RTS_Instructor_Interview_Notes__c</fieldNames>
+        <info>Instructor interview done. Log outcome before advancing.</info>
+        <picklistValueName>RTS - Interview 1 Complete</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Case Manager invitation email sent. Waiting for applicant to book via Lunacal.</info>
+        <picklistValueName>RTS - Interview 2 Requested</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_CM_Interview_DateTime__c</fieldNames>
+        <info>Applicant booked the Case Manager interview via Lunacal.</info>
+        <picklistValueName>RTS - Interview 2 Scheduled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_CM_Interview_Outcome__c</fieldNames>
+        <fieldNames>RTS_CM_Interview_Notes__c</fieldNames>
+        <fieldNames>RTS_Wraparound_Notes__c</fieldNames>
+        <info>Case Manager interview done. Log outcome plus any wraparound support granted.</info>
+        <picklistValueName>RTS - Interview 2 Complete</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Decision__c</fieldNames>
+        <fieldNames>RTS_Offer_Sent_Date__c</fieldNames>
+        <info>Offer email sent. 5-day follow-up task created. Waiting for applicant to confirm.</info>
+        <picklistValueName>RTS - Accepted - Offer Sent</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Offer_Response__c</fieldNames>
+        <fieldNames>RTS_Offer_Response_Date__c</fieldNames>
+        <info>Applicant confirmed their seat. Convert to Contact and create Program Engagement.</info>
+        <picklistValueName>RTS - Accepted - Confirmed</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Decision_Reason__c</fieldNames>
+        <info>Waitlist notification sent.</info>
+        <picklistValueName>RTS - Waitlisted</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Decision_Reason__c</fieldNames>
+        <info>Decline notification sent.</info>
+        <picklistValueName>RTS - Declined - Not Qualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Applicant withdrew. No email sent.</info>
+        <picklistValueName>RTS - Declined - Withdrew</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Lead converted to Contact. Program Engagement created in NPC/PMM.</info>
+        <picklistValueName>RTS - Converted</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>RTS_Applicant</recordTypeName>
+</PathAssistant>
