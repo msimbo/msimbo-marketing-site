@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent when Coordinator sets Lead status to Waitlisted. Applicant is held for Cohort 1 seat availability through May 5 and encouraged toward Cohort 2.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>RTS Waitlist Notification</name>
+    <style>none</style>
+    <subject>Your RTS application. An update from our team.</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Decline notification sent when Coordinator sets Lead status to Declined - Not Qualified. Encourages reapplication to Cohort 2.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>RTS Application Status Update</name>
+    <style>none</style>
+    <subject>An update on your RTS application, {!Lead.FirstName}.</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

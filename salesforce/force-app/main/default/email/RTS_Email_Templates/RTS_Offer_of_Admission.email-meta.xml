@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Offer letter sent when Coordinator sets Lead status to Accepted - Offer Sent. Applicant must reply with "I confirm" within 5 days.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>RTS Offer of Admission</name>
+    <style>none</style>
+    <subject>Congratulations, {!Lead.FirstName}. You've been accepted to RTS Cohort 1.</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>
