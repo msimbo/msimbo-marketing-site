@@ -293,6 +293,10 @@
         <field>RTS_Cohort__c.Cohort_Notes__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <recordTypeVisibilities>
+        <recordType>Lead.RTS_Applicant</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
     <tabSettings>
         <tab>RTS_Cohort__c</tab>
         <visibility>Available</visibility>
