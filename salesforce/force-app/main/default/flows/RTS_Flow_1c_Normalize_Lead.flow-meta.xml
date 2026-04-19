@@ -38,7 +38,7 @@
             <field>Username</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>domotosho@ulem.org</stringValue>
+                <stringValue>bguzman@ulem.org</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
