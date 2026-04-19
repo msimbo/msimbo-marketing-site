@@ -162,7 +162,7 @@
         <h2 class="section-headline">Start With an Info Session</h2>
         <div class="form-card__rule" aria-hidden="true"></div>
         <p class="form-card__sub">Join us for a free 30-minute session to learn about the program, meet the instructor, and ask questions. No commitment required.</p>
-        <p class="form-card__schedule">Program runs Mon&ndash;Wed 10 AM&ndash;4 PM + Thu&ndash;Fri remote for 10 weeks starting May 18, 2026.</p>
+        <p class="form-card__schedule">Program runs Mon&ndash;Wed 10 AM&ndash;4 PM + Thu&ndash;Fri remote for 10 weeks starting May 11, 2026.</p>
 
         <form id="infoSessionForm" class="form" novalidate>
           <fieldset>
@@ -302,35 +302,152 @@
         <div class="form-card__rule" aria-hidden="true"></div>
         <p class="form-card__sub form-card__sub--light">If you've already attended an info session &mdash; or you've seen enough and you're ready &mdash; submit your application here. We'll follow up within 48 hours.</p>
 
-        <form id="applicationForm" class="form form--dark" novalidate>
-          <div class="form__fields">
-            <div class="form__group">
-              <label for="appName" class="form__label">Full Name</label>
-              <input type="text" id="appName" name="fullName" class="form__input" required autocomplete="name" placeholder="Your full name">
-              <div class="form__error" id="appNameError" role="alert" aria-live="polite"></div>
-            </div>
-            <div class="form__group">
-              <label for="appEmail" class="form__label">Email Address</label>
-              <input type="email" id="appEmail" name="email" class="form__input" required autocomplete="email" placeholder="you@example.com">
-              <div class="form__error" id="appEmailError" role="alert" aria-live="polite"></div>
-            </div>
-            <div class="form__group">
-              <label for="appPhone" class="form__label">Phone Number</label>
-              <input type="tel" id="appPhone" name="phone" class="form__input" required autocomplete="tel" placeholder="(617) 555-0100">
-              <div class="form__error" id="appPhoneError" role="alert" aria-live="polite"></div>
-            </div>
-            <div class="form__group">
-              <label for="appZip" class="form__label">Zip Code</label>
-              <input type="text" id="appZip" name="zipCode" class="form__input" required autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="02119">
-              <div class="form__error" id="appZipError" role="alert" aria-live="polite"></div>
-            </div>
+        <form id="applicationForm" class="form form--dark form--wizard" novalidate>
+          <!-- Progress indicator -->
+          <div class="wizard__progress" aria-hidden="true">
+            <div class="wizard__progress-bar"><span class="wizard__progress-fill" id="wizProgressFill"></span></div>
+            <p class="wizard__progress-label"><span id="wizStepLabel">Step 1 of 4</span> &middot; <span id="wizStepTitle">Your contact info</span></p>
           </div>
 
-          <button type="submit" class="btn btn--primary btn--full" id="appSubmitBtn">
-            <span class="btn__text">Submit Your Application <span aria-hidden="true">&rarr;</span></span>
-            <span class="btn__spinner" aria-hidden="true"></span>
-          </button>
-          <p class="form__reassure form__reassure--light">Applications are reviewed on a rolling basis. Cohort 1 begins May 18, 2026 with <strong>15 seats available.</strong></p>
+          <!-- Step 1 — Contact -->
+          <fieldset class="wizard__step wizard__step--active" data-step="1">
+            <legend class="wizard__legend">Your contact info</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appFirstName" class="form__label">First Name</label>
+                <input type="text" id="appFirstName" name="firstName" class="form__input" required autocomplete="given-name" placeholder="Your first name">
+                <div class="form__error" id="appFirstNameError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appLastName" class="form__label">Last Name</label>
+                <input type="text" id="appLastName" name="lastName" class="form__input" required autocomplete="family-name" placeholder="Your last name">
+                <div class="form__error" id="appLastNameError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEmail" class="form__label">Email Address</label>
+                <input type="email" id="appEmail" name="email" class="form__input" required autocomplete="email" placeholder="you@example.com">
+                <div class="form__error" id="appEmailError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appPhone" class="form__label">Phone Number</label>
+                <input type="tel" id="appPhone" name="phone" class="form__input" required autocomplete="tel" placeholder="(617) 555-0100">
+                <div class="form__error" id="appPhoneError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Step 2 — Eligibility -->
+          <fieldset class="wizard__step" data-step="2" hidden>
+            <legend class="wizard__legend">Eligibility</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appDob" class="form__label">Date of Birth</label>
+                <input type="date" id="appDob" name="dateOfBirth" class="form__input" required autocomplete="bday">
+                <p class="form__hint form__hint--light">Used only for program eligibility. You must be 18 or older.</p>
+                <div class="form__error" id="appDobError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appZip" class="form__label">Zip Code</label>
+                <input type="text" id="appZip" name="zipCode" class="form__input" required autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="02119">
+                <div class="form__error" id="appZipError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label class="form__checkbox-label">
+                  <input type="checkbox" id="appDaytime" name="daytimeAvailable" class="form__checkbox" required>
+                  <span>I can attend in person Monday through Wednesday, 10 AM to 4 PM, for 10 weeks starting May 11, 2026.</span>
+                </label>
+                <div class="form__error" id="appDaytimeError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Step 3 — Background -->
+          <fieldset class="wizard__step" data-step="3" hidden>
+            <legend class="wizard__legend">Your background</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appNeighborhood" class="form__label">Neighborhood</label>
+                <input type="text" id="appNeighborhood" name="neighborhood" class="form__input" required placeholder="e.g., Roxbury, Dorchester">
+                <div class="form__error" id="appNeighborhoodError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appLanguage" class="form__label">Primary Language</label>
+                <input type="text" id="appLanguage" name="primaryLanguage" class="form__input" required placeholder="English">
+                <div class="form__error" id="appLanguageError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEmployment" class="form__label">Employment Status</label>
+                <select id="appEmployment" name="employmentStatus" class="form__input form__select" required>
+                  <option value="">Select one</option>
+                  <option value="Employed FT">Employed full-time</option>
+                  <option value="Employed PT">Employed part-time</option>
+                  <option value="Unemployed">Unemployed</option>
+                  <option value="Student">Student</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="form__error" id="appEmploymentError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEducation" class="form__label">Highest Education Completed</label>
+                <select id="appEducation" name="educationLevel" class="form__input form__select" required>
+                  <option value="">Select one</option>
+                  <option value="Less than HS">Less than high school</option>
+                  <option value="HS/GED">High school or GED</option>
+                  <option value="Some College">Some college</option>
+                  <option value="Associate's">Associate's degree</option>
+                  <option value="Bachelor's">Bachelor's degree</option>
+                  <option value="Graduate">Graduate degree</option>
+                </select>
+                <div class="form__error" id="appEducationError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label for="appReferral" class="form__label">How did you hear about RTS?</label>
+                <select id="appReferral" name="referralSource" class="form__input form__select" required>
+                  <option value="">Select one</option>
+                  <option value="Google">Google search</option>
+                  <option value="Facebook/Instagram">Facebook or Instagram</option>
+                  <option value="Friend/Family">Friend or family member</option>
+                  <option value="Flyer">Flyer or poster</option>
+                  <option value="Partner Org">Partner organization</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="form__error" id="appReferralError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Step 4 — Motivation -->
+          <fieldset class="wizard__step" data-step="4" hidden>
+            <legend class="wizard__legend">Your motivation</legend>
+            <div class="form__fields">
+              <div class="form__group form__group--full">
+                <label for="appMotivationNow" class="form__label">Where are you now in your career?</label>
+                <textarea id="appMotivationNow" name="motivationNow" class="form__input form__textarea" required rows="4" minlength="50" maxlength="500" placeholder="A few sentences about where you are today — your current role, recent experience, or what brought you here."></textarea>
+                <p class="form__hint form__hint--light"><span id="appMotivationNowCount">0</span> / 500 characters (50 minimum)</p>
+                <div class="form__error" id="appMotivationNowError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label for="appMotivationGoal" class="form__label">What does success look like for you after RTS?</label>
+                <textarea id="appMotivationGoal" name="motivationGoal" class="form__input form__textarea" required rows="4" minlength="50" maxlength="500" placeholder="A few sentences about what you want this program to help you do — the role, the life, or the outcome you're working toward."></textarea>
+                <p class="form__hint form__hint--light"><span id="appMotivationGoalCount">0</span> / 500 characters (50 minimum)</p>
+                <div class="form__error" id="appMotivationGoalError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Wizard controls -->
+          <div class="wizard__controls">
+            <button type="button" class="btn btn--ghost" id="wizBackBtn" hidden>&larr; Back</button>
+            <button type="button" class="btn btn--primary" id="wizNextBtn">Continue <span aria-hidden="true">&rarr;</span></button>
+            <button type="submit" class="btn btn--primary" id="appSubmitBtn" hidden>
+              <span class="btn__text">Submit Your Application <span aria-hidden="true">&rarr;</span></span>
+              <span class="btn__spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="form__error form__error--summary" id="appFormError" role="alert" aria-live="polite"></div>
+
+          <p class="form__reassure form__reassure--light">Applications are reviewed on a rolling basis. Cohort 1 begins May 11, 2026 with <strong>15 seats available.</strong></p>
         </form>
 
         <!-- Success: JS redirects to /thank-you-application.html -->
@@ -456,7 +573,7 @@
             <span class="accordion__icon" aria-hidden="true"></span>
           </summary>
           <div class="accordion__body">
-            <p>Cohort 1 launches May 18, 2026 with 15 seats. We plan to run additional cohorts throughout the year. Attend an info session to learn more and get early access to the application.</p>
+            <p>Cohort 1 launches May 11, 2026 with 15 seats. We plan to run additional cohorts throughout the year. Attend an info session to learn more and get early access to the application.</p>
           </div>
         </details>
         <details class="accordion__item">
@@ -496,7 +613,7 @@
     <div class="container">
       <img src="/assets/ulem-logo.png" alt="" class="final-cta__logo" width="40" height="40" aria-hidden="true" loading="lazy">
       <h2 class="final-cta__headline">15 Seats. One Cohort. <em>Your Moment.</em></h2>
-      <p class="final-cta__sub">The first community-based RevOps training program in the U.S. starts May 18, 2026. Don't miss it.</p>
+      <p class="final-cta__sub">The first community-based RevOps training program in the U.S. starts May 11, 2026. Don't miss it.</p>
       <div class="final-cta__actions">
         <a href="#info-session" class="btn btn--primary">Reserve Your Spot at an Info Session <span aria-hidden="true">&rarr;</span></a>
         <a href="#apply" class="final-cta__secondary">or Apply Now <span aria-hidden="true">&rarr;</span></a>

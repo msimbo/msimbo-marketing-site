@@ -1175,3 +1175,135 @@ em { font-family: var(--font-display); font-style: italic; }
   .form-section--light, .form-section--dark { padding: 80px 0; }
   .final-cta { padding: 80px 0 64px; }
 }
+
+/* ==================== APPLICATION WIZARD ==================== */
+.form--wizard { display: flex; flex-direction: column; gap: 24px; }
+
+.wizard__progress { margin-bottom: 8px; }
+.wizard__progress-bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.wizard__progress-fill {
+  display: block;
+  height: 100%;
+  width: 25%;
+  background: var(--color-primary, #E8BE73);
+  transition: width 280ms ease;
+  border-radius: 2px;
+}
+.wizard__progress-label {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.wizard__step { border: 0; padding: 0; margin: 0; }
+.wizard__step[hidden] { display: none; }
+
+/* Force the hidden attribute to win over inline-flex on buttons */
+.form--wizard [hidden] { display: none !important; }
+.wizard__legend {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: 22px;
+  color: #fff;
+  margin-bottom: 18px;
+  padding: 0;
+  letter-spacing: -0.01em;
+}
+
+.wizard__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.wizard__controls .btn { min-width: 140px; }
+.wizard__controls #wizBackBtn { margin-right: auto; }
+.wizard__controls #wizNextBtn,
+.wizard__controls #appSubmitBtn { margin-left: auto; }
+
+/* Make button ghost variant for Back */
+.btn--ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.btn--ghost:hover { border-color: rgba(255, 255, 255, 0.6); color: #fff; }
+
+/* Checkbox styling for dark form */
+.form__checkbox-label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.form__checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary, #E8BE73);
+}
+
+/* Select styling to match inputs */
+.form__select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+/* Textarea */
+.form__textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* Hint / help text under fields */
+.form__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.01em;
+}
+.form__hint--light { color: rgba(255, 255, 255, 0.55); }
+
+/* Full-width form groups (span both columns in 2-col layouts) */
+.form__group--full { grid-column: 1 / -1; }
+
+/* Form-level error summary (for submission failures / duplicates) */
+.form__error--summary {
+  text-align: center;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  color: #fda4af;
+  font-size: 14px;
+  min-height: 0;
+}
+.form__error--summary:empty {
+  display: none;
+}
+
