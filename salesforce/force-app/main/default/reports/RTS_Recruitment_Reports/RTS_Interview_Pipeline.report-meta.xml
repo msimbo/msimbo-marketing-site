@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Lead.RTS_Instructor_Interview_DateTime__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_Instructor_Interview_Outcome__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_CM_Interview_DateTime__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_CM_Interview_Outcome__c</field>
+    </columns>
+    <description>Active interview candidates grouped by Status. Shows applicants at Interview 1 Requested through Interview 2 Complete with both interview dates and outcomes visible.</description>
+    <filter>
+        <criteriaItems>
+            <column>STATUS</column>
+            <operator>equals</operator>
+            <value>RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Interview 2 Requested,RTS - Interview 2 Scheduled,RTS - Interview 2 Complete</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>STATUS</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>RTS Interview Pipeline</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>LeadList</reportType>
+    <scope>user</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

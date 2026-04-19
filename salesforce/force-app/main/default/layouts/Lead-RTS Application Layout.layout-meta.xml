@@ -20,6 +20,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>RTS_Date_of_Birth__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>RTS_Zip_Code__c</field>
             </layoutItems>
             <layoutItems>
@@ -88,6 +92,10 @@
                 <field>RTS_Assessment_Date__c</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>RTS_Assessment_Attempts__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
                 <field>RTS_Assessment_Notes__c</field>
             </layoutItems>
@@ -107,6 +115,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>RTS_Instructor_Interview_Outcome__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>RTS_Instructor_Invite_Sent__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -130,6 +142,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>RTS_CM_Interview_Outcome__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>RTS_CM_Invite_Sent__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

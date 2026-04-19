@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Lead.RTS_Applicant</fullName>
+    <fullName>RTS_Applicant</fullName>
     <active>true</active>
     <entityName>Lead</entityName>
     <fieldName>Status</fieldName>
@@ -11,16 +11,11 @@
         <picklistValueName>RTS - Assessment Pending</picklistValueName>
     </pathAssistantSteps>
     <pathAssistantSteps>
-        <fieldNames>RTS_Assessment_Status__c</fieldNames>
-        <fieldNames>RTS_Assessment_Notes__c</fieldNames>
-        <info>Coordinator review of application plus assessment scores.</info>
-        <picklistValueName>RTS - Under Review</picklistValueName>
-    </pathAssistantSteps>
-    <pathAssistantSteps>
         <fieldNames>RTS_CLIK_Score__c</fieldNames>
         <fieldNames>RTS_CCAT_Score__c</fieldNames>
         <fieldNames>RTS_CBST2_Score__c</fieldNames>
-        <info>All three Criteria Core assessments scored. Verify thresholds before advancing.</info>
+        <fieldNames>RTS_Assessment_Notes__c</fieldNames>
+        <info>All three Criteria Core assessments scored. Verify thresholds and review the application before advancing to Interview 1.</info>
         <picklistValueName>RTS - Assessment Complete</picklistValueName>
     </pathAssistantSteps>
     <pathAssistantSteps>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Send_Instructor_Interview_Invitation</name>
+        <label>Send Instructor Interview Invitation</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <actionName>Lead.RTS_Send_Instructor_Interview_Invitation</actionName>
+        <actionType>emailAlert</actionType>
+        <connector>
+            <targetReference>Mark_Invite_Sent</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Lead.RTS_Send_Instructor_Interview_Invitation</nameSegment>
+    </actionCalls>
+    <apiVersion>62.0</apiVersion>
+    <recordUpdates>
+        <name>Mark_Invite_Sent</name>
+        <label>Mark Instructor Invite Sent</label>
+        <locationX>176</locationX>
+        <locationY>408</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>RTS_Instructor_Invite_Sent__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
+    <description>Fires when Coordinator moves a Lead to Status = RTS - Interview 1 Requested. Sends the Instructor Interview Invitation email (with Lunacal booking link) and flips RTS_Instructor_Invite_Sent__c to true to prevent duplicates. Does not change Status — Lunacal webhook advances it to Interview 1 Scheduled when the applicant books.</description>
+    <environments>Default</environments>
+    <interviewLabel>RTS Flow 2 — Instructor Interview Invitation {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RTS Flow 2 — Instructor Interview Invitation</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Send_Instructor_Interview_Invitation</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Status</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>RTS - Interview 1 Requested</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>RTS_Instructor_Invite_Sent__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

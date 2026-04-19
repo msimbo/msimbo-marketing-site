@@ -20,6 +20,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Lead.RTS_Date_of_Birth__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Lead.RTS_Neighborhood__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -100,6 +105,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Lead.RTS_Instructor_Invite_Sent__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.RTS_Assessment_Attempts__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Lead.RTS_Instructor_Interview_Notes__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -111,6 +126,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.RTS_CM_Interview_DateTime__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.RTS_CM_Invite_Sent__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

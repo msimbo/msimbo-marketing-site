@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Instructor_Invite_Sent__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Set true by Flow 2 when the Instructor Interview Invitation email fires. Prevents duplicate sends if the Lead is re-saved in Interview 1 Requested.</description>
+    <externalId>false</externalId>
+    <label>Instructor Invite Sent</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

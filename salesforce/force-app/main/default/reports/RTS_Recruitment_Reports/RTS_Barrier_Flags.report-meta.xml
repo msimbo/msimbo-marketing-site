@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Lead.RTS_Transportation_Barrier__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_Childcare_Barrier__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_Internet_Barrier__c</field>
+    </columns>
+    <columns>
+        <field>STATUS</field>
+    </columns>
+    <description>Wraparound support flags for RTS Cohort 1 applicants who have advanced past assessment. Informs budget for transportation, childcare, and laptop/internet support.</description>
+    <filter>
+        <criteriaItems>
+            <column>STATUS</column>
+            <operator>notEqual</operator>
+            <value>RTS - Assessment Pending,RTS - Declined - Not Qualified,RTS - Declined - Withdrew</value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>RTS Barrier Flags</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>LeadList</reportType>
+    <scope>user</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

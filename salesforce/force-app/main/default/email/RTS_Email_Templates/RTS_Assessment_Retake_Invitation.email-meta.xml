@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent when Coordinator sets Assessment Status to Retake Required. Includes the Criteria Core assessment link and a 3-day window. Invoked by Flow 8 only when Attempts &lt; 2.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>RTS Assessment Retake Invitation</name>
+    <style>none</style>
+    <subject>Retake invitation for your RTS assessment, {!Lead.FirstName}</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

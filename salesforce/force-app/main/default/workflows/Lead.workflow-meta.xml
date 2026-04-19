@@ -5,9 +5,10 @@
         <description>Sends RTS Application Received email (includes Criteria Core assessment link) when a new RTS Website Lead is created. Invoked by Flow 1.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Application_Received</template>
     </alerts>
@@ -16,9 +17,10 @@
         <description>Sends RTS Instructor Interview Invitation email with Lunacal booking link when Coordinator moves Lead to Interview 1 Requested. Invoked by Flow 2.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Instructor_Interview_Invitation</template>
     </alerts>
@@ -27,9 +29,10 @@
         <description>Sends RTS Case Manager Interview Invitation email with Lunacal booking link when Coordinator advances Lead to Interview 2 Requested. Invoked by Flow 3.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Case_Manager_Interview_Invitation</template>
     </alerts>
@@ -38,9 +41,10 @@
         <description>Sends RTS Offer of Admission email when Coordinator moves Lead to Accepted - Offer Sent. Invoked by Flow 4.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Offer_of_Admission</template>
     </alerts>
@@ -49,9 +53,10 @@
         <description>Sends RTS Waitlist Notification email when Coordinator moves Lead to Waitlisted. Invoked by Flow 5.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Waitlist_Notification</template>
     </alerts>
@@ -60,20 +65,34 @@
         <description>Sends RTS Application Status Update (decline) email when Coordinator moves Lead to Declined - Not Qualified. Invoked by Flow 6.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Application_Status_Update</template>
+    </alerts>
+    <alerts>
+        <fullName>RTS_Send_Assessment_Retake_Invitation</fullName>
+        <description>Sends RTS Assessment Retake Invitation email when Coordinator sets Assessment Status to Retake Required. Invoked by Flow 8 (only when Attempts &lt; 2).</description>
+        <protected>false</protected>
+        <recipients>
+            <field>Email</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>program-rts@ulem.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>RTS_Email_Templates/RTS_Assessment_Retake_Invitation</template>
     </alerts>
     <alerts>
         <fullName>RTS_Send_Enrollment_Confirmation</fullName>
         <description>Sends RTS Enrollment Confirmation email when Coordinator moves Lead to Accepted - Confirmed. Invoked by Flow 7.</description>
         <protected>false</protected>
         <recipients>
-            <type>creator</type>
+            <field>Email</field>
+            <type>email</type>
         </recipients>
-        <senderAddress>programs@ulem.org</senderAddress>
+        <senderAddress>program-rts@ulem.org</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Enrollment_Confirmation</template>
     </alerts>

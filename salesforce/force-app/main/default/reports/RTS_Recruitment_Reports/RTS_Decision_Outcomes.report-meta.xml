@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Lead.RTS_Decision_Reason__c</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_Decision_Date__c</field>
+    </columns>
+    <description>Accept / Waitlist / Decline breakdown with decision reasons for RTS Cohort 1.</description>
+    <filter>
+        <criteriaItems>
+            <column>Lead.RTS_Decision__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Lead.RTS_Decision__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>RTS Decision Outcomes</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>LeadList</reportType>
+    <scope>user</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

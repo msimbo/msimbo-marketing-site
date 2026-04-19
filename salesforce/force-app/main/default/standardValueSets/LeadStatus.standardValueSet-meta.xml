@@ -56,12 +56,6 @@
         <converted>false</converted>
     </standardValue>
     <standardValue>
-        <fullName>RTS - Under Review</fullName>
-        <default>false</default>
-        <label>RTS - Under Review</label>
-        <converted>false</converted>
-    </standardValue>
-    <standardValue>
         <fullName>RTS - Assessment Complete</fullName>
         <default>false</default>
         <label>RTS - Assessment Complete</label>
