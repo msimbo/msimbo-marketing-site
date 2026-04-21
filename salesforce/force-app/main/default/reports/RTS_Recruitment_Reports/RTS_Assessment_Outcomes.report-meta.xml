@@ -29,12 +29,14 @@
         <value>1</value>
     </params>
     <reportType>LeadList</reportType>
-    <scope>user</scope>
+    <scope>allusers</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
     <timeFrameFilter>
         <dateColumn>CREATED_DATE</dateColumn>
+        <endDate>2030-12-31</endDate>
         <interval>INTERVAL_CUSTOM</interval>
+        <startDate>2020-01-01</startDate>
     </timeFrameFilter>
 </Report>

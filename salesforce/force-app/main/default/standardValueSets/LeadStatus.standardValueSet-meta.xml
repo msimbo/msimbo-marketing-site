@@ -52,85 +52,85 @@
     <standardValue>
         <fullName>RTS - Assessment Pending</fullName>
         <default>false</default>
-        <label>RTS - Assessment Pending</label>
+        <label>Assess Pending</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Assessment Complete</fullName>
         <default>false</default>
-        <label>RTS - Assessment Complete</label>
+        <label>Assess Complete</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 1 Requested</fullName>
         <default>false</default>
-        <label>RTS - Interview 1 Requested</label>
+        <label>Int1 Req</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 1 Scheduled</fullName>
         <default>false</default>
-        <label>RTS - Interview 1 Scheduled</label>
+        <label>Int1 Sched</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 1 Complete</fullName>
         <default>false</default>
-        <label>RTS - Interview 1 Complete</label>
+        <label>Int1 Done</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 2 Requested</fullName>
         <default>false</default>
-        <label>RTS - Interview 2 Requested</label>
+        <label>Int2 Req</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 2 Scheduled</fullName>
         <default>false</default>
-        <label>RTS - Interview 2 Scheduled</label>
+        <label>Int2 Sched</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 2 Complete</fullName>
         <default>false</default>
-        <label>RTS - Interview 2 Complete</label>
+        <label>Int2 Done</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Accepted - Offer Sent</fullName>
         <default>false</default>
-        <label>RTS - Accepted - Offer Sent</label>
+        <label>Offer Sent</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Accepted - Confirmed</fullName>
         <default>false</default>
-        <label>RTS - Accepted - Confirmed</label>
+        <label>Offer Confirmed</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Waitlisted</fullName>
         <default>false</default>
-        <label>RTS - Waitlisted</label>
+        <label>Waitlisted</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Declined - Not Qualified</fullName>
         <default>false</default>
-        <label>RTS - Declined - Not Qualified</label>
+        <label>Declined-NotQual</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Declined - Withdrew</fullName>
         <default>false</default>
-        <label>RTS - Declined - Withdrew</label>
+        <label>Declined-Withdrew</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Converted</fullName>
         <default>false</default>
-        <label>RTS - Converted</label>
+        <label>Converted-RTS</label>
         <converted>true</converted>
     </standardValue>
 </StandardValueSet>
