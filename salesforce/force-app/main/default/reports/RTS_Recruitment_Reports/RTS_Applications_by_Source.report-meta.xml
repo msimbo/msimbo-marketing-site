@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Distribution of RTS Cohort 1 applicants by referral source (Google, Facebook, Friend/Family, Flyer, Partner Org, Other).</description>
+    <filter>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>

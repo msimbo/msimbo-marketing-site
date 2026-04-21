@@ -533,7 +533,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 > Questions? Reply to this email or reach us at programs@ulem.org.
 >
 > We'll be in touch,
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -560,7 +560,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > We look forward to speaking with you!
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -583,7 +583,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > After this interview, our team will make a final decision and be in touch shortly.
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -615,7 +615,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > We can't wait to have you in the cohort. Congratulations again.
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -637,7 +637,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > Thank you for your patience — and for your interest in building a career in tech. We hope to work with you soon.
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -662,7 +662,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > Thank you again for your interest. We wish you the very best.
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 
@@ -692,7 +692,7 @@ All templates live in **Setup → Classic Email Templates** or **Lightning Email
 >
 > We are so excited to have you. See you May 18.
 >
-> The RTS Team at ULEM
+> The MSIMBO Team at ULEM
 
 ---
 

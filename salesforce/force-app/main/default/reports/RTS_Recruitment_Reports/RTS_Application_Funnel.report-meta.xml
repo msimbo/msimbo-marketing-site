@@ -7,6 +7,13 @@
         <field>CREATED_DATE</field>
     </columns>
     <description>Count of RTS Cohort 1 applicants at each Status stage. Scoped to leads whose linked Cohort is in Recruiting status, so it stays accurate when Cohort 2 opens.</description>
+    <filter>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>

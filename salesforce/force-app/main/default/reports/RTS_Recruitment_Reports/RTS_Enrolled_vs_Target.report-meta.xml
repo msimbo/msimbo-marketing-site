@@ -9,12 +9,22 @@
     <description>Count of RTS Cohort 1 applicants who have confirmed enrollment. Used by the Enrolled vs Target gauge (0-15) on the dashboard.</description>
     <filter>
         <criteriaItems>
+            <column>Lead.RTS_Cohort__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
             <column>STATUS</column>
             <operator>equals</operator>
             <value>RTS - Accepted - Confirmed</value>
         </criteriaItems>
     </filter>
-    <format>Tabular</format>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>STATUS</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
     <name>RTS Enrolled vs Target</name>
     <params>
         <name>co</name>

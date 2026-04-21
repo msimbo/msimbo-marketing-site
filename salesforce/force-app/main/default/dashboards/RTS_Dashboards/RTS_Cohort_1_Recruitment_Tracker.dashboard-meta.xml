@@ -4,7 +4,7 @@
     <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
     <backgroundStartColor>#FFFFFF</backgroundStartColor>
     <dashboardType>SpecifiedUser</dashboardType>
-    <description>Live recruitment tracker for RTS Cohort 1 — May 2026. Running user is domotosho@ulem.org (Acting Director).</description>
+    <description>Live recruitment tracker for RTS Cohort 1 — May 2026. Running user is bguzman@ulem.org (Program Coordinator, owns all RTS leads).</description>
     <isGridLayout>false</isGridLayout>
     <leftSection>
         <columnSize>Medium</columnSize>
@@ -169,7 +169,7 @@
             <useReportChart>false</useReportChart>
         </components>
     </rightSection>
-    <runningUser>domotosho@ulem.org</runningUser>
+    <runningUser>bguzman@ulem.org</runningUser>
     <textColor>#000000</textColor>
     <title>RTS Cohort 1 — Recruitment Tracker</title>
     <titleColor>#000000</titleColor>

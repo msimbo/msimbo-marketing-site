@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Letterhead xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <backgroundColor>#F5F5F7</backgroundColor>
+    <bodyColor>#FFFFFF</bodyColor>
+    <description>Shared letterhead for all RTS (MSIMBO) program email templates</description>
+    <name>RTS Letterhead</name>
+    <topLine>
+        <color>#7F56D9</color>
+        <height>4</height>
+    </topLine>
+    <header>
+        <backgroundColor>#FFFFFF</backgroundColor>
+        <height>0</height>
+    </header>
+    <middleLine>
+        <color>#EAECF0</color>
+        <height>1</height>
+    </middleLine>
+    <bottomLine>
+        <color>#EAECF0</color>
+        <height>1</height>
+    </bottomLine>
+    <footer>
+        <backgroundColor>#F9FAFB</backgroundColor>
+        <height>0</height>
+    </footer>
+</Letterhead>
