@@ -96,4 +96,16 @@
         <senderType>OrgWideEmailAddress</senderType>
         <template>RTS_Email_Templates/RTS_Enrollment_Confirmation</template>
     </alerts>
+    <alerts>
+        <fullName>RTS_Send_Info_Session_Confirmation</fullName>
+        <description>Sends RTS Info Session Confirmation email to leads who RSVP via the landing page. Invoked by the Info Session Confirmation flow on Lead insert or when Info Session Date changes.</description>
+        <protected>false</protected>
+        <recipients>
+            <field>Email</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>program-rts@ulem.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>RTS_Email_Templates/RTS_Info_Session_Confirmation</template>
+    </alerts>
 </Workflow>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent automatically when a lead RSVPs to an RTS info session via the landing page. Confirms the session, sets expectations for the Google Calendar invite (sent separately by n8n), and soft-sells the application CTA.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>RTS Info Session Confirmation</name>
+    <style>none</style>
+    <subject>You're registered for the RTS info session, {!Lead.FirstName}</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

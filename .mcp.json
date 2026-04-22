@@ -28,9 +28,9 @@
         "-e",
         "DISABLE_CONSOLE_OUTPUT=true",
         "-e",
-        "N8N_API_URL=https://n8n.viz.li",
+        "N8N_API_URL",
         "-e",
-        "N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MWM5M2RhZS03Y2I3LTRhOTItODlkOS0wZTU2MmMzZjM1YTkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjIzMzI4ZjAtNDYwYi00ODYzLTg4MDctYjVjNWVmNDk5OWY1IiwiaWF0IjoxNzc2NDU5MjU2fQ.dEJPF0_dJuRQ8P04Mos0UFQM7gyxpwVlOnEEr2C-_Cs",
+        "N8N_API_KEY",
         "ghcr.io/czlonkowski/n8n-mcp:latest"
       ]
     }

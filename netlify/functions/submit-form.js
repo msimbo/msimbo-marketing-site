@@ -2,18 +2,24 @@
  * Netlify Serverless Function — Form submission proxy
  *
  * Routes:
- *   signupType === 'application' → Salesforce Web-to-Lead (RTS Cohort 1)
- *   signupType === 'info_session' → SwipeOne CRM (marketing nurture)
+ *   signupType === 'application'  → Salesforce
+ *                                    - If existing Info Session Lead: PATCH to promote (flip RecordType to Applicant)
+ *                                    - Else: Web-to-Lead (create as Applicant)
+ *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
+ *                                   + n8n webhook (Google Calendar invite)
  *
  * Required Netlify environment variables:
- *   SF_ORG_ID                 — Salesforce 15-char Org ID (e.g., 00D50000000cxiS)
- *   SF_RTS_COHORT_ID          — 15-char Cohort record ID (e.g., a1JUV000005GKMT)
- *   SF_RECORD_TYPE_ID         — 15-char RTS_Applicant RecordType Id (e.g., 012UV000003WmSn)
- *   SF_INSTANCE_URL           — e.g., https://ulem.my.salesforce.com
- *   SF_DUPE_CHECK_USERNAME    — integration user username (for SOQL duplicate check)
- *   SF_DUPE_CHECK_PASSWORD    — integration user password + security token
- *   SWIPEONE_API_KEY          — SwipeOne API key (for info-session flow)
- *   SWIPEONE_WORKSPACE_ID     — SwipeOne workspace ID
+ *   SF_ORG_ID                       — Salesforce 15-char Org ID
+ *   SF_RTS_COHORT_ID                — 15-char Cohort record ID (applications only)
+ *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
+ *   SF_INFO_SESSION_RECORD_TYPE_ID  — 15-char RTS_Info_Session RecordType Id
+ *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
+ *   SF_DUPE_CHECK_USERNAME          — integration user username (SOQL + PATCH)
+ *   SF_DUPE_CHECK_PASSWORD          — integration user password + security token
+ *   N8N_INFO_SESSION_WEBHOOK_URL    — https://protomated.app.n8n.cloud/webhook/<id>
+ *   USE_SF_INFO_SESSION             — 'true' to route info-session to SF; anything else = legacy SwipeOne path
+ *   SWIPEONE_API_KEY                — SwipeOne API key (legacy info-session fallback)
+ *   SWIPEONE_WORKSPACE_ID           — SwipeOne workspace ID (legacy info-session fallback)
  */
 
 // Lead custom field IDs (15-char) for Web-to-Lead
@@ -28,6 +34,26 @@ const SF_FIELDS = {
   referralSource: '00NUV00001BlCae',
   motivation: '00NUV00001BlCaY',
   cohort: '00NUV00001BlCaK',
+  // Info Session fields (15-char Web-to-Lead IDs). REST PATCH uses API names from SF_API_NAMES.
+  infoSessionDate: '00NUV00001CLmDW',
+  infoSessionSource: '00NUV00001CLmDX',
+};
+
+// API names used for REST PATCH (promote path). Fixed; no IDs needed.
+const SF_API_NAMES = {
+  infoSessionDate: 'RTS_Info_Session_Date__c',
+  infoSessionSource: 'RTS_Info_Session_Source__c',
+  infoSessionAttended: 'RTS_Info_Session_Attended__c',
+  dateOfBirth: 'RTS_Date_of_Birth__c',
+  zipCode: 'RTS_Zip_Code__c',
+  daytimeAvailable: 'RTS_Daytime_Available__c',
+  neighborhood: 'RTS_Neighborhood__c',
+  primaryLanguage: 'RTS_Primary_Language__c',
+  employmentStatus: 'RTS_Employment_Status__c',
+  educationLevel: 'RTS_Education_Level__c',
+  referralSource: 'RTS_Referral_Source__c',
+  motivation: 'RTS_Motivation__c',
+  cohort: 'RTS_Cohort__c',
 };
 
 exports.handler = async function (event) {
@@ -49,17 +75,24 @@ exports.handler = async function (event) {
   }
 
   if (data.signupType === 'application') {
-    return submitToSalesforce(data, headers);
+    return submitApplication(data, headers);
   }
 
-  return submitToSwipeOne(data, headers);
+  if (data.signupType === 'info_session') {
+    if (process.env.USE_SF_INFO_SESSION === 'true') {
+      return submitInfoSessionToSalesforce(data, headers);
+    }
+    return submitToSwipeOne(data, headers);
+  }
+
+  return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown signupType' }) };
 };
 
 // ──────────────────────────────────────────────
-// SALESFORCE APPLICATION FLOW
+// APPLICATION FLOW (with promote-from-info-session path)
 // ──────────────────────────────────────────────
 
-async function submitToSalesforce(data, headers) {
+async function submitApplication(data, headers) {
   const {
     SF_ORG_ID,
     SF_RTS_COHORT_ID,
@@ -74,42 +107,72 @@ async function submitToSalesforce(data, headers) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
   }
 
-  // Server-side validation
   const err = validateApplication(data);
   if (err) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: err }) };
   }
 
-  // Duplicate check (best-effort; non-blocking if creds missing)
+  // Look up existing Lead by email (any RecordType). If they're already an Applicant,
+  // reject as duplicate. If they're an Info Session Lead, promote via REST PATCH
+  // (preserves info-session fields for conversion funnel reporting).
+  let existingLead = null;
   if (SF_INSTANCE_URL && SF_DUPE_CHECK_USERNAME && SF_DUPE_CHECK_PASSWORD) {
     try {
-      const isDuplicate = await checkDuplicateLead(data.email, {
+      existingLead = await findLeadByEmail(data.email, {
         instanceUrl: SF_INSTANCE_URL,
         username: SF_DUPE_CHECK_USERNAME,
         password: SF_DUPE_CHECK_PASSWORD,
       });
-      if (isDuplicate) {
-        return {
-          statusCode: 409,
-          headers,
-          body: JSON.stringify({
-            error: "You've already applied to RTS Cohort 1 with this email. If this seems wrong, contact program-rts@ulem.org.",
-          }),
-        };
-      }
     } catch (e) {
-      console.error('Duplicate check failed (continuing):', e.message);
+      console.error('Lead lookup failed (continuing with W2L):', e.message);
     }
   }
 
-  // Combine motivation answers into one field
+  if (existingLead) {
+    if (existingLead.recordType === 'RTS_Applicant') {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({
+          error: "You've already applied to RTS Cohort 1 with this email. If this seems wrong, contact program-rts@ulem.org.",
+        }),
+      };
+    }
+
+    if (existingLead.recordType === 'RTS_Info_Session') {
+      // Promote: flip RecordType to Applicant and populate applicant fields.
+      // Info-session fields on the Lead are untouched (preserved for funnel reporting).
+      try {
+        await promoteLeadToApplicant(existingLead, data, {
+          instanceUrl: existingLead.instanceUrl,
+          sessionId: existingLead.sessionId,
+          recordTypeId: SF_RECORD_TYPE_ID,
+          cohortId: SF_RTS_COHORT_ID,
+        });
+        return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
+      } catch (e) {
+        console.error('Promote-to-applicant failed:', e.message);
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+        };
+      }
+    }
+  }
+
+  // No existing Lead (or unknown RecordType) → create via Web-to-Lead.
+  return createApplicantViaW2L(data, headers, { SF_ORG_ID, SF_RTS_COHORT_ID, SF_RECORD_TYPE_ID });
+}
+
+async function createApplicantViaW2L(data, headers, env) {
+  const { SF_ORG_ID, SF_RTS_COHORT_ID, SF_RECORD_TYPE_ID } = env;
+
   const motivationCombined =
     'Where I am now:\n' + data.motivationNow + '\n\n' +
     'Success after RTS:\n' + data.motivationGoal;
 
-  // Build Web-to-Lead form-encoded body
   const params = new URLSearchParams();
-  // Web-to-Lead requires a 15-char Org ID — slice defensively in case an 18-char ID was provided.
   params.append('oid', String(SF_ORG_ID).slice(0, 15));
   params.append('first_name', data.firstName);
   params.append('last_name', data.lastName);
@@ -118,7 +181,6 @@ async function submitToSalesforce(data, headers) {
   params.append('company', 'N/A');
   params.append('lead_source', 'Wesbite_msimbo.org');
 
-  // recordType hidden field sets the RecordTypeId at create time. Web-to-Lead accepts 15-char.
   if (SF_RECORD_TYPE_ID) params.append('recordType', String(SF_RECORD_TYPE_ID).slice(0, 15));
 
   params.append(SF_FIELDS.dateOfBirth, data.dateOfBirth);
@@ -130,7 +192,6 @@ async function submitToSalesforce(data, headers) {
   params.append(SF_FIELDS.educationLevel, data.educationLevel);
   params.append(SF_FIELDS.referralSource, data.referralSource);
   params.append(SF_FIELDS.motivation, motivationCombined);
-  // Cohort lookup field — use 15-char truncation to be safe
   if (SF_RTS_COHORT_ID) params.append(SF_FIELDS.cohort, String(SF_RTS_COHORT_ID).slice(0, 15));
 
   try {
@@ -140,8 +201,6 @@ async function submitToSalesforce(data, headers) {
       body: params.toString(),
     });
 
-    // Salesforce Web-to-Lead always returns 200 with HTML — there's no JSON response.
-    // The only way to verify the lead was created is via a subsequent SOQL query.
     if (!sfRes.ok) {
       console.error('Salesforce W2L returned status:', sfRes.status);
       return {
@@ -151,20 +210,143 @@ async function submitToSalesforce(data, headers) {
       };
     }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ status: 'success' }),
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
   } catch (err) {
     console.error('Salesforce W2L error:', err);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal server error' }) };
   }
 }
+
+// ──────────────────────────────────────────────
+// INFO SESSION FLOW (Salesforce path)
+// ──────────────────────────────────────────────
+
+async function submitInfoSessionToSalesforce(data, headers) {
+  const {
+    SF_ORG_ID,
+    SF_INFO_SESSION_RECORD_TYPE_ID,
+    N8N_INFO_SESSION_WEBHOOK_URL,
+  } = process.env;
+
+  if (!SF_ORG_ID) {
+    console.error('Missing SF_ORG_ID');
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
+  }
+
+  const err = validateInfoSession(data);
+  if (err) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: err }) };
+  }
+
+  // Fire the SF Web-to-Lead and n8n webhook in parallel. Neither blocks the other.
+  const sfPromise = createInfoSessionLeadViaW2L(data, { SF_ORG_ID, SF_INFO_SESSION_RECORD_TYPE_ID });
+  const n8nPromise = N8N_INFO_SESSION_WEBHOOK_URL
+    ? fireN8nWebhook(data, N8N_INFO_SESSION_WEBHOOK_URL)
+    : Promise.resolve();
+
+  const [sfResult, n8nResult] = await Promise.allSettled([sfPromise, n8nPromise]);
+
+  if (sfResult.status === 'rejected') {
+    console.error('Info-session SF W2L failed:', sfResult.reason);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
+  }
+  if (n8nResult.status === 'rejected') {
+    // Non-blocking: SF has the lead, calendar invite will be missing. Log and succeed.
+    console.error('n8n webhook failed (non-blocking):', n8nResult.reason);
+  }
+
+  return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
+}
+
+async function createInfoSessionLeadViaW2L(data, env) {
+  const { SF_ORG_ID, SF_INFO_SESSION_RECORD_TYPE_ID } = env;
+
+  console.log('[info-session] SF_INFO_SESSION_RECORD_TYPE_ID =', JSON.stringify(SF_INFO_SESSION_RECORD_TYPE_ID));
+
+  const params = new URLSearchParams();
+  params.append('oid', String(SF_ORG_ID).slice(0, 15));
+  params.append('first_name', data.firstName);
+  params.append('last_name', data.lastName);
+  params.append('email', data.email);
+  params.append('phone', data.phone);
+  params.append('company', 'N/A');
+  params.append('lead_source', 'Wesbite_msimbo.org');
+
+  // Deliberately do NOT send recordType param for info-session submissions.
+  // The before-save flow "RTS Flow — Info Session Assign RecordType" sets RecordTypeId
+  // based on RTS_Info_Session_Date__c presence. Sending the recordType param here seems
+  // to cause W2L to post-assign to RTS_Applicant in this org's configuration.
+  console.log('[info-session] Skipping recordType param; flow will assign RecordTypeId');
+
+  params.append(SF_FIELDS.zipCode, data.zipCode);
+  params.append(SF_FIELDS.infoSessionDate, data.infoSessionDate);
+  params.append(SF_FIELDS.infoSessionSource, formatSessionLabel(data.infoSessionDate));
+
+  const sfRes = await fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString(),
+  });
+
+  if (!sfRes.ok) {
+    throw new Error('Salesforce W2L returned status ' + sfRes.status);
+  }
+}
+
+async function fireN8nWebhook(data, webhookUrl) {
+  const payload = {
+    email: data.email,
+    name: ((data.firstName || '') + ' ' + (data.lastName || '')).trim(),
+    session: data.infoSessionDate,
+    tag: 'info_session_lead',
+  };
+
+  const res = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error('n8n webhook returned status ' + res.status);
+  }
+}
+
+function formatSessionLabel(isoDatetime) {
+  const d = new Date(isoDatetime);
+  if (isNaN(d.getTime())) return '';
+  // Render in Eastern time so the label matches what the user saw on the landing page.
+  const dayFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short', month: 'long', day: 'numeric',
+  });
+  const timeFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric', minute: '2-digit', hour12: true,
+  });
+  return dayFmt.format(d) + ' — ' + timeFmt.format(d);
+}
+
+function validateInfoSession(data) {
+  const required = ['firstName', 'lastName', 'email', 'phone', 'zipCode', 'infoSessionDate'];
+  for (const k of required) {
+    if (!data[k] || String(data[k]).trim().length === 0) return 'Missing required field: ' + k;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return 'Invalid email address';
+  if (!/^[0-9]{5}$/.test(data.zipCode)) return 'Invalid zip code';
+  const phoneDigits = String(data.phone).replace(/\D/g, '');
+  if (phoneDigits.length < 10) return 'Invalid phone number';
+  if (isNaN(new Date(data.infoSessionDate).getTime())) return 'Invalid info session date';
+  return null;
+}
+
+// ──────────────────────────────────────────────
+// APPLICATION VALIDATION
+// ──────────────────────────────────────────────
 
 function validateApplication(data) {
   const required = ['firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'zipCode', 'neighborhood', 'primaryLanguage', 'employmentStatus', 'educationLevel', 'referralSource', 'motivationNow', 'motivationGoal'];
@@ -178,7 +360,6 @@ function validateApplication(data) {
   if (phoneDigits.length < 10) return 'Invalid phone number';
   if (!data.daytimeAvailable) return 'Daytime availability is required for this program';
 
-  // Age check (18+)
   const dob = new Date(data.dateOfBirth);
   if (isNaN(dob.getTime())) return 'Invalid date of birth';
   const today = new Date();
@@ -194,8 +375,11 @@ function validateApplication(data) {
   return null;
 }
 
-async function checkDuplicateLead(email, sfCreds) {
-  // Salesforce SOAP login to get session ID, then SOQL via REST
+// ──────────────────────────────────────────────
+// SALESFORCE REST API (login, lookup, PATCH)
+// ──────────────────────────────────────────────
+
+async function sfLogin(sfCreds) {
   const loginBody = `<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:partner.soap.sforce.com">
   <soapenv:Body>
@@ -208,34 +392,85 @@ async function checkDuplicateLead(email, sfCreds) {
 
   const loginRes = await fetch('https://login.salesforce.com/services/Soap/u/62.0', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'text/xml; charset=UTF-8',
-      'SOAPAction': 'login',
-    },
+    headers: { 'Content-Type': 'text/xml; charset=UTF-8', 'SOAPAction': 'login' },
     body: loginBody,
   });
 
   const loginText = await loginRes.text();
   const sessionMatch = loginText.match(/<sessionId>([^<]+)<\/sessionId>/);
   const serverUrlMatch = loginText.match(/<serverUrl>([^<]+)<\/serverUrl>/);
-  if (!sessionMatch || !serverUrlMatch) {
-    throw new Error('Salesforce login failed');
-  }
+  if (!sessionMatch || !serverUrlMatch) throw new Error('Salesforce login failed');
 
-  const sessionId = sessionMatch[1];
-  const instanceHost = serverUrlMatch[1].replace(/^https:\/\//, '').replace(/\/.*$/, '');
+  return {
+    sessionId: sessionMatch[1],
+    instanceUrl: 'https://' + serverUrlMatch[1].replace(/^https:\/\//, '').replace(/\/.*$/, ''),
+  };
+}
 
-  const soql = `SELECT Id FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false AND RTS_Cohort__c != null LIMIT 1`;
-  const queryUrl = `https://${instanceHost}/services/data/v62.0/query?q=${encodeURIComponent(soql)}`;
+async function findLeadByEmail(email, sfCreds) {
+  const { sessionId, instanceUrl } = await sfLogin(sfCreds);
 
-  const queryRes = await fetch(queryUrl, {
-    headers: { 'Authorization': 'Bearer ' + sessionId },
-  });
+  const soql = `SELECT Id, Email, RecordType.DeveloperName, IsConverted FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
+  const queryUrl = `${instanceUrl}/services/data/v62.0/query?q=${encodeURIComponent(soql)}`;
 
+  const queryRes = await fetch(queryUrl, { headers: { 'Authorization': 'Bearer ' + sessionId } });
   if (!queryRes.ok) throw new Error('SOQL query failed: ' + queryRes.status);
 
   const queryData = await queryRes.json();
-  return (queryData.records && queryData.records.length > 0);
+  if (!queryData.records || queryData.records.length === 0) return null;
+
+  const record = queryData.records[0];
+  return {
+    id: record.Id,
+    email: record.Email,
+    recordType: record.RecordType && record.RecordType.DeveloperName,
+    sessionId,
+    instanceUrl,
+  };
+}
+
+async function promoteLeadToApplicant(existingLead, data, opts) {
+  const { instanceUrl, sessionId, recordTypeId, cohortId } = opts;
+
+  const motivationCombined =
+    'Where I am now:\n' + data.motivationNow + '\n\n' +
+    'Success after RTS:\n' + data.motivationGoal;
+
+  const body = {
+    FirstName: data.firstName,
+    LastName: data.lastName,
+    Phone: data.phone,
+    Company: 'N/A',
+    LeadSource: 'Wesbite_msimbo.org',
+    [SF_API_NAMES.dateOfBirth]: data.dateOfBirth,
+    [SF_API_NAMES.zipCode]: data.zipCode,
+    [SF_API_NAMES.daytimeAvailable]: Boolean(data.daytimeAvailable),
+    [SF_API_NAMES.neighborhood]: data.neighborhood,
+    [SF_API_NAMES.primaryLanguage]: data.primaryLanguage,
+    [SF_API_NAMES.employmentStatus]: data.employmentStatus,
+    [SF_API_NAMES.educationLevel]: data.educationLevel,
+    [SF_API_NAMES.referralSource]: data.referralSource,
+    [SF_API_NAMES.motivation]: motivationCombined,
+  };
+
+  if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
+  if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
+
+  const patchUrl = `${instanceUrl}/services/data/v62.0/sobjects/Lead/${existingLead.id}`;
+
+  const res = await fetch(patchUrl, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': 'Bearer ' + sessionId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error('Lead PATCH failed: ' + res.status + ' ' + text);
+  }
 }
 
 function escapeXml(s) {
@@ -252,7 +487,9 @@ function escapeSOQL(s) {
 }
 
 // ──────────────────────────────────────────────
-// SWIPEONE INFO-SESSION FLOW (unchanged)
+// LEGACY SWIPEONE INFO-SESSION FLOW
+// Kept as fallback when USE_SF_INFO_SESSION is not set.
+// Remove once SF path is verified stable.
 // ──────────────────────────────────────────────
 
 async function submitToSwipeOne(data, headers) {

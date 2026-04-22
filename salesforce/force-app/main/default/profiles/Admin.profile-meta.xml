@@ -5,10 +5,20 @@
         <layout>Lead-RTS Application Layout</layout>
         <recordType>Lead.RTS_Applicant</recordType>
     </layoutAssignments>
+    <layoutAssignments>
+        <layout>Lead-RTS Info Session Layout</layout>
+        <recordType>Lead.RTS_Info_Session</recordType>
+    </layoutAssignments>
     <recordTypeVisibilities>
         <default>false</default>
         <personAccountDefault>false</personAccountDefault>
         <recordType>Lead.RTS_Applicant</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <personAccountDefault>false</personAccountDefault>
+        <recordType>Lead.RTS_Info_Session</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
 </Profile>

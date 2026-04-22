@@ -13,7 +13,8 @@
   const INFO_SESSION_DATES = [
     { label: "Fri, April 24", time: "12:00 PM", value: "2026-04-24T12:00:00" },
     { label: "Tue, April 28", time: "6:00 PM", value: "2026-04-28T18:00:00" },
-    { label: "Tue, April 30", time: "6:00 PM", value: "2026-04-30T18:00:00" },
+    { label: "Wed, April 29", time: "6:00 PM", value: "2026-04-29T18:00:00" },
+    { label: "Thu, April 30", time: "6:00 PM", value: "2026-04-30T18:00:00" },
   ];
 
   // Serverless function endpoint
@@ -195,8 +196,13 @@
     var phoneInput = document.getElementById(prefix + "Phone");
     var zipInput = document.getElementById(prefix + "Zip");
 
-    if (!nameInput.value.trim()) {
+    var nameValue = nameInput.value.trim();
+    if (!nameValue) {
       showError(prefix + "NameError", "Please enter your name");
+      nameInput.classList.add("form__input--error");
+      valid = false;
+    } else if (nameValue.split(/\s+/).length < 2) {
+      showError(prefix + "NameError", "Please enter your first and last name");
       nameInput.classList.add("form__input--error");
       valid = false;
     } else {

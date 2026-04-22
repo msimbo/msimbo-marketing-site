@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Info_Session</fullName>
+    <active>true</active>
+    <businessProcess>RTS_Info_Session_Process</businessProcess>
+    <description>Lead record type for Revenue Technology Specialist (RTS) program info-session RSVPs. Created via Web-to-Lead from msimbo.org info-session form. Promoted to RTS_Applicant RecordType when the same email submits an application.</description>
+    <label>RTS Info Session</label>
+</RecordType>

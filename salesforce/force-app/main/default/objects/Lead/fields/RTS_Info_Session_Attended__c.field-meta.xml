@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Info_Session_Attended__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marked true by the RTS Program Coordinator after the info session if the lead attended. Used for show-rate reporting and info-session → application conversion funnel.</description>
+    <externalId>false</externalId>
+    <label>Info Session Attended</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

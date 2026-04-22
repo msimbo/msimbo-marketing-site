@@ -1,37 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>62.0</apiVersion>
-    <assignments>
-        <name>Assign_Status_And_Owner</name>
-        <label>Assign Status and Owner</label>
-        <locationX>176</locationX>
-        <locationY>288</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.Status</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <stringValue>RTS - Assessment Pending</stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>$Record.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Get_Coordinator.Id</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>$Record.RecordTypeId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Get_RTS_RecordType.Id</elementReference>
-            </value>
-        </assignmentItems>
-    </assignments>
-    <description>Before-save flow. When a Lead is created with LeadSource = Wesbite_msimbo.org, sets Status to RTS - Assessment Pending and assigns owner to the Program Coordinator (Dele temporarily; switch to Betzaida for production). Paired with Flow 1b for the email alert (after-save).</description>
+    <description>After-save flow. When a new Lead is created with LeadSource = Wesbite_msimbo.org AND RTS_Info_Session_Date__c populated AND RTS_Date_of_Birth__c null (info-session, not application), updates the Lead's RecordTypeId to RTS_Info_Session and assigns the Program Coordinator as owner. Works around Web-to-Lead's default RecordType behavior which creates leads as RTS_Applicant even when the recordType hidden field is sent.</description>
     <environments>Default</environments>
-    <interviewLabel>RTS Flow 1 — Application Received (Before-Save) {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>RTS Flow 1 — Application Received</label>
+    <interviewLabel>RTS Flow — Info Session Assign RecordType {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RTS Flow — Info Session Assign RecordType</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -58,7 +31,7 @@
         <locationY>168</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_RTS_RecordType</targetReference>
+            <targetReference>Get_Info_Session_RecordType</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -73,20 +46,20 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <name>Get_RTS_RecordType</name>
-        <label>Get RTS Applicant Record Type</label>
+        <name>Get_Info_Session_RecordType</name>
+        <label>Get RTS Info Session RecordType</label>
         <locationX>176</locationX>
         <locationY>228</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Assign_Status_And_Owner</targetReference>
+            <targetReference>Update_Lead_RecordType</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
             <field>DeveloperName</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>RTS_Applicant</stringValue>
+                <stringValue>RTS_Info_Session</stringValue>
             </value>
         </filters>
         <filters>
@@ -100,6 +73,39 @@
         <object>RecordType</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordUpdates>
+        <name>Update_Lead_RecordType</name>
+        <label>Update Lead RecordType and Owner</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>RecordTypeId</field>
+            <value>
+                <elementReference>Get_Info_Session_RecordType.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>Get_Coordinator.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Open - Not Contacted</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
@@ -115,15 +121,22 @@
             </value>
         </filters>
         <filters>
-            <field>RTS_Date_of_Birth__c</field>
+            <field>RTS_Info_Session_Date__c</field>
             <operator>IsNull</operator>
             <value>
                 <booleanValue>false</booleanValue>
             </value>
         </filters>
+        <filters>
+            <field>RTS_Date_of_Birth__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
-        <triggerType>RecordBeforeSave</triggerType>
+        <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
 </Flow>

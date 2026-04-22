@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Info_Session_Compact</fullName>
+    <fields>Name</fields>
+    <fields>RTS_Info_Session_Date__c</fields>
+    <fields>RTS_Info_Session_Attended__c</fields>
+    <fields>Status</fields>
+    <fields>Phone</fields>
+    <fields>Email</fields>
+    <label>RTS Info Session Compact</label>
+</CompactLayout>

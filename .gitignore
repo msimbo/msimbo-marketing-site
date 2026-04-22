@@ -3,3 +3,11 @@
 .claude/skills/
 # Local Netlify folder
 .netlify
+# macOS
+.DS_Store
+# Salesforce CLI local state
+salesforce/.sf/
+# Local-only reference docs (not tracked in git)
+docs/Urban League of Eastern MA_contacts_*.csv
+docs/\[ULEM\] Invite to RTS Info Session.json
+docs/info-session-calendar-description.txt
