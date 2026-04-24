@@ -41,4 +41,14 @@ private class RTS_DashboardRefreshSchedulerTest {
         CronTrigger ct = [SELECT Id, CronExpression FROM CronTrigger WHERE Id = :jobId];
         System.assertEquals(cron, ct.CronExpression);
     }
+
+    @isTest
+    static void refreshJob_makesCallout() {
+        Test.setMock(HttpCalloutMock.class, new RefreshMock());
+        Id fakeId = '01ZUV000003a8jh2AA';
+
+        Test.startTest();
+        System.enqueueJob(new RTS_DashboardRefreshScheduler.RefreshJob(fakeId));
+        Test.stopTest();
+    }
 }

@@ -11,7 +11,6 @@
   // Update these when new sessions are scheduled
   // ──────────────────────────────────────────────
   const INFO_SESSION_DATES = [
-    { label: "Fri, April 24", time: "12:00 PM", value: "2026-04-24T12:00:00" },
     { label: "Tue, April 28", time: "6:00 PM", value: "2026-04-28T18:00:00" },
     { label: "Wed, April 29", time: "6:00 PM", value: "2026-04-29T18:00:00" },
     { label: "Thu, April 30", time: "6:00 PM", value: "2026-04-30T18:00:00" },

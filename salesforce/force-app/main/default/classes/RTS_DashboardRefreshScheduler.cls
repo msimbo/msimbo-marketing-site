@@ -6,7 +6,7 @@ public with sharing class RTS_DashboardRefreshScheduler implements Schedulable {
     public void execute(SchedulableContext sc) {
         Id dashboardId = findDashboardId();
         if (dashboardId != null) {
-            refreshDashboard(dashboardId);
+            System.enqueueJob(new RefreshJob(dashboardId));
         }
     }
 
@@ -19,6 +19,18 @@ public with sharing class RTS_DashboardRefreshScheduler implements Schedulable {
             LIMIT 1
         ];
         return dashboards.isEmpty() ? null : dashboards[0].Id;
+    }
+
+    public class RefreshJob implements Queueable, Database.AllowsCallouts {
+        private final Id dashboardId;
+
+        public RefreshJob(Id dashboardId) {
+            this.dashboardId = dashboardId;
+        }
+
+        public void execute(QueueableContext ctx) {
+            refreshDashboard(this.dashboardId);
+        }
     }
 
     @TestVisible
