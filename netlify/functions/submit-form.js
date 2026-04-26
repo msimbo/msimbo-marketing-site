@@ -2,15 +2,17 @@
  * Netlify Serverless Function — Form submission proxy
  *
  * Routes:
- *   signupType === 'application'  → Salesforce
+ *   signupType === 'application'  → Salesforce REST (uses SF login)
  *                                    - If existing Info Session Lead: PATCH to promote (flip RecordType to Applicant)
- *                                    - Else: Web-to-Lead (create as Applicant)
+ *                                    - Else: REST insert (create as Applicant). W2L can't reliably populate
+ *                                      lookup fields (RTS_Cohort__c) before validation rules run.
  *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
  *                                   + n8n webhook (Google Calendar invite)
  *
  * Required Netlify environment variables:
- *   SF_ORG_ID                       — Salesforce 15-char Org ID
+ *   SF_ORG_ID                       — Salesforce 15-char Org ID (info-session W2L only)
  *   SF_RTS_COHORT_ID                — 15-char Cohort record ID (applications only)
+ *   SF_RTS_COHORT_NAME              — Human-readable cohort name (e.g., "RTS - Cohort 1 - May 2026")
  *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
  *   SF_INFO_SESSION_RECORD_TYPE_ID  — 15-char RTS_Info_Session RecordType Id
  *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
@@ -34,6 +36,7 @@ const SF_FIELDS = {
   referralSource: '00NUV00001BlCae',
   motivation: '00NUV00001BlCaY',
   cohort: '00NUV00001BlCaK',
+  cohortName: '00NUV00001Cdof3',
   // Info Session fields (15-char Web-to-Lead IDs). REST PATCH uses API names from SF_API_NAMES.
   infoSessionDate: '00NUV00001CLmDW',
   infoSessionSource: '00NUV00001CLmDX',
@@ -54,6 +57,7 @@ const SF_API_NAMES = {
   referralSource: 'RTS_Referral_Source__c',
   motivation: 'RTS_Motivation__c',
   cohort: 'RTS_Cohort__c',
+  cohortName: 'RTS_Cohort_Name__c',
 };
 
 exports.handler = async function (event) {
@@ -94,18 +98,13 @@ exports.handler = async function (event) {
 
 async function submitApplication(data, headers) {
   const {
-    SF_ORG_ID,
     SF_RTS_COHORT_ID,
+    SF_RTS_COHORT_NAME,
     SF_RECORD_TYPE_ID,
     SF_INSTANCE_URL,
     SF_DUPE_CHECK_USERNAME,
     SF_DUPE_CHECK_PASSWORD,
   } = process.env;
-
-  if (!SF_ORG_ID) {
-    console.error('Missing SF_ORG_ID');
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
-  }
 
   const err = validateApplication(data);
   if (err) {
@@ -113,19 +112,27 @@ async function submitApplication(data, headers) {
   }
 
   // Look up existing Lead by email (any RecordType). If they're already an Applicant,
-  // reject as duplicate. If they're an Info Session Lead, promote via REST PATCH
-  // (preserves info-session fields for conversion funnel reporting).
-  let existingLead = null;
-  if (SF_INSTANCE_URL && SF_DUPE_CHECK_USERNAME && SF_DUPE_CHECK_PASSWORD) {
-    try {
-      existingLead = await findLeadByEmail(data.email, {
-        instanceUrl: SF_INSTANCE_URL,
-        username: SF_DUPE_CHECK_USERNAME,
-        password: SF_DUPE_CHECK_PASSWORD,
-      });
-    } catch (e) {
-      console.error('Lead lookup failed (continuing with W2L):', e.message);
-    }
+  // reject as duplicate. If a Lead exists with any other RecordType, promote it via
+  // REST PATCH (preserves history and avoids W2L-duplicate rejections).
+  if (!SF_INSTANCE_URL || !SF_DUPE_CHECK_USERNAME || !SF_DUPE_CHECK_PASSWORD) {
+    console.error('Missing dedupe credentials — refusing submission to avoid ghost Leads');
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
+  }
+
+  let existingLead;
+  try {
+    existingLead = await findLeadByEmail(data.email, {
+      instanceUrl: SF_INSTANCE_URL,
+      username: SF_DUPE_CHECK_USERNAME,
+      password: SF_DUPE_CHECK_PASSWORD,
+    });
+  } catch (e) {
+    console.error('Lead lookup failed:', e.message);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
   }
 
   if (existingLead) {
@@ -139,81 +146,48 @@ async function submitApplication(data, headers) {
       };
     }
 
-    if (existingLead.recordType === 'RTS_Info_Session') {
-      // Promote: flip RecordType to Applicant and populate applicant fields.
-      // Info-session fields on the Lead are untouched (preserved for funnel reporting).
-      try {
-        await promoteLeadToApplicant(existingLead, data, {
-          instanceUrl: existingLead.instanceUrl,
-          sessionId: existingLead.sessionId,
-          recordTypeId: SF_RECORD_TYPE_ID,
-          cohortId: SF_RTS_COHORT_ID,
-        });
-        return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
-      } catch (e) {
-        console.error('Promote-to-applicant failed:', e.message);
-        return {
-          statusCode: 502,
-          headers,
-          body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
-        };
-      }
-    }
-  }
-
-  // No existing Lead (or unknown RecordType) → create via Web-to-Lead.
-  return createApplicantViaW2L(data, headers, { SF_ORG_ID, SF_RTS_COHORT_ID, SF_RECORD_TYPE_ID });
-}
-
-async function createApplicantViaW2L(data, headers, env) {
-  const { SF_ORG_ID, SF_RTS_COHORT_ID, SF_RECORD_TYPE_ID } = env;
-
-  const motivationCombined =
-    'Where I am now:\n' + data.motivationNow + '\n\n' +
-    'Success after RTS:\n' + data.motivationGoal;
-
-  const params = new URLSearchParams();
-  params.append('oid', String(SF_ORG_ID).slice(0, 15));
-  params.append('first_name', data.firstName);
-  params.append('last_name', data.lastName);
-  params.append('email', data.email);
-  params.append('phone', data.phone);
-  params.append('company', 'N/A');
-  params.append('lead_source', 'Wesbite_msimbo.org');
-
-  if (SF_RECORD_TYPE_ID) params.append('recordType', String(SF_RECORD_TYPE_ID).slice(0, 15));
-
-  params.append(SF_FIELDS.dateOfBirth, data.dateOfBirth);
-  params.append(SF_FIELDS.zipCode, data.zipCode);
-  params.append(SF_FIELDS.daytimeAvailable, data.daytimeAvailable ? '1' : '0');
-  params.append(SF_FIELDS.neighborhood, data.neighborhood);
-  params.append(SF_FIELDS.primaryLanguage, data.primaryLanguage);
-  params.append(SF_FIELDS.employmentStatus, data.employmentStatus);
-  params.append(SF_FIELDS.educationLevel, data.educationLevel);
-  params.append(SF_FIELDS.referralSource, data.referralSource);
-  params.append(SF_FIELDS.motivation, motivationCombined);
-  if (SF_RTS_COHORT_ID) params.append(SF_FIELDS.cohort, String(SF_RTS_COHORT_ID).slice(0, 15));
-
-  try {
-    const sfRes = await fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
-    });
-
-    if (!sfRes.ok) {
-      console.error('Salesforce W2L returned status:', sfRes.status);
+    // Any non-Applicant RecordType (Info Session, legacy Student Lead, etc.) → promote
+    // the existing Lead in-place via REST PATCH. Creating a second Lead via W2L would
+    // either duplicate or (as we've seen) get silently rejected by SF.
+    try {
+      await promoteLeadToApplicant(existingLead, data, {
+        instanceUrl: existingLead.instanceUrl,
+        sessionId: existingLead.sessionId,
+        recordTypeId: SF_RECORD_TYPE_ID,
+        cohortId: SF_RTS_COHORT_ID,
+        cohortName: SF_RTS_COHORT_NAME,
+      });
+      return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
+    } catch (e) {
+      console.error('Promote-to-applicant failed:', e.message);
       return {
         statusCode: 502,
         headers,
         body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
       };
     }
+  }
 
+  // No existing Lead → create via REST API. We can't use Web-to-Lead because it
+  // doesn't reliably populate lookup fields (RTS_Cohort__c) before validation
+  // rules fire, so the Cohort-required rule rejects every W2L submission.
+  try {
+    await createApplicantViaRest(data, {
+      instanceUrl: SF_INSTANCE_URL,
+      username: SF_DUPE_CHECK_USERNAME,
+      password: SF_DUPE_CHECK_PASSWORD,
+      recordTypeId: SF_RECORD_TYPE_ID,
+      cohortId: SF_RTS_COHORT_ID,
+      cohortName: SF_RTS_COHORT_NAME,
+    });
     return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
-  } catch (err) {
-    console.error('Salesforce W2L error:', err);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal server error' }) };
+  } catch (e) {
+    console.error('Lead create failed:', e.message);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
   }
 }
 
@@ -399,7 +373,11 @@ async function sfLogin(sfCreds) {
   const loginText = await loginRes.text();
   const sessionMatch = loginText.match(/<sessionId>([^<]+)<\/sessionId>/);
   const serverUrlMatch = loginText.match(/<serverUrl>([^<]+)<\/serverUrl>/);
-  if (!sessionMatch || !serverUrlMatch) throw new Error('Salesforce login failed');
+  if (!sessionMatch || !serverUrlMatch) {
+    const faultMatch = loginText.match(/<faultcode>([^<]+)<\/faultcode>/);
+    const faultStrMatch = loginText.match(/<faultstring>([^<]+)<\/faultstring>/);
+    throw new Error('Salesforce login failed: ' + (faultMatch ? faultMatch[1] : 'unknown') + ' — ' + (faultStrMatch ? faultStrMatch[1].slice(0, 200) : loginText.slice(0, 200)));
+  }
 
   return {
     sessionId: sessionMatch[1],
@@ -430,7 +408,7 @@ async function findLeadByEmail(email, sfCreds) {
 }
 
 async function promoteLeadToApplicant(existingLead, data, opts) {
-  const { instanceUrl, sessionId, recordTypeId, cohortId } = opts;
+  const { instanceUrl, sessionId, recordTypeId, cohortId, cohortName } = opts;
 
   const motivationCombined =
     'Where I am now:\n' + data.motivationNow + '\n\n' +
@@ -455,6 +433,7 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
 
   if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
   if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
+  if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
 
   const patchUrl = `${instanceUrl}/services/data/v62.0/sobjects/Lead/${existingLead.id}`;
 
@@ -470,6 +449,53 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
   if (!res.ok) {
     const text = await res.text();
     throw new Error('Lead PATCH failed: ' + res.status + ' ' + text);
+  }
+}
+
+async function createApplicantViaRest(data, opts) {
+  const { instanceUrl, username, password, recordTypeId, cohortId, cohortName } = opts;
+  const { sessionId, instanceUrl: resolvedUrl } = await sfLogin({ username, password });
+
+  const motivationCombined =
+    'Where I am now:\n' + data.motivationNow + '\n\n' +
+    'Success after RTS:\n' + data.motivationGoal;
+
+  const body = {
+    FirstName: data.firstName,
+    LastName: data.lastName,
+    Email: data.email,
+    Phone: data.phone,
+    Company: 'N/A',
+    LeadSource: 'Wesbite_msimbo.org',
+    [SF_API_NAMES.dateOfBirth]: data.dateOfBirth,
+    [SF_API_NAMES.zipCode]: data.zipCode,
+    [SF_API_NAMES.daytimeAvailable]: Boolean(data.daytimeAvailable),
+    [SF_API_NAMES.neighborhood]: data.neighborhood,
+    [SF_API_NAMES.primaryLanguage]: data.primaryLanguage,
+    [SF_API_NAMES.employmentStatus]: data.employmentStatus,
+    [SF_API_NAMES.educationLevel]: data.educationLevel,
+    [SF_API_NAMES.referralSource]: data.referralSource,
+    [SF_API_NAMES.motivation]: motivationCombined,
+  };
+
+  if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
+  if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
+  if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
+
+  const url = `${instanceUrl || resolvedUrl}/services/data/v62.0/sobjects/Lead/`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + sessionId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error('Lead INSERT failed: ' + res.status + ' ' + text);
   }
 }
 

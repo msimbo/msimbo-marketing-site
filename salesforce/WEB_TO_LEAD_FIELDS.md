@@ -32,6 +32,7 @@ Use these Field IDs as the `name` attribute on HTML form inputs when posting to 
 | RTS_CM_Interview_Notes__c | 00NUV00001BlCaG | Case Manager Interview Notes |
 | RTS_CM_Interview_Outcome__c | 00NUV00001BlCaH | Case Manager Interview Outcome |
 | RTS_Cohort__c | 00NUV00001BlCaK | Cohort (lookup) |
+| RTS_Cohort_Name__c | 00NUV00001Cdof3 | Cohort Name (text) |
 | RTS_Daytime_Available__c | 00NUV00001BlCaL | Available Daytime (M-W) |
 | RTS_Decision__c | 00NUV00001BlCaO | Decision |
 | RTS_Decision_Date__c | 00NUV00001BlCaM | Decision Date |

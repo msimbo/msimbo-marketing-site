@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Cohort_Required</fullName>
+    <active>true</active>
+    <description>Requires the Cohort field when creating or editing an RTS Applicant lead.</description>
+    <errorConditionFormula>RecordType.DeveloperName = &apos;RTS_Applicant&apos; &amp;&amp; ISBLANK(RTS_Cohort__c)</errorConditionFormula>
+    <errorDisplayField>RTS_Cohort__c</errorDisplayField>
+    <errorMessage>Cohort is required for RTS Applicant records.</errorMessage>
+</ValidationRule>
