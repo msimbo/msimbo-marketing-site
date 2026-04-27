@@ -291,9 +291,8 @@ async function fireN8nWebhook(data, webhookUrl) {
 }
 
 function formatSessionLabel(isoDatetime) {
-  const d = new Date(isoDatetime);
-  if (isNaN(d.getTime())) return '';
-  // Render in Eastern time so the label matches what the user saw on the landing page.
+  const d = parseEasternDatetime(isoDatetime);
+  if (!d) return '';
   const dayFmt = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
     weekday: 'short', month: 'long', day: 'numeric',
@@ -303,6 +302,35 @@ function formatSessionLabel(isoDatetime) {
     hour: 'numeric', minute: '2-digit', hour12: true,
   });
   return dayFmt.format(d) + ' — ' + timeFmt.format(d);
+}
+
+// Parses values from the landing page (e.g. "2026-04-28T18:00:00"). A naive
+// datetime is interpreted as America/New_York; a value with a Z or ±HH:MM
+// offset is parsed as-is. Returns null for unparseable input.
+function parseEasternDatetime(s) {
+  if (!s) return null;
+  const raw = String(s);
+  if (/Z$|[+-]\d{2}:?\d{2}$/.test(raw)) {
+    const d = new Date(raw);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return null;
+  const [, y, mo, d, h, mi, sec] = match;
+  const naiveUtc = new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi, +(sec || 0)));
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  });
+  const parts = Object.fromEntries(fmt.formatToParts(naiveUtc).map(p => [p.type, p.value]));
+  const asEasternWall = Date.UTC(
+    +parts.year, +parts.month - 1, +parts.day,
+    parts.hour === '24' ? 0 : +parts.hour, +parts.minute, +parts.second
+  );
+  const offsetMs = naiveUtc.getTime() - asEasternWall;
+  return new Date(naiveUtc.getTime() + offsetMs);
 }
 
 function validateInfoSession(data) {
