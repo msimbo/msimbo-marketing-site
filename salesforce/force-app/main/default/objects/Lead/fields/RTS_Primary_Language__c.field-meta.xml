@@ -3,9 +3,93 @@
     <fullName>RTS_Primary_Language__c</fullName>
     <externalId>false</externalId>
     <label>Primary Language</label>
-    <length>50</length>
     <required>false</required>
     <trackHistory>false</trackHistory>
-    <type>Text</type>
-    <unique>false</unique>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>English</fullName>
+                <default>false</default>
+                <label>English</label>
+            </value>
+            <value>
+                <fullName>Spanish</fullName>
+                <default>false</default>
+                <label>Spanish</label>
+            </value>
+            <value>
+                <fullName>Haitian Creole</fullName>
+                <default>false</default>
+                <label>Haitian Creole</label>
+            </value>
+            <value>
+                <fullName>Portuguese</fullName>
+                <default>false</default>
+                <label>Portuguese</label>
+            </value>
+            <value>
+                <fullName>Cape Verdean Creole</fullName>
+                <default>false</default>
+                <label>Cape Verdean Creole</label>
+            </value>
+            <value>
+                <fullName>Chinese (Mandarin)</fullName>
+                <default>false</default>
+                <label>Chinese (Mandarin)</label>
+            </value>
+            <value>
+                <fullName>Chinese (Cantonese)</fullName>
+                <default>false</default>
+                <label>Chinese (Cantonese)</label>
+            </value>
+            <value>
+                <fullName>Vietnamese</fullName>
+                <default>false</default>
+                <label>Vietnamese</label>
+            </value>
+            <value>
+                <fullName>French</fullName>
+                <default>false</default>
+                <label>French</label>
+            </value>
+            <value>
+                <fullName>Arabic</fullName>
+                <default>false</default>
+                <label>Arabic</label>
+            </value>
+            <value>
+                <fullName>Russian</fullName>
+                <default>false</default>
+                <label>Russian</label>
+            </value>
+            <value>
+                <fullName>Korean</fullName>
+                <default>false</default>
+                <label>Korean</label>
+            </value>
+            <value>
+                <fullName>Tagalog/Filipino</fullName>
+                <default>false</default>
+                <label>Tagalog/Filipino</label>
+            </value>
+            <value>
+                <fullName>Somali</fullName>
+                <default>false</default>
+                <label>Somali</label>
+            </value>
+            <value>
+                <fullName>Amharic</fullName>
+                <default>false</default>
+                <label>Amharic</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
 </CustomField>
