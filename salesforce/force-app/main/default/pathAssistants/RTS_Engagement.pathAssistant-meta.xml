@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Engagement</fullName>
+    <active>true</active>
+    <entityName>pmdm__ProgramEngagement__c</entityName>
+    <fieldName>RTS_Completion_Status__c</fieldName>
+    <masterLabel>RTS Engagement Path</masterLabel>
+    <recordTypeName>__MASTER__</recordTypeName>
+    <pathAssistantSteps>
+        <info>Trainee just enrolled. Confirm the engagement is linked to the right Cohort and that ServiceParticipants were auto-created.</info>
+        <picklistValueName>Enrolled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Class started. Confirm the trainee has at least one ServiceDelivery on file. HubSpot RevOps cert path should be active by week 4.</info>
+        <picklistValueName>In Progress</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>Halfway point. Run a 1:1 with the trainee. Log attendance trend, capstone progress, and any wraparound needs.</info>
+        <picklistValueName>Mid-Cohort Check</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>RTS_Final_Capstone_Score__c</fieldNames>
+        <fieldNames>RTS_Completion_Date__c</fieldNames>
+        <fieldNames>RTS_HubSpot_Cert_Earned__c</fieldNames>
+        <fieldNames>RTS_Google_AI_Cert_Earned__c</fieldNames>
+        <info>Demo Day done. Log capstone score, completion date, and which certifications were earned before closing the engagement.</info>
+        <picklistValueName>Completed</picklistValueName>
+    </pathAssistantSteps>
+</PathAssistant>

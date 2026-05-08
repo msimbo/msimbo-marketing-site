@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PMM_Cohort__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Bridge to the PMM ProgramCohort that owns the delivery side (Services, Sessions, ServiceDeliveries) for this RTS recruiting cohort.</description>
+    <externalId>false</externalId>
+    <label>PMM Cohort</label>
+    <referenceTo>pmdm__ProgramCohort__c</referenceTo>
+    <relationshipLabel>RTS Cohorts</relationshipLabel>
+    <relationshipName>RTS_Cohorts</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

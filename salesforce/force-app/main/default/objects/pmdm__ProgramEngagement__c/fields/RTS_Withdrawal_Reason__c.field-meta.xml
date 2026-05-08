@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Withdrawal_Reason__c</fullName>
+    <description>Free-form notes on why the trainee withdrew. Populated only when Completion Status = Withdrew.</description>
+    <externalId>false</externalId>
+    <label>RTS Withdrawal Reason</label>
+    <length>500</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

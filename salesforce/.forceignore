@@ -3,5 +3,10 @@
 **/npsp__*
 **/pmdm__*
 
+# But DO track our custom RTS_* fields and stub object-meta files we add
+# to managed-package objects for delivery-side tracking.
+!**/pmdm__*/fields/RTS_*.field-meta.xml
+!**/pmdm__*/pmdm__*.object-meta.xml
+
 # OS cruft
 .DS_Store

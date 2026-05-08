@@ -1,8 +1,8 @@
 # RTS Cohort 1 — Delivery Setup Recommendation
 
 **Author:** Dele Tosh
-**Date:** 2026-05-06 (updated 2026-05-08 with locked decisions)
-**Status:** Approved — ready for phased SF deploy
+**Date:** 2026-05-06 (updated 2026-05-08 with locked decisions; deployed to production 2026-05-08)
+**Status:** Deployed — see `cohort-1-delivery-management-guide.md` for day-to-day operations
 **Cohort record:** `RTS - Cohort 1 - May 2026` (`a1JUV000005GKMT2A4`), May 11 – July 20, 2026
 
 This document covers the Salesforce setup for **delivering** Cohort 1 once class starts. Recruiting (Lead pipeline → conversion to Contact) is already built. This is the next layer down: tracking who attended what, what they completed, and how they did.
@@ -119,7 +119,7 @@ Each ServiceParticipant:
 - `pmdm__Service__c`: lookup to the Service
 - `pmdm__Status__c`: `Active`
 
-**Automation:** add a flow `RTS Flow 6 — Auto-create ServiceParticipants` that fires on Lead conversion (or on ProgramEngagement create). For each new engagement, create a ServiceParticipant for each Active Service in this cohort.
+**Automation:** add a flow `RTS Flow 9 — Auto-create ServiceParticipants` that fires on Lead conversion (or on ProgramEngagement create). For each new engagement, create a ServiceParticipant for each Active Service in this cohort.
 
 ---
 
@@ -172,8 +172,8 @@ salesforce/force-app/main/default/objects/
   RTS_Cohort__c/fields/
     PMM_Cohort__c.field-meta.xml  (lookup to pmdm__ProgramCohort__c)
 
-salesforce/force-app/main/default/pathAssistant/
-  pmdm__ProgramEngagement__c.RTS_Engagement_Path.pathAssistant-meta.xml
+salesforce/force-app/main/default/pathAssistants/
+  RTS_Engagement.pathAssistant-meta.xml
     (4 active stages: Enrolled → In Progress → Mid-Cohort Check → Completed,
      plus Withdrew / Did Not Complete as off-path terminal values)
 
@@ -191,7 +191,7 @@ salesforce/force-app/main/default/flexipages/
 
 **Plus one new Flow:**
 
-`RTS Flow 6 — Auto-create ServiceParticipants` — record-triggered on `pmdm__ProgramEngagement__c` create. Sets `RTS_Completion_Status__c = 'Enrolled'` and loops the active Services for the cohort, creating a ServiceParticipant per Service.
+`RTS Flow 9 — Auto-create ServiceParticipants` — record-triggered on `pmdm__ProgramEngagement__c` create. Sets `RTS_Completion_Status__c = 'Enrolled'` and loops the active Services for the cohort, creating a ServiceParticipant per Service.
 
 **Verification gate before bulk-conversion:** convert one Lead first, confirm the ProgramEngagement / ServiceParticipants / Path render correctly, then convert the remaining 9 confirmed Leads.
 
@@ -230,22 +230,20 @@ Flow 4 has not fired yet in production (no Leads have hit `RTS - Converted` with
 - If the engagement is missing the new ProgramCohort lookup or the outcome fields default wrong, fix Flow 4 before bulk-converting the rest of the cohort.
 - After verification, bulk-convert the remaining 9 confirmed Leads in a single operation so all 10 engagements exist on day 1.
 
-### 4. Lightning Path on ProgramEngagement: **yes, add it**
+### 4. Lightning Path on ProgramEngagement: **deployed**
 
-Path stages on `pmdm__ProgramEngagement__c` (driven by `RTS_Completion_Status__c`):
+`RTS Engagement Path` is live on `pmdm__ProgramEngagement__c` (Master record type), driven by `RTS_Completion_Status__c`.
 
-| # | Stage label | API value | When it fires |
+| # | Stage | Picklist value | Coordinator action |
 |---|---|---|---|
-| 1 | Enrolled | `Enrolled` | Default on engagement create (Flow 4 sets this) |
-| 2 | In Progress | `In Progress` | Coordinator advances on first ServiceDelivery (week 1) |
-| 3 | Mid-Cohort Check | `Mid-Cohort Check` | Coordinator advances at week 5 (formal check-in) |
-| 4 | Completed | `Completed` | Set on Demo Day after capstone graded |
-| — | Withdrew | `Withdrew` | Off-path terminal status (closes Path) |
-| — | Did Not Complete | `Did Not Complete` | Off-path terminal status (closes Path) |
+| 1 | Enrolled | `Enrolled` | Confirm engagement is linked to the right Cohort and ServiceParticipants were auto-created |
+| 2 | In Progress | `In Progress` | Verify the trainee has at least one ServiceDelivery; HubSpot RevOps cert path active by week 4 |
+| 3 | Mid-Cohort Check | `Mid-Cohort Check` | Run a 1:1; log attendance trend, capstone progress, and any wraparound needs |
+| 4 | Completed | `Completed` | Log capstone score, completion date, and which certifications were earned before closing |
 
-Add Path guidance text at each stage (e.g., on "In Progress": "Confirm trainee has started ServiceDeliveries and HubSpot cert path is active"). This gives the Coordinator a single record-page driver for the trainee lifecycle, mirroring the Lead Path used during recruiting.
+Off-path terminal values (`Withdrew`, `Did Not Complete`) close the Path when set.
 
-The `RTS_Completion_Status__c` picklist values listed in section 3 expand to include `Mid-Cohort Check` to support the Path.
+**One caveat from deploy:** the PMM-shipped `Program_Engagement_Status` Path had to be deleted from `Setup → Path Settings` first because Salesforce only permits one Path per object+recordType, regardless of active state. Re-installing or upgrading the PMM package may restore that path; if so, delete it again before re-deploying ours.
 
 ---
 

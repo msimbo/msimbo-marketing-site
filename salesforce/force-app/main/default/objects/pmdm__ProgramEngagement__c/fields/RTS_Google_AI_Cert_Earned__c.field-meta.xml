@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Google_AI_Cert_Earned__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Trainee passed Google AI Essentials Certification.</description>
+    <externalId>false</externalId>
+    <label>RTS Google AI Cert Earned</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Job_Placement_Salary__c</fullName>
+    <description>Reported starting salary for funder outcome metrics. Do NOT surface to learner-facing layouts.</description>
+    <externalId>false</externalId>
+    <label>RTS Job Placement Salary</label>
+    <precision>9</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>
