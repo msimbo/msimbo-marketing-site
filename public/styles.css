@@ -1307,3 +1307,54 @@ em { font-family: var(--font-display); font-style: italic; }
   display: none;
 }
 
+/* --- Cohort 1 closed announcement banner --- */
+.announcement {
+  background: var(--dark);
+  color: var(--white);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.announcement__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  text-align: center;
+}
+.announcement strong { color: var(--white); }
+.announcement__link {
+  color: var(--white);
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  transition: border-color 0.2s ease;
+}
+.announcement__link:hover { border-color: var(--white); }
+@media (max-width: 600px) {
+  .announcement__inner { flex-direction: column; gap: 6px; padding: 14px 20px; }
+}
+
+/* Eyebrow on dark form card */
+.form-card__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+.form-card__eyebrow--light { color: #f08080; }
+
+/* In-page anchor alias (legacy #apply still routes here) */
+.anchor-alias {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+

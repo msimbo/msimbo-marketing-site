@@ -6,6 +6,8 @@
  *                                    - If existing Info Session Lead: PATCH to promote (flip RecordType to Applicant)
  *                                    - Else: REST insert (create as Applicant). W2L can't reliably populate
  *                                      lookup fields (RTS_Cohort__c) before validation rules run.
+ *   signupType === 'waitlist'     → Salesforce REST insert (RTS_Applicant RecordType,
+ *                                   Status='RTS - Waitlisted', linked to Cohort 2 via SF_RTS_COHORT_2_ID)
  *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
  *                                   + n8n webhook (Google Calendar invite)
  *
@@ -13,6 +15,8 @@
  *   SF_ORG_ID                       — Salesforce 15-char Org ID (info-session W2L only)
  *   SF_RTS_COHORT_ID                — 15-char Cohort record ID (applications only)
  *   SF_RTS_COHORT_NAME              — Human-readable cohort name (e.g., "RTS - Cohort 1 - May 2026")
+ *   SF_RTS_COHORT_2_ID              — 15-char Cohort 2 record ID (waitlist only)
+ *   SF_RTS_COHORT_2_NAME            — Human-readable cohort name (e.g., "RTS - Cohort 2 - Fall 2026")
  *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
  *   SF_INFO_SESSION_RECORD_TYPE_ID  — 15-char RTS_Info_Session RecordType Id
  *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
@@ -80,6 +84,10 @@ exports.handler = async function (event) {
 
   if (data.signupType === 'application') {
     return submitApplication(data, headers);
+  }
+
+  if (data.signupType === 'waitlist') {
+    return submitWaitlist(data, headers);
   }
 
   if (data.signupType === 'info_session') {
@@ -344,6 +352,118 @@ function validateInfoSession(data) {
   if (phoneDigits.length < 10) return 'Invalid phone number';
   if (isNaN(new Date(data.infoSessionDate).getTime())) return 'Invalid info session date';
   return null;
+}
+
+// ──────────────────────────────────────────────
+// WAITLIST FLOW (Cohort 2 early-notice list)
+// ──────────────────────────────────────────────
+
+async function submitWaitlist(data, headers) {
+  const {
+    SF_RTS_COHORT_2_ID,
+    SF_RTS_COHORT_2_NAME,
+    SF_RECORD_TYPE_ID,
+    SF_INSTANCE_URL,
+    SF_DUPE_CHECK_USERNAME,
+    SF_DUPE_CHECK_PASSWORD,
+  } = process.env;
+
+  const err = validateWaitlist(data);
+  if (err) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: err }) };
+  }
+
+  if (!SF_INSTANCE_URL || !SF_DUPE_CHECK_USERNAME || !SF_DUPE_CHECK_PASSWORD) {
+    console.error('Missing SF credentials for waitlist insert');
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
+  }
+
+  // If a Lead already exists with this email, treat as "already on the list"
+  // and succeed silently rather than creating a duplicate.
+  let existingLead;
+  try {
+    existingLead = await findLeadByEmail(data.email, {
+      instanceUrl: SF_INSTANCE_URL,
+      username: SF_DUPE_CHECK_USERNAME,
+      password: SF_DUPE_CHECK_PASSWORD,
+    });
+  } catch (e) {
+    console.error('Waitlist lookup failed:', e.message);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
+  }
+
+  if (existingLead) {
+    return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', alreadyOnList: true }) };
+  }
+
+  try {
+    await createWaitlistViaRest(data, {
+      instanceUrl: SF_INSTANCE_URL,
+      username: SF_DUPE_CHECK_USERNAME,
+      password: SF_DUPE_CHECK_PASSWORD,
+      recordTypeId: SF_RECORD_TYPE_ID,
+      cohortId: SF_RTS_COHORT_2_ID,
+      cohortName: SF_RTS_COHORT_2_NAME,
+    });
+    return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
+  } catch (e) {
+    console.error('Waitlist Lead create failed:', e.message);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
+  }
+}
+
+function validateWaitlist(data) {
+  const required = ['firstName', 'lastName', 'email', 'phone'];
+  for (const k of required) {
+    if (!data[k] || String(data[k]).trim().length === 0) return 'Missing required field: ' + k;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return 'Invalid email address';
+  const phoneDigits = String(data.phone).replace(/\D/g, '');
+  if (phoneDigits.length < 10) return 'Invalid phone number';
+  return null;
+}
+
+async function createWaitlistViaRest(data, opts) {
+  const { username, password, recordTypeId, cohortId, cohortName } = opts;
+  const { sessionId, instanceUrl } = await sfLogin({ username, password });
+
+  const body = {
+    FirstName: data.firstName,
+    LastName: data.lastName,
+    Email: data.email,
+    Phone: data.phone,
+    Company: 'N/A',
+    LeadSource: 'Wesbite_msimbo.org',
+    Status: 'RTS - Waitlisted',
+  };
+
+  if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
+  if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
+  if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
+
+  const url = `${instanceUrl}/services/data/v62.0/sobjects/Lead/`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + sessionId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error('Waitlist Lead INSERT failed: ' + res.status + ' ' + text);
+  }
 }
 
 // ──────────────────────────────────────────────

@@ -11,3 +11,9 @@ salesforce/.sf/
 docs/Urban League of Eastern MA_contacts_*.csv
 docs/\[ULEM\] Invite to RTS Info Session.json
 docs/info-session-calendar-description.txt
+docs/EmailLog_*.csv
+docs/*Transcription*.txt
+docs/ConditionalAcceptanceLetterMSIMBO.md
+
+# Salesforce wholesale settings retrieve dump (not RTS-related)
+salesforce/force-app/main/default/settings/
