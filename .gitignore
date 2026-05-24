@@ -1,5 +1,6 @@
 .sales
 .env
+.mcp.json
 .claude/skills/
 # Local Netlify folder
 .netlify
