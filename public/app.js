@@ -11,7 +11,8 @@
   // Update these when new sessions are scheduled
   // ──────────────────────────────────────────────
   const INFO_SESSION_DATES = [
-    { label: "Thu, Jun 4", time: "6:00 PM", value: "2026-06-04T18:00:00" },
+    { label: "Thu, Jun 18", time: "6:00 PM", value: "2026-06-18T18:00:00" },
+    { label: "Thu, Jun 25", time: "6:00 PM", value: "2026-06-25T18:00:00" },
   ];
 
   // Serverless function endpoint
