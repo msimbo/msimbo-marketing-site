@@ -255,6 +255,13 @@
   function submitForm(formEl, prefix, signupType) {
     var btn = formEl.querySelector('button[type="submit"]');
 
+    // With no upcoming sessions there is no date to pick, and the backend
+    // rejects an info_session Lead without one. Capture the lead on the
+    // Cohort 2 waitlist instead, which requires no date.
+    if (signupType === "info_session" && !sessions.length) {
+      signupType = "waitlist";
+    }
+
     if (!validateForm(prefix, signupType === "info_session")) return;
 
     var nameInput = document.getElementById(prefix + "Name");
@@ -299,11 +306,13 @@
         fireConversionEvents(signupType, payload);
 
         // Redirect to thank-you page
-        var thankYouPage =
-          signupType === "info_session"
-            ? "/thank-you-info-session.html"
-            : "/thank-you-application.html";
-        window.location.href = thankYouPage;
+        var thankYouPages = {
+          info_session: "/thank-you-info-session.html",
+          waitlist: "/thank-you-waitlist.html",
+          application: "/thank-you-application.html",
+        };
+        window.location.href =
+          thankYouPages[signupType] || "/thank-you-application.html";
       })
       .catch(function () {
         btn.classList.remove("btn--loading");
@@ -347,6 +356,86 @@
   // ──────────────────────────────────────────────
   var infoForm = document.getElementById("infoSessionForm");
   var appForm = document.getElementById("applicationForm");
+  var waitForm = document.getElementById("waitlistForm");
+
+  // The waitlist form has its own field shape (separate first/last name, no
+  // zip), so it can't reuse the prefix-based validateForm/submitForm pair.
+  function submitWaitlistForm(formEl) {
+    var btn = formEl.querySelector('button[type="submit"]');
+    var firstInput = document.getElementById("waitFirstName");
+    var lastInput = document.getElementById("waitLastName");
+    var emailInput = document.getElementById("waitEmail");
+    var phoneInput = document.getElementById("waitPhone");
+
+    var fields = [
+      { input: firstInput, error: "waitFirstNameError", msg: "Please enter your first name", ok: function (v) { return v.length > 0; } },
+      { input: lastInput, error: "waitLastNameError", msg: "Please enter your last name", ok: function (v) { return v.length > 0; } },
+      { input: emailInput, error: "waitEmailError", msg: "Please enter a valid email address", ok: validateEmail },
+      { input: phoneInput, error: "waitPhoneError", msg: "Please enter a valid phone number", ok: validatePhone },
+    ];
+
+    var valid = true;
+    fields.forEach(function (f) {
+      clearError(f.error);
+      var value = f.input.value.trim();
+      if (!f.ok(value)) {
+        showError(f.error, f.msg);
+        f.input.classList.add("form__input--error");
+        valid = false;
+      } else {
+        f.input.classList.remove("form__input--error");
+      }
+    });
+    clearError("waitFormError");
+    if (!valid) return;
+
+    var payload = {
+      firstName: firstInput.value.trim(),
+      lastName: lastInput.value.trim(),
+      email: emailInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      signupType: "waitlist",
+      leadSource: "Landing Page",
+      utmSource: utmParams.utm_source || "",
+      utmMedium: utmParams.utm_medium || "",
+      utmCampaign: utmParams.utm_campaign || "",
+      utmContent: utmParams.utm_content || "",
+      utmTerm: utmParams.utm_term || "",
+      submittedAt: new Date().toISOString(),
+    };
+
+    btn.classList.add("btn--loading");
+
+    fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Submission failed");
+        return res.json();
+      })
+      .then(function () {
+        fireConversionEvents("waitlist", payload);
+        window.location.href = "/thank-you-waitlist.html";
+      })
+      .catch(function () {
+        btn.classList.remove("btn--loading");
+        showError("waitFormError", "Something went wrong. Please try again.");
+      });
+  }
+
+  if (waitForm) {
+    waitForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      submitWaitlistForm(waitForm);
+    });
+
+    waitForm.addEventListener("focusin", function handler() {
+      track("InitiateCheckout", { content_name: "waitlist" });
+      waitForm.removeEventListener("focusin", handler);
+    });
+  }
 
   if (infoForm) {
     infoForm.addEventListener("submit", function (e) {
