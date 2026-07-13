@@ -15,6 +15,15 @@
     { label: "Thu, Aug 6", time: "6:00 PM", value: "2026-08-06T18:00:00" }
   ];
 
+  // Sessions whose start time has already passed are never shown.
+  function upcomingSessions() {
+    var now = Date.now();
+    return INFO_SESSION_DATES.filter(function (session) {
+      var starts = new Date(session.value).getTime();
+      return !isNaN(starts) && starts > now;
+    });
+  }
+
   // Serverless function endpoint
   const API_ENDPOINT = "/.netlify/functions/submit-form";
 
@@ -75,12 +84,22 @@
   // ──────────────────────────────────────────────
   var selectedDate = null;
   var datePicker = document.querySelector(".date-picker");
+  var sessions = upcomingSessions();
 
   function renderDatePicker() {
     if (!datePicker) return;
     datePicker.innerHTML = "";
 
-    INFO_SESSION_DATES.forEach(function (session, i) {
+    if (!sessions.length) {
+      var empty = document.createElement("p");
+      empty.className = "date-picker__empty";
+      empty.textContent =
+        "New info session dates are being scheduled. Sign up and we'll email you as soon as the next one is announced.";
+      datePicker.appendChild(empty);
+      return;
+    }
+
+    sessions.forEach(function (session, i) {
       var card = document.createElement("div");
       card.className = "date-option";
       card.setAttribute("role", "radio");
@@ -231,7 +250,7 @@
       zipInput.classList.remove("form__input--error");
     }
 
-    if (requireDate && !selectedDate) {
+    if (requireDate && sessions.length && !selectedDate) {
       showError("dateError", "Please select a session date");
       valid = false;
     }
