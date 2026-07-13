@@ -570,17 +570,6 @@ em { font-family: var(--font-display); font-style: italic; }
   margin-bottom: 12px;
 }
 
-.date-picker__empty {
-  grid-column: 1 / -1;
-  padding: 14px 12px;
-  border: 2px dashed rgba(0,0,0,0.1);
-  border-radius: 8px;
-  text-align: center;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  opacity: 0.8;
-}
-
 .date-option {
   padding: 14px 12px;
   border: 2px solid rgba(0,0,0,0.1);

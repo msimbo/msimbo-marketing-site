@@ -90,15 +90,6 @@
     if (!datePicker) return;
     datePicker.innerHTML = "";
 
-    if (!sessions.length) {
-      var empty = document.createElement("p");
-      empty.className = "date-picker__empty";
-      empty.textContent =
-        "New info session dates are being scheduled. Sign up and we'll email you as soon as the next one is announced.";
-      datePicker.appendChild(empty);
-      return;
-    }
-
     sessions.forEach(function (session, i) {
       var card = document.createElement("div");
       card.className = "date-option";
@@ -250,7 +241,7 @@
       zipInput.classList.remove("form__input--error");
     }
 
-    if (requireDate && sessions.length && !selectedDate) {
+    if (requireDate && !selectedDate) {
       showError("dateError", "Please select a session date");
       valid = false;
     }
