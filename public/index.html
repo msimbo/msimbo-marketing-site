@@ -27,8 +27,8 @@
   <!-- ==================== ANNOUNCEMENT BANNER ==================== -->
   <div class="announcement" role="status">
     <div class="announcement__inner">
-      <strong>Cohort 1 is now in training.</strong> Be first in line for Cohort 2 (Fall 2026).
-      <a href="#waitlist" class="announcement__link">Join the Cohort 2 Waitlist <span aria-hidden="true">&rarr;</span></a>
+      <strong>Cohort 2 is live &mdash; applications are open.</strong> Class starts October 5, 2026 and seats are limited.
+      <a href="#apply" class="announcement__link">Apply Now <span aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 
@@ -39,13 +39,13 @@
       <div class="hero__logo-row">
         <img src="/assets/ulem-logo.png" alt="Urban League of Eastern Massachusetts" class="hero__logo" width="56" height="56" loading="eager">
       </div>
-      <p class="hero__eyebrow">FREE 10-WEEK PROGRAM &middot; BOSTON &middot; COHORT 2 STARTS FALL 2026</p>
+      <p class="hero__eyebrow">FREE 10-WEEK PROGRAM &middot; BOSTON &middot; COHORT 2 STARTS OCTOBER 5, 2026</p>
       <h1 class="hero__headline">Launch Your Career in Revenue Operations</h1>
       <div class="hero__rule" aria-hidden="true"></div>
       <p class="hero__sub">Get certified. Build a portfolio. Land a $55K&ndash;$70K role &mdash; all at no cost to you.</p>
       <div class="hero__ctas">
-        <a href="#waitlist" class="btn btn--primary">Join the Cohort 2 Waitlist <span aria-hidden="true">&rarr;</span></a>
-        <a href="#info-session" class="hero__secondary-cta">Or attend an info session <span aria-hidden="true">&rarr;</span></a>
+        <a href="#apply" class="btn btn--primary">Apply for Cohort 2 <span aria-hidden="true">&rarr;</span></a>
+        <a href="#info-session" class="hero__secondary-cta">Or attend an info session first <span aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="hero__trust">
         <img src="/assets/ulem-logo.png" alt="" class="hero__trust-logo" width="24" height="24" aria-hidden="true">
@@ -169,8 +169,8 @@
       <div class="form-card form-card--light">
         <h2 class="section-headline">Start With an Info Session</h2>
         <div class="form-card__rule" aria-hidden="true"></div>
-        <p class="form-card__sub">Cohort 1 is now in training. Join us for a free 30-minute session to learn about the program, meet the instructor, and prep for Cohort 2 (Fall 2026). No commitment required.</p>
-        <p class="form-card__schedule">Program runs Mon&ndash;Wed 10 AM&ndash;4 PM + Thu&ndash;Fri remote for 10 weeks. Cohort 2 starts Fall 2026.</p>
+        <p class="form-card__sub">Not ready to apply yet? Join a free 30-minute session to learn about the program, meet the instructor, and get your questions answered. No commitment required.</p>
+        <p class="form-card__schedule">Program runs Mon&ndash;Wed 10 AM&ndash;4 PM + Thu&ndash;Fri remote for 10 weeks. Cohort 2 starts October 5, 2026.</p>
 
         <form id="infoSessionForm" class="form" novalidate>
           <fieldset>
@@ -302,53 +302,188 @@
     </div>
   </section>
 
-  <!-- ==================== SECTION 8: COHORT 2 WAITLIST FORM ==================== -->
-  <section class="form-section form-section--dark" id="waitlist">
-    <a id="apply" class="anchor-alias" aria-hidden="true"></a>
+  <!-- ==================== SECTION 8: COHORT 2 APPLICATION ==================== -->
+  <section class="form-section form-section--dark" id="apply">
+    <a id="waitlist" class="anchor-alias" aria-hidden="true"></a>
     <div class="container">
       <div class="form-card form-card--dark">
-        <p class="form-card__eyebrow form-card__eyebrow--light">COHORT 2 &middot; FALL 2026</p>
-        <h2 class="section-headline section-headline--white">Join the Cohort 2 Waitlist</h2>
+        <p class="form-card__eyebrow form-card__eyebrow--light">COHORT 2 &middot; STARTS OCTOBER 5, 2026</p>
+        <h2 class="section-headline section-headline--white">Apply for Cohort 2</h2>
         <div class="form-card__rule" aria-hidden="true"></div>
-        <p class="form-card__sub form-card__sub--light">Cohort 1 is now in training in Boston. Cohort 2 starts Fall 2026. Add your name to the waitlist and we'll notify you the moment applications open.</p>
+        <p class="form-card__sub form-card__sub--light">Applications are open now. It takes about 10 minutes &mdash; no resume required. After you apply, you'll complete a short online assessment and have a one-on-one interview with our team.</p>
 
-        <form id="waitlistForm" class="form form--dark" novalidate>
-          <div class="form__fields">
-            <div class="form__group">
-              <label for="waitFirstName" class="form__label">First Name</label>
-              <input type="text" id="waitFirstName" name="firstName" class="form__input" required autocomplete="given-name" placeholder="Your first name">
-              <div class="form__error" id="waitFirstNameError" role="alert" aria-live="polite"></div>
+        <form id="applicationForm" class="form form--dark form--wizard" novalidate>
+          <div class="wizard__progress">
+            <div class="wizard__progress-bar">
+              <div class="wizard__progress-fill" id="wizProgressFill"></div>
             </div>
-            <div class="form__group">
-              <label for="waitLastName" class="form__label">Last Name</label>
-              <input type="text" id="waitLastName" name="lastName" class="form__input" required autocomplete="family-name" placeholder="Your last name">
-              <div class="form__error" id="waitLastNameError" role="alert" aria-live="polite"></div>
-            </div>
-            <div class="form__group">
-              <label for="waitEmail" class="form__label">Email Address</label>
-              <input type="email" id="waitEmail" name="email" class="form__input" required autocomplete="email" placeholder="you@example.com">
-              <div class="form__error" id="waitEmailError" role="alert" aria-live="polite"></div>
-            </div>
-            <div class="form__group">
-              <label for="waitPhone" class="form__label">Phone Number</label>
-              <input type="tel" id="waitPhone" name="phone" class="form__input" required autocomplete="tel" placeholder="(617) 555-0100">
-              <div class="form__error" id="waitPhoneError" role="alert" aria-live="polite"></div>
-            </div>
+            <p class="wizard__progress-label">
+              <span id="wizStepLabel">Step 1 of 4</span> &middot; <span id="wizStepTitle">Your contact info</span>
+            </p>
           </div>
 
-          <button type="submit" class="btn btn--primary btn--full" id="waitSubmitBtn">
-            <span class="btn__text">Add Me to the Waitlist <span aria-hidden="true">&rarr;</span></span>
-            <span class="btn__spinner" aria-hidden="true"></span>
-          </button>
+          <!-- STEP 1: Contact -->
+          <fieldset class="wizard__step wizard__step--active" data-step="1">
+            <legend class="wizard__legend">Your contact info</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appFirstName" class="form__label">First Name</label>
+                <input type="text" id="appFirstName" name="firstName" class="form__input" autocomplete="given-name" placeholder="Your first name">
+                <div class="form__error" id="appFirstNameError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appLastName" class="form__label">Last Name</label>
+                <input type="text" id="appLastName" name="lastName" class="form__input" autocomplete="family-name" placeholder="Your last name">
+                <div class="form__error" id="appLastNameError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEmail" class="form__label">Email Address</label>
+                <input type="email" id="appEmail" name="email" class="form__input" autocomplete="email" placeholder="you@example.com">
+                <div class="form__error" id="appEmailError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appPhone" class="form__label">Phone Number</label>
+                <input type="tel" id="appPhone" name="phone" class="form__input" autocomplete="tel" placeholder="(617) 555-0100">
+                <div class="form__error" id="appPhoneError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
 
-          <div class="form__error form__error--summary" id="waitFormError" role="alert" aria-live="polite"></div>
+          <!-- STEP 2: Eligibility -->
+          <fieldset class="wizard__step" data-step="2" hidden>
+            <legend class="wizard__legend">Eligibility</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appDob" class="form__label">Date of Birth</label>
+                <input type="date" id="appDob" name="dateOfBirth" class="form__input" autocomplete="bday">
+                <p class="form__hint form__hint--light">You must be 18 or older to apply.</p>
+                <div class="form__error" id="appDobError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appZip" class="form__label">Zip Code</label>
+                <input type="text" id="appZip" name="zipCode" class="form__input" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="02119">
+                <div class="form__error" id="appZipError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label class="form__checkbox-label" for="appDaytime">
+                  <input type="checkbox" id="appDaytime" name="daytimeAvailable" class="form__checkbox">
+                  <span>I can attend in person at ULEM Boston on Mon&ndash;Wed, 10 AM&ndash;4 PM, for the full 10 weeks.</span>
+                </label>
+                <div class="form__error" id="appDaytimeError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
 
-          <p class="form__reassure form__reassure--light">No commitment. We'll email you when Cohort 2 applications open and share a few program updates along the way.</p>
+          <!-- STEP 3: Background -->
+          <fieldset class="wizard__step" data-step="3" hidden>
+            <legend class="wizard__legend">Your background</legend>
+            <div class="form__fields">
+              <div class="form__group">
+                <label for="appNeighborhood" class="form__label">Neighborhood / City</label>
+                <input type="text" id="appNeighborhood" name="neighborhood" class="form__input" placeholder="e.g. Roxbury, Brockton">
+                <div class="form__error" id="appNeighborhoodError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appLanguage" class="form__label">Primary Language</label>
+                <select id="appLanguage" name="primaryLanguage" class="form__input form__select">
+                  <option value="">Select one</option>
+                  <option value="English">English</option>
+                  <option value="Spanish">Spanish</option>
+                  <option value="Haitian Creole">Haitian Creole</option>
+                  <option value="Portuguese">Portuguese</option>
+                  <option value="Cape Verdean Creole">Cape Verdean Creole</option>
+                  <option value="Chinese (Mandarin)">Chinese (Mandarin)</option>
+                  <option value="Chinese (Cantonese)">Chinese (Cantonese)</option>
+                  <option value="Vietnamese">Vietnamese</option>
+                  <option value="French">French</option>
+                  <option value="Arabic">Arabic</option>
+                  <option value="Russian">Russian</option>
+                  <option value="Korean">Korean</option>
+                  <option value="Tagalog/Filipino">Tagalog/Filipino</option>
+                  <option value="Somali">Somali</option>
+                  <option value="Amharic">Amharic</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="form__error" id="appLanguageError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEmployment" class="form__label">Employment Status</label>
+                <select id="appEmployment" name="employmentStatus" class="form__input form__select">
+                  <option value="">Select one</option>
+                  <option value="Employed FT">Employed full-time</option>
+                  <option value="Employed PT">Employed part-time</option>
+                  <option value="Unemployed">Unemployed</option>
+                  <option value="Student">Student</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="form__error" id="appEmploymentError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group">
+                <label for="appEducation" class="form__label">Highest Education</label>
+                <select id="appEducation" name="educationLevel" class="form__input form__select">
+                  <option value="">Select one</option>
+                  <option value="Less than HS">Less than high school</option>
+                  <option value="HS/GED">High school / GED</option>
+                  <option value="Some College">Some college</option>
+                  <option value="Associate's">Associate's degree</option>
+                  <option value="Bachelor's">Bachelor's degree</option>
+                  <option value="Graduate">Graduate degree</option>
+                </select>
+                <p class="form__hint form__hint--light">No degree is required for this program.</p>
+                <div class="form__error" id="appEducationError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label for="appReferral" class="form__label">How did you hear about RTS?</label>
+                <select id="appReferral" name="referralSource" class="form__input form__select">
+                  <option value="">Select one</option>
+                  <option value="Google">Google</option>
+                  <option value="Facebook/Instagram">Facebook / Instagram</option>
+                  <option value="Friend/Family">Friend or family</option>
+                  <option value="Flyer">Flyer</option>
+                  <option value="Partner Org">Partner organization</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="form__error" id="appReferralError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- STEP 4: Motivation -->
+          <fieldset class="wizard__step" data-step="4" hidden>
+            <legend class="wizard__legend">Your motivation</legend>
+            <div class="form__fields">
+              <div class="form__group form__group--full">
+                <label for="appMotivationNow" class="form__label">Why are you looking to make a change right now?</label>
+                <textarea id="appMotivationNow" name="motivationNow" class="form__input form__textarea" placeholder="Tell us what's driving this decision."></textarea>
+                <p class="form__hint form__hint--light"><span id="appMotivationNowCount">0</span> characters &middot; 50 minimum</p>
+                <div class="form__error" id="appMotivationNowError" role="alert" aria-live="polite"></div>
+              </div>
+              <div class="form__group form__group--full">
+                <label for="appMotivationGoal" class="form__label">What do you hope to be doing a year from now?</label>
+                <textarea id="appMotivationGoal" name="motivationGoal" class="form__input form__textarea" placeholder="Tell us where you want this to take you."></textarea>
+                <p class="form__hint form__hint--light"><span id="appMotivationGoalCount">0</span> characters &middot; 50 minimum</p>
+                <div class="form__error" id="appMotivationGoalError" role="alert" aria-live="polite"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="wizard__controls">
+            <button type="button" class="btn btn--ghost" id="wizBackBtn" hidden>&larr; Back</button>
+            <button type="button" class="btn btn--primary" id="wizNextBtn">Continue <span aria-hidden="true">&rarr;</span></button>
+            <button type="submit" class="btn btn--primary" id="appSubmitBtn" hidden>
+              <span class="btn__text">Submit Application <span aria-hidden="true">&rarr;</span></span>
+              <span class="btn__spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="form__error form__error--summary" id="appFormError" role="alert" aria-live="polite"></div>
+
+          <p class="form__reassure form__reassure--light">Your information stays with ULEM &mdash; we never share or sell your data.</p>
         </form>
 
-        <!-- Success: JS redirects to /thank-you-waitlist.html -->
+        <!-- Success: JS redirects to /thank-you-application.html -->
 
-        <p class="form-card__fallback">Want to meet the instructor before Cohort 2 opens? <a href="#info-session" class="form-card__fallback-link">Register for an info session <span aria-hidden="true">&rarr;</span></a></p>
+        <p class="form-card__fallback">Not ready to apply? <a href="#info-session" class="form-card__fallback-link">Register for an info session first <span aria-hidden="true">&rarr;</span></a></p>
       </div>
     </div>
   </section>
@@ -419,7 +554,7 @@
             <span class="accordion__icon" aria-hidden="true"></span>
           </summary>
           <div class="accordion__body">
-            <p>Cohort 1 is currently in training (May &ndash; July 2026). Cohort 2 starts Fall 2026. <a href="#waitlist">Join the Cohort 2 waitlist</a> to be notified when applications open, or attend an info session to meet the instructor and learn more.</p>
+            <p>Cohort 2 starts October 5, 2026 and runs for 10 weeks. Recruitment is open now &mdash; <a href="#apply">apply now</a>, or <a href="#info-session">register for an info session</a> first if you want to meet the instructor and ask questions.</p>
           </div>
         </details>
         <details class="accordion__item">
@@ -428,7 +563,7 @@
             <span class="accordion__icon" aria-hidden="true"></span>
           </summary>
           <div class="accordion__body">
-            <p>The in-person days (Mon&ndash;Wed, 10 AM&ndash;4 PM) do require daytime availability. If your current schedule doesn't allow that, register for an info session and we can talk through options before Cohort 2 opens.</p>
+            <p>The in-person days (Mon&ndash;Wed, 10 AM&ndash;4 PM) do require daytime availability. If your current schedule doesn't allow that, register for an info session and we can talk through your options.</p>
           </div>
         </details>
         <details class="accordion__item">
@@ -437,7 +572,7 @@
             <span class="accordion__icon" aria-hidden="true"></span>
           </summary>
           <div class="accordion__body">
-            <p>Cohort 2 starts Fall 2026. <a href="#waitlist">Join the waitlist</a> and we'll email you the moment applications open. We plan to run additional cohorts after that.</p>
+            <p>Cohort 2 starts October 5, 2026. If that timing doesn't work, <a href="#info-session">come to an info session</a> and we'll talk through your options &mdash; we plan to run additional cohorts after this one.</p>
           </div>
         </details>
         <details class="accordion__item">
@@ -446,7 +581,7 @@
             <span class="accordion__icon" aria-hidden="true"></span>
           </summary>
           <div class="accordion__body">
-            <p>When Cohort 2 applications open, the process is straightforward: submit a short application, complete an online assessment (30&ndash;60 minutes), then have a one-on-one interview with our team. No resume required.</p>
+            <p>The process is straightforward: submit a short application, complete an online assessment (30&ndash;60 minutes), then have a one-on-one interview with our team. No resume required.</p>
           </div>
         </details>
       </div>
@@ -458,11 +593,11 @@
     <div class="final-cta__rule" aria-hidden="true"></div>
     <div class="container">
       <img src="/assets/ulem-logo.png" alt="" class="final-cta__logo" width="40" height="40" aria-hidden="true" loading="lazy">
-      <h2 class="final-cta__headline">Cohort 1 is Training Now. <em>Cohort 2 Starts Fall 2026.</em></h2>
-      <p class="final-cta__sub">One of the first community-based RevOps training programs in the U.S. is already underway in Boston. Join the Cohort 2 waitlist to be first in line when applications open.</p>
+      <h2 class="final-cta__headline">Recruitment is Open. <em>Cohort 2 Starts October 5, 2026.</em></h2>
+      <p class="final-cta__sub">One of the first community-based RevOps training programs in the U.S. is running right here in Boston. Applications for Cohort 2 are open now &mdash; it takes about 10 minutes.</p>
       <div class="final-cta__actions">
-        <a href="#waitlist" class="btn btn--primary">Join the Cohort 2 Waitlist <span aria-hidden="true">&rarr;</span></a>
-        <a href="#info-session" class="final-cta__secondary">or attend an info session <span aria-hidden="true">&rarr;</span></a>
+        <a href="#apply" class="btn btn--primary">Apply for Cohort 2 <span aria-hidden="true">&rarr;</span></a>
+        <a href="#info-session" class="final-cta__secondary">or attend an info session first <span aria-hidden="true">&rarr;</span></a>
       </div>
     </div>
   </section>

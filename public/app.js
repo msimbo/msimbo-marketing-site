@@ -11,8 +11,9 @@
   // Update these when new sessions are scheduled
   // ──────────────────────────────────────────────
   const INFO_SESSION_DATES = [
-    { label: "Thu, Jul 23", time: "6:00 PM", value: "2026-07-23T18:00:00" },
-    { label: "Thu, Aug 6", time: "6:00 PM", value: "2026-08-06T18:00:00" }
+    { label: "Thu, Sep 24", time: "6:00 PM", value: "2026-09-24T18:00:00" },
+    { label: "Thu, Oct 1", time: "6:00 PM", value: "2026-10-01T18:00:00" },
+    { label: "Thu, Oct 8", time: "6:00 PM", value: "2026-10-08T18:00:00" }
   ];
 
   // Sessions whose start time has already passed are never shown.
@@ -596,7 +597,7 @@
         if (!daytime) {
           setFieldError(
             "appDaytimeError",
-            "Daytime availability is required for this program. If you cannot attend Mon–Wed 10 AM–4 PM, the program is not a fit for Cohort 1.",
+            "Daytime availability is required for this program. If you cannot attend Mon–Wed 10 AM–4 PM, the program is not a fit for Cohort 2.",
           );
           valid = false;
         }

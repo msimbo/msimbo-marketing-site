@@ -20,3 +20,4 @@ docs/ConditionalAcceptanceLetterMSIMBO.md
 
 # Salesforce wholesale settings retrieve dump (not RTS-related)
 salesforce/force-app/main/default/settings/
+.envrc
