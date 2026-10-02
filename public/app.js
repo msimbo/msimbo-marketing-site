@@ -15,7 +15,8 @@
     { label: "Thu, Oct 8", time: "6:00 PM", value: "2026-10-08T18:00:00" },
     { label: "Fri, Oct 9", time: "12:00 PM", value: "2026-10-09T12:00:00" },
     { label: "Tue, Oct 13", time: "6:00 PM", value: "2026-10-13T18:00:00" },
-    { label: "Wed, Oct 14", time: "6:00 PM", value: "2026-10-14T18:00:00" }
+    { label: "Wed, Oct 14", time: "6:00 PM", value: "2026-10-14T18:00:00" },
+    { label: "Thu, Oct 15", time: "6:00 PM", value: "2026-10-15T18:00:00" }
   ];
 
   // Sessions whose start time has already passed are never shown.
