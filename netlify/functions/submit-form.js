@@ -6,17 +6,23 @@
  *                                    - If existing Info Session Lead: PATCH to promote (flip RecordType to Applicant)
  *                                    - Else: REST insert (create as Applicant). W2L can't reliably populate
  *                                      lookup fields (RTS_Cohort__c) before validation rules run.
+ *                                    - If existing RTS Applicant who already applied to the current cohort: 409
+ *                                    - If waitlist / prior-cohort Applicant: PATCH onto the current cohort,
+ *                                      Status reset to 'RTS - Assessment Pending'
  *   signupType === 'waitlist'     → Salesforce REST insert (RTS_Applicant RecordType,
- *                                   Status='RTS - Waitlisted', linked to Cohort 2 via SF_RTS_COHORT_2_ID)
+ *                                   Status='RTS - Waitlisted', linked to the current cohort)
  *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
  *                                   + n8n webhook (Google Calendar invite)
  *
+ * The current cohort is looked up at submit time: the RTS_Cohort__c with Status__c = 'Recruiting'
+ * and the latest Start_Date__c. Opening a new cohort is a Salesforce data change, not a redeploy.
+ *
  * Required Netlify environment variables:
  *   SF_ORG_ID                       — Salesforce 15-char Org ID (info-session W2L only)
- *   SF_RTS_COHORT_ID                — 15-char Cohort record ID (applications only)
- *   SF_RTS_COHORT_NAME              — Human-readable cohort name (e.g., "RTS - Cohort 1 - May 2026")
- *   SF_RTS_COHORT_2_ID              — 15-char Cohort 2 record ID (waitlist only)
- *   SF_RTS_COHORT_2_NAME            — Human-readable cohort name (e.g., "RTS - Cohort 2 - Fall 2026")
+ *   SF_RTS_COHORT_ID                — Fallback cohort ID for applications if no cohort is Recruiting
+ *   SF_RTS_COHORT_NAME              — Fallback cohort name (e.g., "RTS - Cohort 2 - Fall 2026")
+ *   SF_RTS_COHORT_2_ID              — Fallback cohort ID for the waitlist if no cohort is Recruiting
+ *   SF_RTS_COHORT_2_NAME            — Fallback cohort name for the waitlist
  *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
  *   SF_INFO_SESSION_RECORD_TYPE_ID  — 15-char RTS_Info_Session RecordType Id
  *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
@@ -143,27 +149,53 @@ async function submitApplication(data, headers) {
     };
   }
 
+  let cohort;
+  try {
+    cohort = await resolveRecruitingCohort(
+      { fallbackId: SF_RTS_COHORT_ID, fallbackName: SF_RTS_COHORT_NAME },
+      existingLead || { username: SF_DUPE_CHECK_USERNAME, password: SF_DUPE_CHECK_PASSWORD },
+    );
+  } catch (e) {
+    console.error('Cohort lookup failed:', e.message);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Submission failed. Please try again or contact program-rts@ulem.org.' }),
+    };
+  }
+
   if (existingLead) {
-    if (existingLead.recordType === 'RTS_Applicant') {
+    // Only block a full application (DOB is set by the application form) to the
+    // cohort currently recruiting. Waitlist sign-ups and prior-cohort applicants
+    // re-apply by being moved onto the current cohort.
+    const appliedToCurrentCohort =
+      existingLead.recordType === 'RTS_Applicant' &&
+      existingLead.hasApplication &&
+      sameSfId(existingLead.cohortId, cohort.id);
+
+    if (appliedToCurrentCohort) {
       return {
         statusCode: 409,
         headers,
         body: JSON.stringify({
-          error: "You've already applied to RTS Cohort 1 with this email. If this seems wrong, contact program-rts@ulem.org.",
+          error: "You've already applied to the current RTS cohort with this email. If this seems wrong, contact program-rts@ulem.org.",
         }),
       };
     }
 
-    // Any non-Applicant RecordType (Info Session, legacy Student Lead, etc.) → promote
-    // the existing Lead in-place via REST PATCH. Creating a second Lead via W2L would
+    // Any other existing Lead (Info Session, waitlist, prior cohort, legacy Student Lead, etc.)
+    // → promote the existing Lead in-place via REST PATCH. Creating a second Lead via W2L would
     // either duplicate or (as we've seen) get silently rejected by SF.
     try {
       await promoteLeadToApplicant(existingLead, data, {
         instanceUrl: existingLead.instanceUrl,
         sessionId: existingLead.sessionId,
         recordTypeId: SF_RECORD_TYPE_ID,
-        cohortId: SF_RTS_COHORT_ID,
-        cohortName: SF_RTS_COHORT_NAME,
+        cohortId: cohort.id,
+        cohortName: cohort.name,
+        // Returning applicants carry a stale status (Waitlisted, Declined, ...) from their
+        // earlier record; restart them where a new application starts.
+        resetStatus: existingLead.recordType === 'RTS_Applicant',
       });
       return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
     } catch (e) {
@@ -185,8 +217,8 @@ async function submitApplication(data, headers) {
       username: SF_DUPE_CHECK_USERNAME,
       password: SF_DUPE_CHECK_PASSWORD,
       recordTypeId: SF_RECORD_TYPE_ID,
-      cohortId: SF_RTS_COHORT_ID,
-      cohortName: SF_RTS_COHORT_NAME,
+      cohortId: cohort.id,
+      cohortName: cohort.name,
     });
     return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
   } catch (e) {
@@ -401,13 +433,17 @@ async function submitWaitlist(data, headers) {
   }
 
   try {
+    const cohort = await resolveRecruitingCohort(
+      { fallbackId: SF_RTS_COHORT_2_ID, fallbackName: SF_RTS_COHORT_2_NAME },
+      { username: SF_DUPE_CHECK_USERNAME, password: SF_DUPE_CHECK_PASSWORD },
+    );
     await createWaitlistViaRest(data, {
       instanceUrl: SF_INSTANCE_URL,
       username: SF_DUPE_CHECK_USERNAME,
       password: SF_DUPE_CHECK_PASSWORD,
       recordTypeId: SF_RECORD_TYPE_ID,
-      cohortId: SF_RTS_COHORT_2_ID,
-      cohortName: SF_RTS_COHORT_2_NAME,
+      cohortId: cohort.id,
+      cohortName: cohort.name,
     });
     return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
   } catch (e) {
@@ -536,13 +572,8 @@ async function sfLogin(sfCreds) {
 async function findLeadByEmail(email, sfCreds) {
   const { sessionId, instanceUrl } = await sfLogin(sfCreds);
 
-  const soql = `SELECT Id, Email, RecordType.DeveloperName, IsConverted FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
-  const queryUrl = `${instanceUrl}/services/data/v62.0/query?q=${encodeURIComponent(soql)}`;
-
-  const queryRes = await fetch(queryUrl, { headers: { 'Authorization': 'Bearer ' + sessionId } });
-  if (!queryRes.ok) throw new Error('SOQL query failed: ' + queryRes.status);
-
-  const queryData = await queryRes.json();
+  const soql = `SELECT Id, Email, RecordType.DeveloperName, IsConverted, ${SF_API_NAMES.cohort}, ${SF_API_NAMES.dateOfBirth} FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
+  const queryData = await sfQuery(soql, { sessionId, instanceUrl });
   if (!queryData.records || queryData.records.length === 0) return null;
 
   const record = queryData.records[0];
@@ -550,13 +581,42 @@ async function findLeadByEmail(email, sfCreds) {
     id: record.Id,
     email: record.Email,
     recordType: record.RecordType && record.RecordType.DeveloperName,
+    cohortId: record[SF_API_NAMES.cohort],
+    hasApplication: Boolean(record[SF_API_NAMES.dateOfBirth]),
     sessionId,
     instanceUrl,
   };
 }
 
+// The cohort new applicants join: the RTS_Cohort__c in Recruiting status with the
+// latest start date (same rule as RTS Flow 1c). Env vars are only a fallback for
+// when no cohort is marked Recruiting.
+async function resolveRecruitingCohort(fallback, sfAuth) {
+  const session = sfAuth.sessionId ? sfAuth : await sfLogin(sfAuth);
+  const soql = "SELECT Id, Name FROM RTS_Cohort__c WHERE Status__c = 'Recruiting' ORDER BY Start_Date__c DESC NULLS LAST LIMIT 1";
+  const queryData = await sfQuery(soql, session);
+  const record = queryData.records && queryData.records[0];
+  if (record) return { id: record.Id, name: record.Name };
+
+  if (!fallback.fallbackId) throw new Error('No Recruiting RTS cohort and no fallback cohort env var');
+  console.warn('No Recruiting RTS cohort found; using env fallback', fallback.fallbackName);
+  return { id: fallback.fallbackId, name: fallback.fallbackName };
+}
+
+async function sfQuery(soql, { sessionId, instanceUrl }) {
+  const queryUrl = `${instanceUrl}/services/data/v62.0/query?q=${encodeURIComponent(soql)}`;
+  const queryRes = await fetch(queryUrl, { headers: { 'Authorization': 'Bearer ' + sessionId } });
+  if (!queryRes.ok) throw new Error('SOQL query failed: ' + queryRes.status + ' ' + (await queryRes.text()).slice(0, 200));
+  return queryRes.json();
+}
+
+// Compares 15- and 18-char Salesforce IDs.
+function sameSfId(a, b) {
+  return Boolean(a && b) && String(a).slice(0, 15) === String(b).slice(0, 15);
+}
+
 async function promoteLeadToApplicant(existingLead, data, opts) {
-  const { instanceUrl, sessionId, recordTypeId, cohortId, cohortName } = opts;
+  const { instanceUrl, sessionId, recordTypeId, cohortId, cohortName, resetStatus } = opts;
 
   const motivationCombined =
     'Where I am now:\n' + data.motivationNow + '\n\n' +
@@ -582,6 +642,7 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
   if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
   if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
   if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
+  if (resetStatus) body.Status = 'RTS - Assessment Pending';
 
   const patchUrl = `${instanceUrl}/services/data/v62.0/sobjects/Lead/${existingLead.id}`;
 
