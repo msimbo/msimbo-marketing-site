@@ -36,7 +36,8 @@ public with sharing class RTS_DashboardRefreshScheduler implements Schedulable {
     @TestVisible
     private static Integer refreshDashboard(Id dashboardId) {
         HttpRequest req = new HttpRequest();
-        req.setEndpoint(URL.getOrgDomainUrl().toExternalForm() + '/services/data/v60.0/analytics/dashboards/' + dashboardId + '/results');
+        // PUT on the dashboard itself queues a refresh; PUT on /results is a 404.
+        req.setEndpoint(URL.getOrgDomainUrl().toExternalForm() + '/services/data/v60.0/analytics/dashboards/' + dashboardId);
         req.setMethod('PUT');
         req.setHeader('Authorization', 'Bearer ' + UserInfo.getSessionId());
         req.setHeader('Content-Type', 'application/json');

@@ -6,20 +6,14 @@
     <columns>
         <field>Lead.RTS_Instructor_Interview_Outcome__c</field>
     </columns>
-    <columns>
-        <field>Lead.RTS_CM_Interview_DateTime__c</field>
-    </columns>
-    <columns>
-        <field>Lead.RTS_CM_Interview_Outcome__c</field>
-    </columns>
-    <description>Active interview candidates grouped by Status. Shows applicants at Interview 1 Requested through Interview 2 Complete with both interview dates and outcomes visible.</description>
+    <description>Active interview candidates grouped by Status. Shows applicants from Interview Requested through Interview Complete with the interview date and outcome.</description>
     <filter>
         <criteriaItems>
             <column>STATUS</column>
             <columnToColumn>false</columnToColumn>
             <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
-            <value>RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Interview 2 Requested,RTS - Interview 2 Scheduled,RTS - Interview 2 Complete</value>
+            <value>RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete</value>
         </criteriaItems>
         <criteriaItems>
             <column>Lead.RTS_Cohort_Status__c</column>

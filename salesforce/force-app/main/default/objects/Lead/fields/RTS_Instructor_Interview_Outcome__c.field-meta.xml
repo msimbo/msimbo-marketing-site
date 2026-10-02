@@ -4,7 +4,7 @@
     <externalId>false</externalId>
     <label>Instructor Interview Outcome</label>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackFeedHistory>false</trackFeedHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -13,7 +13,7 @@
             <value>
                 <fullName>Advance to Case Manager</fullName>
                 <default>false</default>
-                <label>Advance to Case Manager</label>
+                <label>Advance</label>
             </value>
             <value>
                 <fullName>Hold for Review</fullName>

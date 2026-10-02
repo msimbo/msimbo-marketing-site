@@ -13,7 +13,7 @@
             <columnToColumn>false</columnToColumn>
             <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
-            <value>RTS - Assessment Pending,RTS - Assessment Complete,RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Interview 2 Requested,RTS - Interview 2 Scheduled,RTS - Interview 2 Complete,RTS - Accepted - Offer Sent,RTS - Accepted - Confirmed,RTS - Waitlisted,RTS - Declined - Not Qualified,RTS - Declined - Withdrew,RTS - Converted</value>
+            <value>RTS - Assessment Pending,RTS - Assessment Complete,RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Accepted - Offer Sent,RTS - Accepted - Confirmed,RTS - Waitlisted,RTS - Declined - Not Qualified,RTS - Declined - Withdrew,RTS - Converted</value>
         </criteriaItems>
         <criteriaItems>
             <column>Lead.RTS_Cohort_Status__c</column>

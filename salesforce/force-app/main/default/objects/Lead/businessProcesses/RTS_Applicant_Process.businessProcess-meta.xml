@@ -3,63 +3,51 @@
     <fullName>RTS_Applicant_Process</fullName>
     <isActive>true</isActive>
     <values>
-        <fullName>RTS - Assessment Pending</fullName>
+        <fullName>Assess Complete</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Assess Pending</fullName>
         <default>true</default>
+    </values>
+    <values>
+        <fullName>Converted-RTS</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Declined-NotQual</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Declined-Withdrew</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Interview Complete</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Interview Requested</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Interview Scheduled</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Offer Confirmed</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Offer Sent</fullName>
+        <default>false</default>
     </values>
     <values>
         <fullName>RTS - Under Review</fullName>
         <default>false</default>
     </values>
     <values>
-        <fullName>RTS - Assessment Complete</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 1 Requested</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 1 Scheduled</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 1 Complete</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 2 Requested</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 2 Scheduled</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Interview 2 Complete</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Accepted - Offer Sent</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Accepted - Confirmed</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Waitlisted</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Declined - Not Qualified</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Declined - Withdrew</fullName>
-        <default>false</default>
-    </values>
-    <values>
-        <fullName>RTS - Converted</fullName>
+        <fullName>Waitlisted</fullName>
         <default>false</default>
     </values>
 </BusinessProcess>

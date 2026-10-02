@@ -64,19 +64,19 @@
     <standardValue>
         <fullName>RTS - Interview 1 Requested</fullName>
         <default>false</default>
-        <label>Int1 Req</label>
+        <label>Interview Requested</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 1 Scheduled</fullName>
         <default>false</default>
-        <label>Int1 Sched</label>
+        <label>Interview Scheduled</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
         <fullName>RTS - Interview 1 Complete</fullName>
         <default>false</default>
-        <label>Int1 Done</label>
+        <label>Interview Complete</label>
         <converted>false</converted>
     </standardValue>
     <standardValue>
@@ -132,5 +132,23 @@
         <default>false</default>
         <label>Converted-RTS</label>
         <converted>true</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Info Session Registered</fullName>
+        <default>false</default>
+        <label>InfoSes Registered</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Info Session Attended</fullName>
+        <default>false</default>
+        <label>InfoSes Attended</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>RTS - Info Session No Show</fullName>
+        <default>false</default>
+        <label>InfoSes No Show</label>
+        <converted>false</converted>
     </standardValue>
 </StandardValueSet>

@@ -5,7 +5,7 @@
     <encodingKey>UTF-8</encodingKey>
     <name>RTS Instructor Interview Invitation</name>
     <style>none</style>
-    <subject>You're moving forward, {!Lead.FirstName}. Schedule your RTS Instructor interview.</subject>
+    <subject>You&apos;re moving forward, {!Lead.FirstName}. Schedule your RTS Instructor interview.</subject>
     <type>text</type>
     <uiType>Aloha</uiType>
 </EmailTemplate>
