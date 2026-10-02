@@ -11,9 +11,11 @@
   // Update these when new sessions are scheduled
   // ──────────────────────────────────────────────
   const INFO_SESSION_DATES = [
-    { label: "Thu, Sep 24", time: "6:00 PM", value: "2026-09-24T18:00:00" },
-    { label: "Thu, Oct 1", time: "6:00 PM", value: "2026-10-01T18:00:00" },
-    { label: "Thu, Oct 8", time: "6:00 PM", value: "2026-10-08T18:00:00" }
+    { label: "Tue, Oct 6", time: "6:00 PM", value: "2026-10-06T18:00:00" },
+    { label: "Thu, Oct 8", time: "6:00 PM", value: "2026-10-08T18:00:00" },
+    { label: "Fri, Oct 9", time: "12:00 PM", value: "2026-10-09T12:00:00" },
+    { label: "Tue, Oct 13", time: "6:00 PM", value: "2026-10-13T18:00:00" },
+    { label: "Wed, Oct 14", time: "6:00 PM", value: "2026-10-14T18:00:00" }
   ];
 
   // Sessions whose start time has already passed are never shown.
