@@ -68,6 +68,8 @@ const SF_API_NAMES = {
   motivation: 'RTS_Motivation__c',
   cohort: 'RTS_Cohort__c',
   cohortName: 'RTS_Cohort_Name__c',
+  instructorInviteSent: 'RTS_Instructor_Invite_Sent__c',
+  cmInviteSent: 'RTS_CM_Invite_Sent__c',
 };
 
 exports.handler = async function (event) {
@@ -572,7 +574,7 @@ async function sfLogin(sfCreds) {
 async function findLeadByEmail(email, sfCreds) {
   const { sessionId, instanceUrl } = await sfLogin(sfCreds);
 
-  const soql = `SELECT Id, Email, RecordType.DeveloperName, IsConverted, ${SF_API_NAMES.cohort}, ${SF_API_NAMES.dateOfBirth} FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
+  const soql = `SELECT Id, Email, Status, RecordType.DeveloperName, IsConverted, ${SF_API_NAMES.cohort}, ${SF_API_NAMES.dateOfBirth} FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
   const queryData = await sfQuery(soql, { sessionId, instanceUrl });
   if (!queryData.records || queryData.records.length === 0) return null;
 
@@ -580,6 +582,7 @@ async function findLeadByEmail(email, sfCreds) {
   return {
     id: record.Id,
     email: record.Email,
+    status: record.Status,
     recordType: record.RecordType && record.RecordType.DeveloperName,
     cohortId: record[SF_API_NAMES.cohort],
     hasApplication: Boolean(record[SF_API_NAMES.dateOfBirth]),
@@ -642,9 +645,29 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
   if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
   if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
   if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
-  if (resetStatus) body.Status = 'RTS - Assessment Pending';
 
   const patchUrl = `${instanceUrl}/services/data/v62.0/sobjects/Lead/${existingLead.id}`;
+
+  if (resetStatus) {
+    body.Status = 'RTS - Assessment Pending';
+    // The invitation flows only send while these are false; a returning applicant
+    // still has them set from their earlier interviews.
+    body[SF_API_NAMES.instructorInviteSent] = false;
+    body[SF_API_NAMES.cmInviteSent] = false;
+
+    // The Application Received email (assessment link) fires only when Status
+    // changes to Assessment Pending. A lead already sitting there has to leave it first.
+    if (existingLead.status === body.Status) {
+      const stepRes = await fetch(patchUrl, {
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + sessionId, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Status: 'Open - Not Contacted' }),
+      });
+      if (!stepRes.ok) {
+        throw new Error('Lead status reset failed: ' + stepRes.status + ' ' + (await stepRes.text()));
+      }
+    }
+  }
 
   const res = await fetch(patchUrl, {
     method: 'PATCH',
