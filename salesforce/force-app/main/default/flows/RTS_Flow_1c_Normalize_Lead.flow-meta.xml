@@ -25,6 +25,29 @@
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
     <recordLookups>
+        <name>Get_Active_Cohort</name>
+        <label>Get Active RTS Cohort</label>
+        <locationX>176</locationX>
+        <locationY>408</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Normalize_Lead</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Recruiting</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RTS_Cohort__c</object>
+        <sortField>Start_Date__c</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Get_Coordinator</name>
         <label>Get Program Coordinator User</label>
         <locationX>176</locationX>
@@ -73,27 +96,6 @@
         <object>RecordType</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
-    <recordLookups>
-        <name>Get_Active_Cohort</name>
-        <label>Get Active RTS Cohort</label>
-        <locationX>176</locationX>
-        <locationY>408</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Normalize_Lead</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Status__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Recruiting</stringValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>RTS_Cohort__c</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
     <recordUpdates>
         <name>Normalize_Lead</name>
         <label>Normalize Lead fields</label>
@@ -108,12 +110,6 @@
             </value>
         </filters>
         <inputAssignments>
-            <field>RecordTypeId</field>
-            <value>
-                <elementReference>Get_RTS_RecordType.Id</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
             <field>OwnerId</field>
             <value>
                 <elementReference>Get_Coordinator.Id</elementReference>
@@ -123,6 +119,18 @@
             <field>RTS_Cohort__c</field>
             <value>
                 <elementReference>Get_Active_Cohort.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RTS_Cohort_Name__c</field>
+            <value>
+                <elementReference>Get_Active_Cohort.Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RecordTypeId</field>
+            <value>
+                <elementReference>Get_RTS_RecordType.Id</elementReference>
             </value>
         </inputAssignments>
         <object>Lead</object>

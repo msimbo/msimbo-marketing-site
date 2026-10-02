@@ -6,12 +6,21 @@
     <columns>
         <field>Lead.RTS_Decision_Date__c</field>
     </columns>
-    <description>Accept / Waitlist / Decline breakdown with decision reasons for RTS Cohort 1.</description>
+    <description>Accept / Waitlist / Decline breakdown with decision reasons for the current (Recruiting) RTS cohort.</description>
     <filter>
         <criteriaItems>
             <column>Lead.RTS_Decision__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>notEqual</operator>
             <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

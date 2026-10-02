@@ -5,7 +5,7 @@
     <encodingKey>UTF-8</encodingKey>
     <name>RTS Application Received</name>
     <style>none</style>
-    <subject>We got your application, {!Lead.FirstName}. Here's what's next.</subject>
+    <subject>We got your application, {!Lead.FirstName}. Here&apos;s what&apos;s next.</subject>
     <type>text</type>
     <uiType>Aloha</uiType>
 </EmailTemplate>

@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>RTS_Cohort_1_All</fullName>
+    <fullName>RTS_Cohort_2_Applicants</fullName>
     <columns>FULL_NAME</columns>
     <columns>LEAD.STATUS</columns>
-    <columns>LEAD.CREATED_DATE</columns>
-    <columns>LEAD.PHONE</columns>
+    <columns>RTS_Assessment_Status__c</columns>
     <columns>LEAD.EMAIL</columns>
+    <columns>LEAD.PHONE</columns>
+    <columns>LEAD.CREATED_DATE</columns>
     <columns>LEAD.UNREAD</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>RTS_Cohort__c</field>
         <operation>equals</operation>
-        <value>RTS - Cohort 1 - May 2026</value>
+        <value>RTS - Cohort 2 - Fall 2026</value>
     </filters>
     <filters>
         <field>LEAD.RECORDTYPE</field>
         <operation>equals</operation>
         <value>Lead.RTS_Applicant</value>
     </filters>
-    <label>RTS Cohort 1 - Applicants</label>
+    <label>RTS Cohort 2 - Applicants</label>
 </ListView>

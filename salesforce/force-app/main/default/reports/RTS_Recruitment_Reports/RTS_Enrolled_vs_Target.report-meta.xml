@@ -6,12 +6,21 @@
     <columns>
         <field>Lead.RTS_Offer_Response_Date__c</field>
     </columns>
-    <description>Count of RTS Cohort 1 applicants who have confirmed enrollment. Used by the Enrolled vs Target gauge (0-15) on the dashboard.</description>
+    <description>Count of applicants in the current (Recruiting) RTS cohort who have confirmed enrollment. Used by the Enrolled vs Target gauge (0-15) on the dashboard.</description>
     <filter>
         <criteriaItems>
             <column>STATUS</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
             <value>RTS - Accepted - Confirmed</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

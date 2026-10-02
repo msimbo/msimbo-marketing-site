@@ -9,12 +9,21 @@
     <columns>
         <field>Lead.RTS_CBST2_Score__c</field>
     </columns>
-    <description>Count of RTS Cohort 1 applicants by Assessment Status (Passed, Retake Required, Did Not Pass, In Progress). Only applicants with an Assessment Date — excludes Not Started.</description>
+    <description>Count of applicants in the current (Recruiting) RTS cohort by Assessment Status (Passed, Retake Required, Did Not Pass, In Progress). Only applicants with an Assessment Date — excludes Not Started.</description>
     <filter>
         <criteriaItems>
             <column>Lead.RTS_Assessment_Date__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>notEqual</operator>
             <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

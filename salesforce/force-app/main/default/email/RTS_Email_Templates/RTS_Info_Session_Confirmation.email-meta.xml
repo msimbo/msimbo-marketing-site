@@ -5,7 +5,7 @@
     <encodingKey>UTF-8</encodingKey>
     <name>RTS Info Session Confirmation</name>
     <style>none</style>
-    <subject>You're registered for the RTS info session, {!Lead.FirstName}</subject>
+    <subject>You&apos;re registered for the RTS info session, {!Lead.FirstName}</subject>
     <type>text</type>
     <uiType>Aloha</uiType>
 </EmailTemplate>

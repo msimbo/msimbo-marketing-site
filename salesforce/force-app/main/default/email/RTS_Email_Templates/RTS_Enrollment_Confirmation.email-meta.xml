@@ -5,7 +5,7 @@
     <encodingKey>UTF-8</encodingKey>
     <name>RTS Enrollment Confirmation</name>
     <style>none</style>
-    <subject>You're officially enrolled, {!Lead.FirstName}. Here's everything you need to know.</subject>
+    <subject>You&apos;re officially enrolled, {!Lead.FirstName}. Here&apos;s everything you need to know.</subject>
     <type>text</type>
     <uiType>Aloha</uiType>
 </EmailTemplate>

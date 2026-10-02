@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RTS_Cohort_Status__c</fullName>
+    <description>Status of the linked RTS Cohort (Planning, Recruiting, Active, Completed). Recruitment reports filter on Recruiting so they always follow the current cohort.</description>
+    <externalId>false</externalId>
+    <formula>TEXT(RTS_Cohort__r.Status__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Cohort Status</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

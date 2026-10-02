@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>LAST_NAME</field>
+    </columns>
+    <columns>
+        <field>STATUS</field>
+    </columns>
     <description>Matrix showing how Instructor interview outcomes correlate with Case Manager interview outcomes. Helps calibrate rubrics across the two interviewers.</description>
     <filter>
         <criteriaItems>
             <column>Lead.RTS_Instructor_Interview_Outcome__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>notEqual</operator>
             <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>

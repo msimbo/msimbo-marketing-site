@@ -6,12 +6,21 @@
     <columns>
         <field>CREATED_DATE</field>
     </columns>
-    <description>Count of RTS Cohort 1 applicants at each Status stage. Scoped to leads whose linked Cohort is in Recruiting status, so it stays accurate when Cohort 2 opens.</description>
+    <description>Count of applicants in the current (Recruiting) RTS cohort at each Status stage. Scoped to leads whose linked Cohort is in Recruiting status, so it stays accurate when Cohort 2 opens.</description>
     <filter>
         <criteriaItems>
             <column>STATUS</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
             <value>RTS - Assessment Pending,RTS - Assessment Complete,RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Interview 2 Requested,RTS - Interview 2 Scheduled,RTS - Interview 2 Complete,RTS - Accepted - Offer Sent,RTS - Accepted - Confirmed,RTS - Waitlisted,RTS - Declined - Not Qualified,RTS - Declined - Withdrew,RTS - Converted</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

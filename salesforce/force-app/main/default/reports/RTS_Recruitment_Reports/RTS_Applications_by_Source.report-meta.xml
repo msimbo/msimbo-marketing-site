@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Distribution of RTS Cohort 1 applicants by referral source (Google, Facebook, Friend/Family, Flyer, Partner Org, Other).</description>
+    <columns>
+        <field>LAST_NAME</field>
+    </columns>
+    <columns>
+        <field>STATUS</field>
+    </columns>
+    <columns>
+        <field>EMAIL</field>
+    </columns>
+    <columns>
+        <field>Lead.RTS_Cohort__c</field>
+    </columns>
+    <columns>
+        <field>CREATED_DATE</field>
+    </columns>
+    <description>Distribution of applicants in the current (Recruiting) RTS cohort by referral source (Google, Facebook, Friend/Family, Flyer, Partner Org, Other).</description>
     <filter>
         <criteriaItems>
             <column>STATUS</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
             <value>RTS - Assessment Pending,RTS - Assessment Complete,RTS - Interview 1 Requested,RTS - Interview 1 Scheduled,RTS - Interview 1 Complete,RTS - Interview 2 Requested,RTS - Interview 2 Scheduled,RTS - Interview 2 Complete,RTS - Accepted - Offer Sent,RTS - Accepted - Confirmed,RTS - Waitlisted,RTS - Declined - Not Qualified,RTS - Declined - Withdrew,RTS - Converted</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.RTS_Cohort_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Recruiting</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

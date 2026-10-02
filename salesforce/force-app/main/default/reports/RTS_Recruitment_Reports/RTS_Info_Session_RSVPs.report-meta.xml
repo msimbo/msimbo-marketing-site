@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Info-session RSVPs grouped by session datetime. Shows attendance rate and how many session leads went on to apply (RecordType flipped to RTS_Applicant). Includes both current Info Session Leads and promoted Applicants who retain Info_Session_Date.</description>
     <columns>
         <field>EMAIL</field>
     </columns>
@@ -19,9 +18,12 @@
     <columns>
         <field>CREATED_DATE</field>
     </columns>
+    <description>Info-session RSVPs grouped by session datetime. Shows attendance rate and how many session leads went on to apply (RecordType flipped to RTS_Applicant). Includes both current Info Session Leads and promoted Applicants who retain Info_Session_Date.</description>
     <filter>
         <criteriaItems>
             <column>Lead.RTS_Info_Session_Date__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
             <operator>notEqual</operator>
             <value></value>
         </criteriaItems>
