@@ -19,5 +19,5 @@
         <operation>equals</operation>
         <value>Lead.RTS_Applicant</value>
     </filters>
-    <label>RTS Cohort 2 (FY27 - C1) - Applicants</label>
+    <label>RTS Cohort 2 - Fall 2026 (FY27 - C1)</label>
 </ListView>
