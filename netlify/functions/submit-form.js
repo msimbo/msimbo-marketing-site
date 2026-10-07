@@ -753,7 +753,12 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
     throw new Error('Lead PATCH failed: ' + res.status + ' ' + text);
   }
 
-  return { passedOn, archivedHistory: Boolean(history) };
+  // RTS Flow 2a moves a Passed Lead with all three scores straight on to Interview
+  // Requested (and Flow 2 sends the invitation) in the same save.
+  const autoAdvanced = Boolean(passedOn) &&
+    ['RTS_CLIK_Score__c', 'RTS_CCAT_Score__c', 'RTS_CBST2_Score__c'].every((f) => previous[f] != null);
+
+  return { passedOn, autoAdvanced, archivedHistory: Boolean(history) };
 }
 
 // Date string of an assessment pass within the last 12 months, else null.
@@ -861,7 +866,7 @@ async function createApplicantViaRest(data, opts) {
 const COORDINATOR_USERNAME = 'bguzman@ulem.org';
 
 async function createReapplicantTask(leadId, data, session, context) {
-  const { otherLeadIds = [], passedOn = null, archivedHistory = false } = context;
+  const { otherLeadIds = [], passedOn = null, autoAdvanced = false, archivedHistory = false } = context;
   const matches = new Map(); // Id -> description
 
   const describe = (r, why) => `${r.Name} <${r.Email || 'no email'}> ${r.RecordType ? r.RecordType.DeveloperName : ''} ${r.Status || ''} — ${why} — ${session.instanceUrl}/${r.Id}`.replace(/\s+/g, ' ');
@@ -900,8 +905,10 @@ async function createReapplicantTask(leadId, data, session, context) {
   if (!passedOn && matches.size === 0) return;
 
   const lines = [];
-  if (passedOn) {
-    lines.push(`Returning applicant who passed the assessment on ${passedOn}. They were placed in RTS - Assessment Complete and did not get the assessment email. Move them to RTS - Interview 1 Requested when ready.`);
+  if (autoAdvanced) {
+    lines.push(`Returning applicant who passed the assessment on ${passedOn}. They skipped the assessment and were moved straight to RTS - Interview 1 Requested, so the interview invitation has already gone out.`);
+  } else if (passedOn) {
+    lines.push(`Returning applicant who passed the assessment on ${passedOn}. They were placed in RTS - Assessment Complete and did not get the assessment email. Their scores are missing, so they were not moved on automatically: enter the CLIK, CCAT and CBST2 scores (or move them to RTS - Interview 1 Requested yourself) when ready.`);
   }
   if (archivedHistory) lines.push('Their previous application is summarised at the top of the Description field.');
   if (matches.size) {
