@@ -8,7 +8,7 @@
         <actionName>Lead.RTS_Send_Instructor_Interview_Invitation</actionName>
         <actionType>emailAlert</actionType>
         <connector>
-            <targetReference>Mark_Invite_Sent</targetReference>
+            <targetReference>Log_Email_Activity</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -20,6 +20,61 @@
         <nameSegment>Lead.RTS_Send_Instructor_Interview_Invitation</nameSegment>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <connector>
+            <targetReference>Mark_Invite_Sent</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Mark_Invite_Sent</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_2_Instructor_Interview_Invitation).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Interview invitation</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
     <recordUpdates>
         <name>Mark_Invite_Sent</name>
         <label>Mark Instructor Invite Sent</label>

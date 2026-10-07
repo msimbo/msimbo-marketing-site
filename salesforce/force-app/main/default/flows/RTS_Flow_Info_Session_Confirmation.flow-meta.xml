@@ -2,6 +2,9 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Send_Info_Session_Confirmation_Email</name>
+        <connector>
+            <targetReference>Log_Email_Activity</targetReference>
+        </connector>
         <label>Send Info Session Confirmation Email</label>
         <locationX>176</locationX>
         <locationY>168</locationY>
@@ -17,6 +20,19 @@
         <nameSegment>Lead.RTS_Send_Info_Session_Confirmation</nameSegment>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Log_Failure_Ignored</name>
+        <label>Log Failure Ignored</label>
+        <locationX>440</locationX>
+        <locationY>200</locationY>
+        <assignmentItems>
+            <assignToReference>LogFailed</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
     <description>Record-triggered after-save flow. Sends the Info Session Confirmation email when a Lead is created or updated with RecordType RTS_Info_Session, LeadSource Website_msimbo.org, and a populated Info Session Date. Fires on create, and on update when Info Session Date changes (re-RSVP for a different session).</description>
     <environments>Default</environments>
     <interviewLabel>RTS Flow — Info Session Confirmation {!$Flow.CurrentDateTime}</interviewLabel>
@@ -40,6 +56,58 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <faultConnector>
+            <targetReference>Log_Failure_Ignored</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_Info_Session_Confirmation).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Info session confirmation</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
@@ -57,4 +125,14 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <variables>
+        <name>LogFailed</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
 </Flow>

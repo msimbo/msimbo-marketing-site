@@ -8,7 +8,7 @@
         <actionName>Lead.RTS_Send_Assessment_Retake_Invitation</actionName>
         <actionType>emailAlert</actionType>
         <connector>
-            <targetReference>Increment_Attempts</targetReference>
+            <targetReference>Log_Email_Activity</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -20,6 +20,61 @@
         <nameSegment>Lead.RTS_Send_Assessment_Retake_Invitation</nameSegment>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <connector>
+            <targetReference>Increment_Attempts</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Increment_Attempts</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_8_Assessment_Retake).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Assessment retake invitation</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
     <recordUpdates>
         <name>Increment_Attempts</name>
         <label>Increment Assessment Attempts</label>

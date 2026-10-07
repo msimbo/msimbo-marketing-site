@@ -2,6 +2,9 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Send_Application_Status_Update</name>
+        <connector>
+            <targetReference>Log_Email_Activity</targetReference>
+        </connector>
         <label>Send Application Status Update</label>
         <locationX>176</locationX>
         <locationY>168</locationY>
@@ -17,6 +20,19 @@
         <nameSegment>Lead.RTS_Send_Application_Status_Update</nameSegment>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Log_Failure_Ignored</name>
+        <label>Log Failure Ignored</label>
+        <locationX>440</locationX>
+        <locationY>200</locationY>
+        <assignmentItems>
+            <assignToReference>LogFailed</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
     <description>Fires only when Coordinator moves a Lead to Status = RTS - Declined - Not Qualified. Sends the decline email. Does NOT fire for Declined - Withdrew (applicant already knows; a rejection email would feel wrong).</description>
     <environments>Default</environments>
     <interviewLabel>RTS Flow 6 — Decline Notification {!$Flow.CurrentDateTime}</interviewLabel>
@@ -40,6 +56,58 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <faultConnector>
+            <targetReference>Log_Failure_Ignored</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_6_Decline_Notification).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Application status update (decline)</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
@@ -60,4 +128,14 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <variables>
+        <name>LogFailed</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
 </Flow>

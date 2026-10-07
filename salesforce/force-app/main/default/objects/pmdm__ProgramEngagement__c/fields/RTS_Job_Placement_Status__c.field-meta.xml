@@ -5,7 +5,7 @@
     <externalId>false</externalId>
     <label>RTS Job Placement Status</label>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackHistory>true</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>

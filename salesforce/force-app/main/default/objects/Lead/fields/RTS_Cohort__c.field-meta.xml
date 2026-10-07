@@ -9,6 +9,6 @@
     <relationshipLabel>Applicants</relationshipLabel>
     <relationshipName>Applicants</relationshipName>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackHistory>true</trackHistory>
     <type>Lookup</type>
 </CustomField>
