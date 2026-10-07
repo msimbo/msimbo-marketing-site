@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>62.0</apiVersion>
-    <description>After-save companion to Flow 1. Web-to-Lead sometimes bypasses before-save field assignments for RecordTypeId and Owner. This flow runs after save and re-asserts those values via DML. Also assigns Cohort if missing.</description>
+    <description>After-save companion to Flow 1. Web-to-Lead sometimes bypasses before-save field assignments for RecordTypeId and Owner. This flow runs after save and re-asserts those values via DML. Also assigns Cohort if missing. Skips info-session sign-ups (info session date set, no date of birth) so it doesn't overwrite the RTS_Info_Session record type set by RTS Flow — Info Session Assign RecordType.</description>
     <environments>Default</environments>
     <interviewLabel>RTS Flow 1c — Normalize Lead {!$Flow.CurrentDateTime}</interviewLabel>
     <label>RTS Flow 1c — Normalize Lead</label>
@@ -141,12 +141,26 @@
         <connector>
             <targetReference>Get_Coordinator</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
+        <filterLogic>1 AND (2 OR 3)</filterLogic>
         <filters>
             <field>LeadSource</field>
             <operator>EqualTo</operator>
             <value>
                 <stringValue>Wesbite_msimbo.org</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>RTS_Date_of_Birth__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>RTS_Info_Session_Date__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
             </value>
         </filters>
         <object>Lead</object>
