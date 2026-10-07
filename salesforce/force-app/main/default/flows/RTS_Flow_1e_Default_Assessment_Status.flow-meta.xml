@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Set_Not_Started</name>
+        <label>Set Assessment Status to Not Started</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.RTS_Assessment_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Before-save flow. Fills a blank Assessment Status with Not Started on RTS Applicant Leads at RTS - Assessment Pending. Leads that start as RTS Info Session (Web-to-Lead) don't get the Applicant record type's picklist default, so the field stays blank when they are switched to RTS Applicant. Sends no email.</description>
+    <environments>Default</environments>
+    <interviewLabel>RTS Flow 1e — Default Assessment Status {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RTS Flow 1e — Default Assessment Status</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Set_Not_Started</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;RTS_Applicant&apos;,
+  ISPICKVAL({!$Record.Status}, &apos;RTS - Assessment Pending&apos;),
+  ISBLANK(TEXT({!$Record.RTS_Assessment_Status__c}))
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
