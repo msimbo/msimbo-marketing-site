@@ -8,7 +8,10 @@
  *                                      lookup fields (RTS_Cohort__c) before validation rules run.
  *                                    - If existing RTS Applicant who already applied to the current cohort: 409
  *                                    - Any promoted Lead (Info Session, waitlist, prior cohort): PATCH onto the
- *                                      current cohort, Status set to 'RTS - Assessment Pending'
+ *                                      current cohort. Status 'RTS - Assessment Complete' if they passed the
+ *                                      assessment in the last 12 months, else 'RTS - Assessment Pending' with
+ *                                      fresh attempts. Previous-cycle details are archived to Description.
+ *                                    - Possible duplicates / returning applicants get a coordinator Task
  *   signupType === 'waitlist'     → Salesforce REST insert (RTS_Applicant RecordType,
  *                                   Status='RTS - Waitlisted', linked to the current cohort)
  *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
@@ -189,17 +192,19 @@ async function submitApplication(data, headers) {
     // → promote the existing Lead in-place via REST PATCH. Creating a second Lead via W2L would
     // either duplicate or (as we've seen) get silently rejected by SF.
     try {
-      await promoteLeadToApplicant(existingLead, data, {
+      // Every promoted Lead restarts the pipeline: Assessment Pending (assessment email),
+      // or Assessment Complete when they passed within the last 12 months.
+      const outcome = await promoteLeadToApplicant(existingLead, data, {
         instanceUrl: existingLead.instanceUrl,
         sessionId: existingLead.sessionId,
         recordTypeId: SF_RECORD_TYPE_ID,
         cohortId: cohort.id,
         cohortName: cohort.name,
-        // Every promoted Lead starts where a new application starts. Returning applicants
-        // carry a stale status (Waitlisted, Declined, ...), and Info Session Leads sit at
-        // 'Open - Not Contacted', which never triggers the Application Received email.
-        resetStatus: true,
       });
+      await createReapplicantTask(existingLead.id, data, existingLead, {
+        otherLeadIds: existingLead.otherLeadIds,
+        ...outcome,
+      }).catch((e) => console.error('Re-applicant task failed:', e.message));
       return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
     } catch (e) {
       console.error('Promote-to-applicant failed:', e.message);
@@ -215,7 +220,7 @@ async function submitApplication(data, headers) {
   // doesn't reliably populate lookup fields (RTS_Cohort__c) before validation
   // rules fire, so the Cohort-required rule rejects every W2L submission.
   try {
-    await createApplicantViaRest(data, {
+    const created = await createApplicantViaRest(data, {
       instanceUrl: SF_INSTANCE_URL,
       username: SF_DUPE_CHECK_USERNAME,
       password: SF_DUPE_CHECK_PASSWORD,
@@ -223,6 +228,9 @@ async function submitApplication(data, headers) {
       cohortId: cohort.id,
       cohortName: cohort.name,
     });
+    // A new email can still be a returning person (different email, or converted before).
+    await createReapplicantTask(created.id, data, created, {})
+      .catch((e) => console.error('Re-applicant task failed:', e.message));
     return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
   } catch (e) {
     console.error('Lead create failed:', e.message);
@@ -572,14 +580,37 @@ async function sfLogin(sfCreds) {
   };
 }
 
+// Fields read off an existing Lead so a re-application can archive the previous
+// cycle and decide whether the assessment carries over.
+const PREVIOUS_CYCLE_FIELDS = [
+  'Status', 'Description', 'RTS_Cohort_Name__c',
+  'RTS_Assessment_Status__c', 'RTS_Assessment_Date__c', 'RTS_Assessment_Attempts__c', 'RTS_Assessment_Notes__c',
+  'RTS_CCAT_Score__c', 'RTS_CBST2_Score__c', 'RTS_CLIK_Score__c',
+  'RTS_Instructor_Interview_DateTime__c', 'RTS_Instructor_Interview_Outcome__c', 'RTS_Instructor_Interview_Notes__c',
+  'RTS_CM_Interview_DateTime__c', 'RTS_CM_Interview_Outcome__c', 'RTS_CM_Interview_Notes__c',
+  'RTS_Decision__c', 'RTS_Decision_Reason__c', 'RTS_Decision_Date__c',
+  'RTS_Offer_Sent_Date__c', 'RTS_Offer_Response__c', 'RTS_Offer_Response_Date__c',
+];
+
+// Which Lead to reuse when several share an email: an RTS Applicant first, then an
+// Info Session sign-up, then anything else (Donor, Student, ...). Newest wins within a tier.
+const RECORD_TYPE_PRIORITY = ['RTS_Applicant', 'RTS_Info_Session'];
+
 async function findLeadByEmail(email, sfCreds) {
   const { sessionId, instanceUrl } = await sfLogin(sfCreds);
 
-  const soql = `SELECT Id, Email, Status, RecordType.DeveloperName, IsConverted, ${SF_API_NAMES.cohort}, ${SF_API_NAMES.dateOfBirth} FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 1`;
+  const soql = `SELECT Id, Email, RecordType.DeveloperName, ${SF_API_NAMES.cohort}, ${SF_API_NAMES.dateOfBirth}, ${PREVIOUS_CYCLE_FIELDS.join(', ')} FROM Lead WHERE Email = '${escapeSOQL(email)}' AND IsConverted = false ORDER BY CreatedDate DESC LIMIT 20`;
   const queryData = await sfQuery(soql, { sessionId, instanceUrl });
   if (!queryData.records || queryData.records.length === 0) return null;
 
-  const record = queryData.records[0];
+  const rank = (r) => {
+    const i = RECORD_TYPE_PRIORITY.indexOf(r.RecordType && r.RecordType.DeveloperName);
+    return i === -1 ? RECORD_TYPE_PRIORITY.length : i;
+  };
+  // Array.prototype.sort is stable, so CreatedDate DESC order holds within a tier.
+  const records = queryData.records.slice().sort((x, y) => rank(x) - rank(y));
+  const record = records[0];
+
   return {
     id: record.Id,
     email: record.Email,
@@ -587,6 +618,8 @@ async function findLeadByEmail(email, sfCreds) {
     recordType: record.RecordType && record.RecordType.DeveloperName,
     cohortId: record[SF_API_NAMES.cohort],
     hasApplication: Boolean(record[SF_API_NAMES.dateOfBirth]),
+    record,
+    otherLeadIds: records.slice(1).map((r) => r.Id),
     sessionId,
     instanceUrl,
   };
@@ -620,7 +653,8 @@ function sameSfId(a, b) {
 }
 
 async function promoteLeadToApplicant(existingLead, data, opts) {
-  const { instanceUrl, sessionId, recordTypeId, cohortId, cohortName, resetStatus } = opts;
+  const { instanceUrl, sessionId, recordTypeId, cohortId, cohortName } = opts;
+  const previous = existingLead.record;
 
   const motivationCombined =
     'Where I am now:\n' + data.motivationNow + '\n\n' +
@@ -647,26 +681,61 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
   if (cohortId) body[SF_API_NAMES.cohort] = String(cohortId).slice(0, 15);
   if (cohortName) body[SF_API_NAMES.cohortName] = cohortName;
 
+  // A re-application starts a new cycle. Keep the old interview/decision/offer details
+  // readable in Description, then clear them so the Lead doesn't look further along
+  // than it is and the invitation flows (which only send while the flags are false) fire again.
+  const history = describePreviousCycle(previous);
+  if (history) {
+    body.Description = (history + (previous.Description ? '\n\n' + previous.Description : '')).slice(0, 32000);
+  }
+  Object.assign(body, {
+    RTS_Instructor_Interview_DateTime__c: null,
+    RTS_Instructor_Interview_Outcome__c: null,
+    RTS_Instructor_Interview_Notes__c: null,
+    RTS_CM_Interview_DateTime__c: null,
+    RTS_CM_Interview_Outcome__c: null,
+    RTS_CM_Interview_Notes__c: null,
+    RTS_Decision__c: null,
+    RTS_Decision_Reason__c: null,
+    RTS_Decision_Date__c: null,
+    RTS_Offer_Sent_Date__c: null,
+    RTS_Offer_Response__c: null,
+    RTS_Offer_Response_Date__c: null,
+    [SF_API_NAMES.instructorInviteSent]: false,
+    [SF_API_NAMES.cmInviteSent]: false,
+  });
+
+  // A pass in the last 12 months carries over: straight to Assessment Complete, no
+  // assessment email. Everyone else re-takes it with a fresh 2 attempts (Flow 8 caps
+  // retakes at Attempts < 2, and new Leads default to Attempts = 1, Status Not Started).
+  const passedOn = recentAssessmentPass(previous);
+  if (passedOn) {
+    body.Status = 'RTS - Assessment Complete';
+  } else {
+    body.Status = 'RTS - Assessment Pending';
+    Object.assign(body, {
+      RTS_Assessment_Status__c: 'Not Started',
+      RTS_Assessment_Attempts__c: 1,
+      RTS_Assessment_Date__c: null,
+      RTS_Assessment_Notes__c: null,
+      RTS_CCAT_Score__c: null,
+      RTS_CBST2_Score__c: null,
+      RTS_CLIK_Score__c: null,
+    });
+  }
+
   const patchUrl = `${instanceUrl}/services/data/v62.0/sobjects/Lead/${existingLead.id}`;
 
-  if (resetStatus) {
-    body.Status = 'RTS - Assessment Pending';
-    // The invitation flows only send while these are false; a returning applicant
-    // still has them set from their earlier interviews.
-    body[SF_API_NAMES.instructorInviteSent] = false;
-    body[SF_API_NAMES.cmInviteSent] = false;
-
-    // The Application Received email (assessment link) fires only when Status
-    // changes to Assessment Pending. A lead already sitting there has to leave it first.
-    if (existingLead.status === body.Status) {
-      const stepRes = await fetch(patchUrl, {
-        method: 'PATCH',
-        headers: { 'Authorization': 'Bearer ' + sessionId, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ Status: 'Open - Not Contacted' }),
-      });
-      if (!stepRes.ok) {
-        throw new Error('Lead status reset failed: ' + stepRes.status + ' ' + (await stepRes.text()));
-      }
+  // The Application Received email (assessment link) fires only when Status
+  // changes to Assessment Pending. A lead already sitting there has to leave it first.
+  if (body.Status === 'RTS - Assessment Pending' && existingLead.status === body.Status) {
+    const stepRes = await fetch(patchUrl, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + sessionId, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Status: 'Open - Not Contacted' }),
+    });
+    if (!stepRes.ok) {
+      throw new Error('Lead status reset failed: ' + stepRes.status + ' ' + (await stepRes.text()));
     }
   }
 
@@ -683,6 +752,53 @@ async function promoteLeadToApplicant(existingLead, data, opts) {
     const text = await res.text();
     throw new Error('Lead PATCH failed: ' + res.status + ' ' + text);
   }
+
+  return { passedOn, archivedHistory: Boolean(history) };
+}
+
+// Date string of an assessment pass within the last 12 months, else null.
+function recentAssessmentPass(lead) {
+  if (!lead || lead.RTS_Assessment_Status__c !== 'Passed' || !lead.RTS_Assessment_Date__c) return null;
+  const passed = new Date(lead.RTS_Assessment_Date__c + 'T00:00:00Z');
+  const cutoff = new Date();
+  cutoff.setUTCFullYear(cutoff.getUTCFullYear() - 1);
+  return passed >= cutoff ? lead.RTS_Assessment_Date__c : null;
+}
+
+// Plain-text summary of an earlier application, or '' when the Lead has none
+// (e.g. an Info Session sign-up applying for the first time).
+function describePreviousCycle(lead) {
+  if (!lead) return '';
+  const day = (v) => (v ? String(v).slice(0, 10) : '');
+  const lines = [];
+  const add = (label, ...parts) => {
+    const text = parts.filter(Boolean).join(', ');
+    if (text) lines.push(label + ': ' + text);
+  };
+
+  const assessed = lead.RTS_Assessment_Status__c && lead.RTS_Assessment_Status__c !== 'Not Started';
+  if (assessed) {
+    const scores = [['CCAT', lead.RTS_CCAT_Score__c], ['CBST2', lead.RTS_CBST2_Score__c], ['CLIK', lead.RTS_CLIK_Score__c]]
+      .filter(([, v]) => v != null).map(([k, v]) => k + ' ' + v).join(' / ');
+    add('Assessment', lead.RTS_Assessment_Status__c, day(lead.RTS_Assessment_Date__c),
+      lead.RTS_Assessment_Attempts__c != null && 'attempts ' + lead.RTS_Assessment_Attempts__c, scores);
+    add('Assessment notes', lead.RTS_Assessment_Notes__c);
+  }
+  add('Instructor interview', day(lead.RTS_Instructor_Interview_DateTime__c), lead.RTS_Instructor_Interview_Outcome__c);
+  add('Instructor interview notes', lead.RTS_Instructor_Interview_Notes__c);
+  add('Case manager interview', day(lead.RTS_CM_Interview_DateTime__c), lead.RTS_CM_Interview_Outcome__c);
+  add('Case manager interview notes', lead.RTS_CM_Interview_Notes__c);
+  add('Decision', lead.RTS_Decision__c, lead.RTS_Decision_Reason__c, day(lead.RTS_Decision_Date__c));
+  add('Offer', lead.RTS_Offer_Sent_Date__c && 'sent ' + day(lead.RTS_Offer_Sent_Date__c),
+    lead.RTS_Offer_Response__c, day(lead.RTS_Offer_Response_Date__c));
+
+  if (lines.length === 0) return '';
+  return [
+    `--- Previous application, archived ${new Date().toISOString().slice(0, 10)} on re-apply ---`,
+    `Cohort: ${lead.RTS_Cohort_Name__c || 'unknown'}; status was ${lead.Status}`,
+    ...lines,
+    '---',
+  ].join('\n');
 }
 
 async function createApplicantViaRest(data, opts) {
@@ -730,6 +846,87 @@ async function createApplicantViaRest(data, opts) {
     const text = await res.text();
     throw new Error('Lead INSERT failed: ' + res.status + ' ' + text);
   }
+
+  const created = await res.json();
+  return { id: created.id, sessionId, instanceUrl: instanceUrl || resolvedUrl };
+}
+
+// ──────────────────────────────────────────────
+// RE-APPLICANT REVIEW TASK
+// Same person under a different email (matched on phone + last name), extra RTS
+// Leads with the same email, or an earlier converted application can't be merged safely
+// from here (families share phones). Leave a Task for the coordinator instead.
+// ──────────────────────────────────────────────
+
+const COORDINATOR_USERNAME = 'bguzman@ulem.org';
+
+async function createReapplicantTask(leadId, data, session, context) {
+  const { otherLeadIds = [], passedOn = null, archivedHistory = false } = context;
+  const matches = new Map(); // Id -> description
+
+  const describe = (r, why) => `${r.Name} <${r.Email || 'no email'}> ${r.RecordType ? r.RecordType.DeveloperName : ''} ${r.Status || ''} — ${why} — ${session.instanceUrl}/${r.Id}`.replace(/\s+/g, ' ');
+
+  if (otherLeadIds.length) {
+    const ids = otherLeadIds.map((id) => `'${escapeSOQL(id)}'`).join(',');
+    const q = await sfQuery(`SELECT Id, Name, Email, Status, RecordType.DeveloperName FROM Lead WHERE Id IN (${ids}) AND RecordType.DeveloperName IN ('RTS_Applicant', 'RTS_Info_Session')`, session);
+    for (const r of q.records || []) matches.set(r.Id, describe(r, 'same email'));
+  }
+
+  // SOSL phone search ignores formatting, so (781) 300-3549 matches 7813003549.
+  const digits = String(data.phone || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+  if (digits.length >= 10) {
+    const sosl = `FIND {${digits}} IN PHONE FIELDS RETURNING Lead(Id, Name, LastName, Email, Status, RecordType.DeveloperName WHERE IsConverted = false)`;
+    const res = await fetch(`${session.instanceUrl}/services/data/v62.0/search?q=${encodeURIComponent(sosl)}`, {
+      headers: { 'Authorization': 'Bearer ' + session.sessionId },
+    });
+    if (!res.ok) throw new Error('SOSL search failed: ' + res.status + ' ' + (await res.text()).slice(0, 200));
+    const found = await res.json();
+    const lastName = String(data.lastName || '').trim().toLowerCase();
+    for (const r of found.searchRecords || []) {
+      if (r.Id === leadId || matches.has(r.Id)) continue;
+      const isRts = r.RecordType && RECORD_TYPE_PRIORITY.includes(r.RecordType.DeveloperName);
+      if (isRts && String(r.LastName || '').trim().toLowerCase() === lastName) matches.set(r.Id, describe(r, 'same phone and last name'));
+    }
+  }
+
+  const converted = await sfQuery(
+    `SELECT Id, Name, Email, Status, RecordType.DeveloperName, ConvertedContactId FROM Lead WHERE Email = '${escapeSOQL(data.email)}' AND IsConverted = true AND RecordType.DeveloperName = 'RTS_Applicant'`,
+    session,
+  );
+  for (const r of converted.records || []) {
+    matches.set(r.Id, describe(r, `earlier RTS application, converted to Contact ${session.instanceUrl}/${r.ConvertedContactId}`));
+  }
+
+  if (!passedOn && matches.size === 0) return;
+
+  const lines = [];
+  if (passedOn) {
+    lines.push(`Returning applicant who passed the assessment on ${passedOn}. They were placed in RTS - Assessment Complete and did not get the assessment email. Move them to RTS - Interview 1 Requested when ready.`);
+  }
+  if (archivedHistory) lines.push('Their previous application is summarised at the top of the Description field.');
+  if (matches.size) {
+    lines.push('Possible earlier records for this person. Review and merge into this Lead if they are the same person:');
+    for (const m of matches.values()) lines.push('- ' + m);
+  }
+
+  const owner = await sfQuery(`SELECT Id FROM User WHERE Username = '${COORDINATOR_USERNAME}' AND IsActive = true LIMIT 1`, session);
+  const due = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const task = {
+    Subject: passedOn ? 'Returning RTS applicant: assessment already passed' : 'Possible duplicate RTS applicant: review',
+    WhoId: leadId,
+    ActivityDate: due,
+    Status: 'Not Started',
+    Priority: 'Normal',
+    Description: lines.join('\n').slice(0, 32000),
+  };
+  if (owner.records && owner.records[0]) task.OwnerId = owner.records[0].Id;
+
+  const res = await fetch(`${session.instanceUrl}/services/data/v62.0/sobjects/Task/`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + session.sessionId, 'Content-Type': 'application/json' },
+    body: JSON.stringify(task),
+  });
+  if (!res.ok) throw new Error('Task create failed: ' + res.status + ' ' + (await res.text()).slice(0, 200));
 }
 
 function escapeXml(s) {
