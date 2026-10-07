@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>FK_CNTC_FIRST_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_CNTC_EMAIL</field>
+    </columns>
+    <columns>
+        <field>FK_CNTC_PHONE3</field>
+    </columns>
+    <columns>
+        <field>pmdm__ProgramEngagement__c.RTS_Completion_Status__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Employer__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Contact.Job_Title__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Job_Start_Date__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Job_End_Date__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Salary__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Job_Placement_Officer__c</field>
+    </columns>
+    <description>RTS participants by cohort with their job placement. Placement is recorded in ULEM&apos;s existing fields on the person&apos;s account (Employer, Job Title, Job Start/End Date, Salary, Job Placement Officer).</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>pmdm__ProgramEngagement__c.pmdm__ProgramCohort__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>RTS Job Placement by Cohort</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$pmdm__ProgramEngagement__c@pmdm__ProgramEngagement__c.pmdm__Contact__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>
