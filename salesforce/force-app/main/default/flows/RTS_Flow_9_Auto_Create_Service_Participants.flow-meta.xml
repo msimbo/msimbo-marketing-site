@@ -118,7 +118,7 @@
             <assignToReference>NewParticipant.pmdm__Status__c</assignToReference>
             <operator>Assign</operator>
             <value>
-                <stringValue>Active</stringValue>
+                <stringValue>Enrolled</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
