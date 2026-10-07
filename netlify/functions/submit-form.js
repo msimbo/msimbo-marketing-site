@@ -20,7 +20,7 @@
  * Required Netlify environment variables:
  *   SF_ORG_ID                       — Salesforce 15-char Org ID (info-session W2L only)
  *   SF_RTS_COHORT_ID                — Fallback cohort ID for applications if no cohort is Recruiting
- *   SF_RTS_COHORT_NAME              — Fallback cohort name (e.g., "RTS - Cohort 2 - Fall 2026")
+ *   SF_RTS_COHORT_NAME              — Fallback cohort name (e.g., "RTS - Cohort 2 - Fall 2026 (FY27 - C1)")
  *   SF_RTS_COHORT_2_ID              — Fallback cohort ID for the waitlist if no cohort is Recruiting
  *   SF_RTS_COHORT_2_NAME            — Fallback cohort name for the waitlist
  *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
