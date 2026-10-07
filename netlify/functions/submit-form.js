@@ -7,8 +7,8 @@
  *                                    - Else: REST insert (create as Applicant). W2L can't reliably populate
  *                                      lookup fields (RTS_Cohort__c) before validation rules run.
  *                                    - If existing RTS Applicant who already applied to the current cohort: 409
- *                                    - If waitlist / prior-cohort Applicant: PATCH onto the current cohort,
- *                                      Status reset to 'RTS - Assessment Pending'
+ *                                    - Any promoted Lead (Info Session, waitlist, prior cohort): PATCH onto the
+ *                                      current cohort, Status set to 'RTS - Assessment Pending'
  *   signupType === 'waitlist'     → Salesforce REST insert (RTS_Applicant RecordType,
  *                                   Status='RTS - Waitlisted', linked to the current cohort)
  *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
@@ -195,9 +195,10 @@ async function submitApplication(data, headers) {
         recordTypeId: SF_RECORD_TYPE_ID,
         cohortId: cohort.id,
         cohortName: cohort.name,
-        // Returning applicants carry a stale status (Waitlisted, Declined, ...) from their
-        // earlier record; restart them where a new application starts.
-        resetStatus: existingLead.recordType === 'RTS_Applicant',
+        // Every promoted Lead starts where a new application starts. Returning applicants
+        // carry a stale status (Waitlisted, Declined, ...), and Info Session Leads sit at
+        // 'Open - Not Contacted', which never triggers the Application Received email.
+        resetStatus: true,
       });
       return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', promoted: true }) };
     } catch (e) {
