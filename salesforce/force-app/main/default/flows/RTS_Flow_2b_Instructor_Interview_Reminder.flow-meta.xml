@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Send_Reminder_Email</name>
+        <label>Send Reminder Email</label>
+        <locationX>50</locationX>
+        <locationY>500</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Log_Email_Activity</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>ReminderSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ReminderBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <stringValue>program-rts@ulem.org</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Log_Failure_Ignored</name>
+        <label>Log Failure Ignored</label>
+        <locationX>314</locationX>
+        <locationY>716</locationY>
+        <assignmentItems>
+            <assignToReference>LogFailed</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Still_Upcoming</name>
+        <label>Still Upcoming?</label>
+        <locationX>182</locationX>
+        <locationY>384</locationY>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
+        <rules>
+            <name>Send</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ShouldSend</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Reminder_Email</targetReference>
+            </connector>
+            <label>Send</label>
+        </rules>
+    </decisions>
+    <description>Record-triggered after-save flow with a scheduled path 1 hour before RTS_Instructor_Interview_DateTime__c (set by the n8n Lunacal workflow). Emails the applicant a reminder. Re-checks at send time that the lead is still at RTS - Interview 1 Scheduled, the interview is still upcoming (within 2 hours), and the lead has an email and has not opted out. Logs a completed Task.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Sends only if the start time is still in the future and at most 2 hours away (guards against a stale path after a reschedule) and the lead still qualifies.</description>
+        <name>ShouldSend</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(NOT(ISBLANK({!$Record.RTS_Instructor_Interview_DateTime__c})), {!$Record.RTS_Instructor_Interview_DateTime__c} &gt; {!$Flow.CurrentDateTime}, {!$Record.RTS_Instructor_Interview_DateTime__c} - {!$Flow.CurrentDateTime} &lt;= 2/24, NOT(ISBLANK({!$Record.Email})), NOT({!$Record.HasOptedOutOfEmail}), AND({!$Record.RecordType.DeveloperName} = &apos;RTS_Applicant&apos;, ISPICKVAL({!$Record.Status}, &apos;RTS - Interview 1 Scheduled&apos;)))</expression>
+    </formulas>
+    <formulas>
+        <description>Start time shifted to US Eastern wall-clock time (still typed as DateTime, so read it with TEXT(), never format it as a DateTime).</description>
+        <name>StartLocal</name>
+        <dataType>DateTime</dataType>
+        <expression>{!$Record.RTS_Instructor_Interview_DateTime__c} - IF(AND({!$Record.RTS_Instructor_Interview_DateTime__c} &gt;= DATETIMEVALUE(TEXT(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Instructor_Interview_DateTime__c}), 10))), 3, 1) + MOD(8 - WEEKDAY(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Instructor_Interview_DateTime__c}), 10))), 3, 1)), 7) + 7) &amp; &apos; 07:00:00&apos;), {!$Record.RTS_Instructor_Interview_DateTime__c} &lt; DATETIMEVALUE(TEXT(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Instructor_Interview_DateTime__c}), 10))), 11, 1) + MOD(8 - WEEKDAY(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Instructor_Interview_DateTime__c}), 10))), 11, 1)), 7)) &amp; &apos; 06:00:00&apos;)), 4, 5) / 24</expression>
+    </formulas>
+    <formulas>
+        <name>StartDayText</name>
+        <dataType>String</dataType>
+        <expression>CASE(WEEKDAY(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))), 1, &apos;Sunday&apos;, 2, &apos;Monday&apos;, 3, &apos;Tuesday&apos;, 4, &apos;Wednesday&apos;, 5, &apos;Thursday&apos;, 6, &apos;Friday&apos;, 7, &apos;Saturday&apos;, &apos;&apos;) &amp; &apos;, &apos; &amp; CASE(MONTH(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))), 1, &apos;January&apos;, 2, &apos;February&apos;, 3, &apos;March&apos;, 4, &apos;April&apos;, 5, &apos;May&apos;, 6, &apos;June&apos;, 7, &apos;July&apos;, 8, &apos;August&apos;, 9, &apos;September&apos;, 10, &apos;October&apos;, 11, &apos;November&apos;, 12, &apos;December&apos;, &apos;&apos;) &amp; &apos; &apos; &amp; TEXT(DAY(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))))</expression>
+    </formulas>
+    <formulas>
+        <name>StartTimeText</name>
+        <dataType>String</dataType>
+        <expression>TEXT(IF(MOD(VALUE(MID(TEXT({!StartLocal}), 12, 2)), 12) = 0, 12, MOD(VALUE(MID(TEXT({!StartLocal}), 12, 2)), 12))) &amp; &apos;:&apos; &amp; MID(TEXT({!StartLocal}), 15, 2) &amp; IF(VALUE(MID(TEXT({!StartLocal}), 12, 2)) &lt; 12, &apos; AM&apos;, &apos; PM&apos;) &amp; &apos; ET&apos;</expression>
+    </formulas>
+    <interviewLabel>RTS Flow 2b — Instructor Interview Reminder {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RTS Flow 2b — Instructor Interview Reminder</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>50</locationX>
+        <locationY>608</locationY>
+        <faultConnector>
+            <targetReference>Log_Failure_Ignored</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_2b_Instructor_Interview_Reminder).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Instructor interview reminder (1 hour before)</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(AND({!$Record.RecordType.DeveloperName} = &apos;RTS_Applicant&apos;, ISPICKVAL({!$Record.Status}, &apos;RTS - Interview 1 Scheduled&apos;)), NOT(ISBLANK({!$Record.RTS_Instructor_Interview_DateTime__c})), NOT({!$Record.HasOptedOutOfEmail}))</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>One_Hour_Before</name>
+            <connector>
+                <targetReference>Still_Upcoming</targetReference>
+            </connector>
+            <label>1 Hour Before</label>
+            <offsetNumber>-1</offsetNumber>
+            <offsetUnit>Hours</offsetUnit>
+            <recordField>RTS_Instructor_Interview_DateTime__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>ReminderBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Hi {!$Record.FirstName},
+
+Quick reminder: your interview with our lead instructor starts in about an hour.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{!StartDayText} at {!StartTimeText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOW TO JOIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Use the details in your booking confirmation: the Zoom link if you chose Zoom, or come to ULEM Boston, 88 Warren Street, Roxbury, MA 02119 if you chose in person.
+
+The interview takes about 30 minutes. Come ready to talk about your interests, your goals, and any supports you might need.
+
+Running late or need to reschedule? Use the link in your booking confirmation or reply to this email.
+
+The MSIMBO Team at ULEM
+
+──────────────────────────────
+Urban League of Eastern Massachusetts
+88 Warren Street, Roxbury, MA 02119
+Questions? Reply to this email or reach us at program-rts@ulem.org.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>ReminderSubject</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Starting soon: your RTS interview at {!StartTimeText}</text>
+    </textTemplates>
+    <variables>
+        <name>LogFailed</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
+</Flow>

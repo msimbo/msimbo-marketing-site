@@ -13,3 +13,15 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Shareable direct link to the info session form. Rewrite (not redirect) so
+# UTM params survive; app.js scrolls to #info-session on these paths.
+[[redirects]]
+  from = "/info-session"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/info-sessions"
+  to = "/index.html"
+  status = 200

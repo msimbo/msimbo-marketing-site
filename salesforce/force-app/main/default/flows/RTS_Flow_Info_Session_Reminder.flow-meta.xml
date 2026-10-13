@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Send_Reminder_Email</name>
+        <label>Send Reminder Email</label>
+        <locationX>50</locationX>
+        <locationY>500</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Log_Email_Activity</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>ReminderSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ReminderBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <stringValue>program-rts@ulem.org</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Log_Failure_Ignored</name>
+        <label>Log Failure Ignored</label>
+        <locationX>314</locationX>
+        <locationY>716</locationY>
+        <assignmentItems>
+            <assignToReference>LogFailed</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Still_Upcoming</name>
+        <label>Still Upcoming?</label>
+        <locationX>182</locationX>
+        <locationY>384</locationY>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
+        <rules>
+            <name>Send</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ShouldSend</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Reminder_Email</targetReference>
+            </connector>
+            <label>Send</label>
+        </rules>
+    </decisions>
+    <description>Record-triggered after-save flow with a scheduled path 1 hour before RTS_Info_Session_Date__c. Emails the RSVP a reminder with the Zoom link. Applies to any lead with a session date (applicants who RSVP too). Re-checks at send time that the session is still upcoming (within 2 hours), the lead has an email, has not opted out, and is not converted, not ticked Info Session Attended, and not at status Attended/No Show. Logs a completed Task.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Sends only if the start time is still in the future and at most 2 hours away (guards against a stale path after a reschedule) and the lead still qualifies.</description>
+        <name>ShouldSend</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(NOT(ISBLANK({!$Record.RTS_Info_Session_Date__c})), {!$Record.RTS_Info_Session_Date__c} &gt; {!$Flow.CurrentDateTime}, {!$Record.RTS_Info_Session_Date__c} - {!$Flow.CurrentDateTime} &lt;= 2/24, NOT(ISBLANK({!$Record.Email})), NOT({!$Record.HasOptedOutOfEmail}), AND(NOT({!$Record.IsConverted}), NOT({!$Record.RTS_Info_Session_Attended__c}), NOT(ISPICKVAL({!$Record.Status}, &apos;RTS - Info Session Attended&apos;)), NOT(ISPICKVAL({!$Record.Status}, &apos;RTS - Info Session No Show&apos;))))</expression>
+    </formulas>
+    <formulas>
+        <description>Start time shifted to US Eastern wall-clock time (still typed as DateTime, so read it with TEXT(), never format it as a DateTime).</description>
+        <name>StartLocal</name>
+        <dataType>DateTime</dataType>
+        <expression>{!$Record.RTS_Info_Session_Date__c} - IF(AND({!$Record.RTS_Info_Session_Date__c} &gt;= DATETIMEVALUE(TEXT(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Info_Session_Date__c}), 10))), 3, 1) + MOD(8 - WEEKDAY(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Info_Session_Date__c}), 10))), 3, 1)), 7) + 7) &amp; &apos; 07:00:00&apos;), {!$Record.RTS_Info_Session_Date__c} &lt; DATETIMEVALUE(TEXT(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Info_Session_Date__c}), 10))), 11, 1) + MOD(8 - WEEKDAY(DATE(YEAR(DATEVALUE(LEFT(TEXT({!$Record.RTS_Info_Session_Date__c}), 10))), 11, 1)), 7)) &amp; &apos; 06:00:00&apos;)), 4, 5) / 24</expression>
+    </formulas>
+    <formulas>
+        <name>StartDayText</name>
+        <dataType>String</dataType>
+        <expression>CASE(WEEKDAY(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))), 1, &apos;Sunday&apos;, 2, &apos;Monday&apos;, 3, &apos;Tuesday&apos;, 4, &apos;Wednesday&apos;, 5, &apos;Thursday&apos;, 6, &apos;Friday&apos;, 7, &apos;Saturday&apos;, &apos;&apos;) &amp; &apos;, &apos; &amp; CASE(MONTH(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))), 1, &apos;January&apos;, 2, &apos;February&apos;, 3, &apos;March&apos;, 4, &apos;April&apos;, 5, &apos;May&apos;, 6, &apos;June&apos;, 7, &apos;July&apos;, 8, &apos;August&apos;, 9, &apos;September&apos;, 10, &apos;October&apos;, 11, &apos;November&apos;, 12, &apos;December&apos;, &apos;&apos;) &amp; &apos; &apos; &amp; TEXT(DAY(DATEVALUE(LEFT(TEXT({!StartLocal}), 10))))</expression>
+    </formulas>
+    <formulas>
+        <name>StartTimeText</name>
+        <dataType>String</dataType>
+        <expression>TEXT(IF(MOD(VALUE(MID(TEXT({!StartLocal}), 12, 2)), 12) = 0, 12, MOD(VALUE(MID(TEXT({!StartLocal}), 12, 2)), 12))) &amp; &apos;:&apos; &amp; MID(TEXT({!StartLocal}), 15, 2) &amp; IF(VALUE(MID(TEXT({!StartLocal}), 12, 2)) &lt; 12, &apos; AM&apos;, &apos; PM&apos;) &amp; &apos; ET&apos;</expression>
+    </formulas>
+    <interviewLabel>RTS Flow — Info Session Reminder {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RTS Flow — Info Session Reminder</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Log_Email_Activity</name>
+        <label>Log Email Activity</label>
+        <locationX>50</locationX>
+        <locationY>608</locationY>
+        <faultConnector>
+            <targetReference>Log_Failure_Ignored</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>Automated email sent by Salesforce from program-rts@ulem.org (RTS_Flow_Info_Session_Reminder).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Completed</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Email sent: Info session reminder (1 hour before)</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TaskSubtype</field>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(AND(NOT({!$Record.IsConverted}), NOT({!$Record.RTS_Info_Session_Attended__c})), NOT(ISBLANK({!$Record.RTS_Info_Session_Date__c})), NOT({!$Record.HasOptedOutOfEmail}))</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>One_Hour_Before</name>
+            <connector>
+                <targetReference>Still_Upcoming</targetReference>
+            </connector>
+            <label>1 Hour Before</label>
+            <offsetNumber>-1</offsetNumber>
+            <offsetUnit>Hours</offsetUnit>
+            <recordField>RTS_Info_Session_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>ReminderBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Hi {!$Record.FirstName},
+
+Quick reminder: the Revenue Technology Specialist (RTS) info session starts in about an hour.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{!StartDayText} at {!StartTimeText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+JOIN ON ZOOM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+https://us02web.zoom.us/j/82779419069
+
+No password, no downloads. It works in any browser. Join a few minutes early if you can.
+
+Running late or can&apos;t make it? Reply to this email and we&apos;ll get you into the next session.
+
+The MSIMBO Team at ULEM
+
+──────────────────────────────
+Urban League of Eastern Massachusetts
+88 Warren Street, Roxbury, MA 02119
+Questions? Reply to this email or reach us at program-rts@ulem.org.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>ReminderSubject</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Starting soon: your RTS info session at {!StartTimeText}</text>
+    </textTemplates>
+    <variables>
+        <name>LogFailed</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
+</Flow>

@@ -31,7 +31,7 @@
  *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
  *   SF_DUPE_CHECK_USERNAME          — integration user username (SOQL + PATCH)
  *   SF_DUPE_CHECK_PASSWORD          — integration user password + security token
- *   N8N_INFO_SESSION_WEBHOOK_URL    — https://protomated.app.n8n.cloud/webhook/<id>
+ *   N8N_INFO_SESSION_WEBHOOK_URL    — https://n8n.viz.li/webhook/<id>
  *   USE_SF_INFO_SESSION             — 'true' to route info-session to SF; anything else = legacy SwipeOne path
  *   SWIPEONE_API_KEY                — SwipeOne API key (legacy info-session fallback)
  *   SWIPEONE_WORKSPACE_ID           — SwipeOne workspace ID (legacy info-session fallback)

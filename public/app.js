@@ -15,8 +15,11 @@
     { label: "Thu, Oct 8", time: "6:00 PM", value: "2026-10-08T18:00:00" },
     { label: "Fri, Oct 9", time: "12:00 PM", value: "2026-10-09T12:00:00" },
     { label: "Tue, Oct 13", time: "6:00 PM", value: "2026-10-13T18:00:00" },
+    { label: "Wed, Oct 14", time: "12:00 PM", value: "2026-10-14T12:00:00" },
     { label: "Wed, Oct 14", time: "6:00 PM", value: "2026-10-14T18:00:00" },
-    { label: "Thu, Oct 15", time: "6:00 PM", value: "2026-10-15T18:00:00" }
+    { label: "Thu, Oct 15", time: "12:00 PM", value: "2026-10-15T12:00:00" },
+    { label: "Thu, Oct 15", time: "6:00 PM", value: "2026-10-15T18:00:00" },
+    { label: "Fri, Oct 16", time: "12:00 PM", value: "2026-10-16T12:00:00" }
   ];
 
   // Sessions whose start time has already passed are never shown.
@@ -898,6 +901,27 @@
         });
     });
   });
+
+  // ──────────────────────────────────────────────
+  // DIRECT LINKS
+  // /info-session (Netlify rewrite) and /#info-session land on the form.
+  // Re-scroll after load so fonts and the date picker don't shift the target.
+  // ──────────────────────────────────────────────
+  var DIRECT_LINK_PATHS = {
+    "/info-session": "info-session",
+    "/info-sessions": "info-session",
+  };
+  var directTargetId =
+    DIRECT_LINK_PATHS[location.pathname.replace(/\/+$/, "")] ||
+    location.hash.slice(1);
+  var directTarget = directTargetId && document.getElementById(directTargetId);
+  if (directTarget) {
+    var scrollToDirectTarget = function () {
+      directTarget.scrollIntoView({ behavior: "instant", block: "start" });
+    };
+    scrollToDirectTarget();
+    window.addEventListener("load", scrollToDirectTarget);
+  }
 
   // ──────────────────────────────────────────────
   // SMOOTH SCROLL (for CTA links)
