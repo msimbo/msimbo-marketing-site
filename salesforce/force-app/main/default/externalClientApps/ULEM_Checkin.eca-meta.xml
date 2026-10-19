@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExternalClientApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <contactEmail>domotosho@ulem.org</contactEmail>
+    <description>Server-to-server login for the ULEM Check-In web app (Netlify). Client credentials flow only, running as the check-in integration user.</description>
+    <distributionState>Local</distributionState>
+    <isProtected>false</isProtected>
+    <label>ULEM Check-In</label>
+</ExternalClientApplication>

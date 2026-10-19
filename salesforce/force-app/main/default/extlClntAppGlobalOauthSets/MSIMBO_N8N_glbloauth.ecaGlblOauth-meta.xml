@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtlClntAppGlobalOauthSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <callbackUrl>https://login.salesforce.com/services/oauth2/success</callbackUrl>
+    <certificate>-----BEGIN CERTIFICATE-----
+MIIDHzCCAgegAwIBAgIUezys00HMhXtQWHyddET+Rj8XyaAwDQYJKoZIhvcNAQEL
+BQAwHzEdMBsGA1UEAwwUdWxlbS1uOG4taW50ZWdyYXRpb24wHhcNMjYxMDE5MTM0
+OTM4WhcNMjkxMDE4MTM0OTM4WjAfMR0wGwYDVQQDDBR1bGVtLW44bi1pbnRlZ3Jh
+dGlvbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM1nKAzyz+5Wudoa
+ATpw9tXoRTpDFkhKExUt0QG+y6p98fuqWpbJu/OkkYunFxfC2YLes8B8iF+yOXEC
+Q327DI9hc8mU9cNSQEa4Z4Ydghgdb84puknPsYfwXDVr8yPx6uXXwyNdhwkdL2WA
+XXx58UqeBCCT5gvB1d64VpJhRQCagAghmoQnbuDxdYiM8a9qbI0F72ITyNwRY753
+dV9h96skYfrOqm3xr6o3pVk0biwKlevNm7zoI8m63+6j9EX1GA7lAAUWnqwkLNvz
+yd+UL81tXrEopn47ooDcagjcPmDKlgSclVf6lzA10isnoxIZF20PzCQitIq9O9Os
+Ie5RT80CAwEAAaNTMFEwHQYDVR0OBBYEFLBrPIXBfxYO/2eo4x1Mo9lYjYhhMB8G
+A1UdIwQYMBaAFLBrPIXBfxYO/2eo4x1Mo9lYjYhhMA8GA1UdEwEB/wQFMAMBAf8w
+DQYJKoZIhvcNAQELBQADggEBAB7CujCpjpwRLOLwGVUj12kxAv6pPZnrH34/POUq
+eUqO+lgFDiJetHFEV3vY2nWhhLMZSk3tdR2kY5aev5is8iVGDuMLcQxQ+gxZYrgP
+z+R8DL8xwQJJmdHGdhVE8V6XkryLT776o8t4zRaeWPiXtmo0UzFjFw3XyM0p5CDG
+/gFdeUdzXFzlpVS6fB7jk7TzzjlM++4cnTdm+MSf4V+n/2d3XVY4lxNYswKbC4vD
+usZLjbGjRNg64kpZCydnwYz7Q0fEyHxqvZvOtLeNaqMDjl97vayYgnZi4a2kTzPR
+hZAdYuChcdW2jYP9ZTT/x3dsdyK3aW9ZbIPdTvkbn7hQbJM=
+-----END CERTIFICATE-----</certificate>
+    <externalClientApplication>MSIMBO_N8N</externalClientApplication>
+    <isClientCredentialsFlowEnabled>false</isClientCredentialsFlowEnabled>
+    <isConsumerSecretOptional>false</isConsumerSecretOptional>
+    <isPkceRequired>false</isPkceRequired>
+    <isSecretRequiredForRefreshToken>true</isSecretRequiredForRefreshToken>
+    <label>MSIMBO_N8N_glbloauth</label>
+    <shouldRotateConsumerKey>false</shouldRotateConsumerKey>
+    <shouldRotateConsumerSecret>false</shouldRotateConsumerSecret>
+</ExtlClntAppGlobalOauthSettings>

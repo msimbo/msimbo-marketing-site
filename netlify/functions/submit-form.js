@@ -14,8 +14,9 @@
  *                                    - Possible duplicates / returning applicants get a coordinator Task
  *   signupType === 'waitlist'     → Salesforce REST insert (RTS_Applicant RecordType,
  *                                   Status='RTS - Waitlisted', linked to the current cohort)
- *   signupType === 'info_session' → Salesforce Web-to-Lead (RTS_Info_Session RecordType)
- *                                   + n8n webhook (Google Calendar invite)
+ *   signupType === 'info_session' → Salesforce REST insert as integration@ulem.org when SF_CLIENT_ID is
+ *                                   set, else Web-to-Lead (created as the W2L Default Lead Creator).
+ *                                   RTS_Info_Session RecordType either way, + n8n webhook (calendar invite)
  *
  * The current cohort is looked up at submit time: the RTS_Cohort__c with Status__c = 'Recruiting'
  * and the latest Start_Date__c. Opening a new cohort is a Salesforce data change, not a redeploy.
@@ -23,18 +24,19 @@
  * Required Netlify environment variables:
  *   SF_ORG_ID                       — Salesforce 15-char Org ID (info-session W2L only)
  *   SF_RTS_COHORT_ID                — Fallback cohort ID for applications if no cohort is Recruiting
- *   SF_RTS_COHORT_NAME              — Fallback cohort name (e.g., "RTS - Cohort 2 - Fall 2026 (FY27 - C1)")
+ *   SF_RTS_COHORT_NAME              — Fallback cohort name (e.g., "RTS Cohort 2 · Fall 2026 · FY27-C1")
  *   SF_RTS_COHORT_2_ID              — Fallback cohort ID for the waitlist if no cohort is Recruiting
  *   SF_RTS_COHORT_2_NAME            — Fallback cohort name for the waitlist
  *   SF_RECORD_TYPE_ID               — 15-char RTS_Applicant RecordType Id
  *   SF_INFO_SESSION_RECORD_TYPE_ID  — 15-char RTS_Info_Session RecordType Id
  *   SF_INSTANCE_URL                 — e.g., https://ulem.my.salesforce.com
- *   SF_DUPE_CHECK_USERNAME          — integration user username (SOQL + PATCH)
- *   SF_DUPE_CHECK_PASSWORD          — integration user password + security token
+ *   SF_CLIENT_ID / SF_CLIENT_SECRET — consumer key/secret of the "msimbo.org Website" External Client
+ *                                     App (MSIMBO_Website), client-credentials flow running as
+ *                                     integration@ulem.org. Preferred; nothing expires.
+ *   SF_LOGIN_URL                    — My Domain URL for the token request (https://ulem.my.salesforce.com)
+ *   SF_DUPE_CHECK_USERNAME          — legacy: username for SOAP login, used only when SF_CLIENT_ID
+ *   SF_DUPE_CHECK_PASSWORD            is not set (password + security token). Remove after cutover.
  *   N8N_INFO_SESSION_WEBHOOK_URL    — https://n8n.viz.li/webhook/<id>
- *   USE_SF_INFO_SESSION             — 'true' to route info-session to SF; anything else = legacy SwipeOne path
- *   SWIPEONE_API_KEY                — SwipeOne API key (legacy info-session fallback)
- *   SWIPEONE_WORKSPACE_ID           — SwipeOne workspace ID (legacy info-session fallback)
  */
 
 // Lead custom field IDs (15-char) for Web-to-Lead
@@ -102,10 +104,7 @@ exports.handler = async function (event) {
   }
 
   if (data.signupType === 'info_session') {
-    if (process.env.USE_SF_INFO_SESSION === 'true') {
-      return submitInfoSessionToSalesforce(data, headers);
-    }
-    return submitToSwipeOne(data, headers);
+    return submitInfoSessionToSalesforce(data, headers);
   }
 
   return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown signupType' }) };
@@ -133,7 +132,7 @@ async function submitApplication(data, headers) {
   // Look up existing Lead by email (any RecordType). If they're already an Applicant,
   // reject as duplicate. If a Lead exists with any other RecordType, promote it via
   // REST PATCH (preserves history and avoids W2L-duplicate rejections).
-  if (!SF_INSTANCE_URL || !SF_DUPE_CHECK_USERNAME || !SF_DUPE_CHECK_PASSWORD) {
+  if (!SF_INSTANCE_URL || !hasSfCredentials()) {
     console.error('Missing dedupe credentials — refusing submission to avoid ghost Leads');
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
   }
@@ -253,7 +252,8 @@ async function submitInfoSessionToSalesforce(data, headers) {
     N8N_INFO_SESSION_WEBHOOK_URL,
   } = process.env;
 
-  if (!SF_ORG_ID) {
+  const viaRest = Boolean(process.env.SF_CLIENT_ID && process.env.SF_CLIENT_SECRET);
+  if (!viaRest && !SF_ORG_ID) {
     console.error('Missing SF_ORG_ID');
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
   }
@@ -263,8 +263,10 @@ async function submitInfoSessionToSalesforce(data, headers) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: err }) };
   }
 
-  // Fire the SF Web-to-Lead and n8n webhook in parallel. Neither blocks the other.
-  const sfPromise = createInfoSessionLeadViaW2L(data, { SF_ORG_ID, SF_INFO_SESSION_RECORD_TYPE_ID });
+  // Create the SF Lead and fire the n8n webhook in parallel. Neither blocks the other.
+  const sfPromise = viaRest
+    ? createInfoSessionLeadViaRest(data, { recordTypeId: SF_INFO_SESSION_RECORD_TYPE_ID })
+    : createInfoSessionLeadViaW2L(data, { SF_ORG_ID, SF_INFO_SESSION_RECORD_TYPE_ID });
   const n8nPromise = N8N_INFO_SESSION_WEBHOOK_URL
     ? fireN8nWebhook(data, N8N_INFO_SESSION_WEBHOOK_URL)
     : Promise.resolve();
@@ -319,6 +321,36 @@ async function createInfoSessionLeadViaW2L(data, env) {
 
   if (!sfRes.ok) {
     throw new Error('Salesforce W2L returned status ' + sfRes.status);
+  }
+}
+
+// Same fields as the Web-to-Lead post. "RTS Flow — Info Session Assign RecordType" still runs
+// (it keys on LeadSource + session date + no DOB) and sets the coordinator as owner. No active
+// Lead duplicate rule, so a repeat sign-up creates a second Lead, as Web-to-Lead did.
+async function createInfoSessionLeadViaRest(data, { recordTypeId }) {
+  const { sessionId, instanceUrl } = await sfLogin({});
+  const session = parseEasternDatetime(data.infoSessionDate);
+  const body = {
+    FirstName: data.firstName,
+    LastName: data.lastName,
+    Email: data.email,
+    Phone: data.phone,
+    Company: 'N/A',
+    LeadSource: 'Wesbite_msimbo.org',
+    [SF_API_NAMES.zipCode]: data.zipCode,
+    // REST reads a datetime without an offset as UTC; the form sends Eastern wall time.
+    [SF_API_NAMES.infoSessionDate]: session ? session.toISOString() : null,
+    [SF_API_NAMES.infoSessionSource]: formatSessionLabel(data.infoSessionDate),
+  };
+  if (recordTypeId) body.RecordTypeId = String(recordTypeId).slice(0, 15);
+
+  const res = await fetch(`${instanceUrl}/services/data/v62.0/sobjects/Lead/`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + sessionId, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error('Info-session Lead INSERT failed: ' + res.status + ' ' + (await res.text()).slice(0, 300));
   }
 }
 
@@ -416,7 +448,7 @@ async function submitWaitlist(data, headers) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: err }) };
   }
 
-  if (!SF_INSTANCE_URL || !SF_DUPE_CHECK_USERNAME || !SF_DUPE_CHECK_PASSWORD) {
+  if (!SF_INSTANCE_URL || !hasSfCredentials()) {
     console.error('Missing SF credentials for waitlist insert');
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
   }
@@ -548,7 +580,33 @@ function validateApplication(data) {
 // SALESFORCE REST API (login, lookup, PATCH)
 // ──────────────────────────────────────────────
 
+function hasSfCredentials() {
+  const { SF_CLIENT_ID, SF_CLIENT_SECRET, SF_LOGIN_URL, SF_DUPE_CHECK_USERNAME, SF_DUPE_CHECK_PASSWORD } = process.env;
+  return Boolean((SF_CLIENT_ID && SF_CLIENT_SECRET && SF_LOGIN_URL) || (SF_DUPE_CHECK_USERNAME && SF_DUPE_CHECK_PASSWORD));
+}
+
+// Client-credentials token, reused across warm invocations of the function.
+let cachedToken = null;
+
+// Logs in as integration@ulem.org through the MSIMBO_Website External Client App when SF_CLIENT_ID
+// is set; otherwise falls back to the legacy SOAP username/password login (sfCreds).
 async function sfLogin(sfCreds) {
+  const { SF_CLIENT_ID, SF_CLIENT_SECRET, SF_LOGIN_URL } = process.env;
+  if (SF_CLIENT_ID && SF_CLIENT_SECRET) {
+    if (cachedToken && cachedToken.expires > Date.now()) return cachedToken.session;
+    if (!SF_LOGIN_URL) throw new Error('SF_LOGIN_URL must be set to the My Domain URL, e.g. https://ulem.my.salesforce.com');
+    const res = await fetch(`${SF_LOGIN_URL.replace(/\/+$/, '')}/services/oauth2/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'client_credentials', client_id: SF_CLIENT_ID, client_secret: SF_CLIENT_SECRET }),
+    });
+    if (!res.ok) throw new Error('Salesforce login failed: ' + res.status + ' ' + (await res.text()).slice(0, 200));
+    const body = await res.json();
+    // Salesforce sessions last at least 2 hours; refresh well before that.
+    cachedToken = { session: { sessionId: body.access_token, instanceUrl: body.instance_url }, expires: Date.now() + 50 * 60 * 1000 };
+    return cachedToken.session;
+  }
+
   const loginBody = `<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:partner.soap.sforce.com">
   <soapenv:Body>
@@ -947,121 +1005,4 @@ function escapeXml(s) {
 
 function escapeSOQL(s) {
   return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-}
-
-// ──────────────────────────────────────────────
-// LEGACY SWIPEONE INFO-SESSION FLOW
-// Kept as fallback when USE_SF_INFO_SESSION is not set.
-// Remove once SF path is verified stable.
-// ──────────────────────────────────────────────
-
-async function submitToSwipeOne(data, headers) {
-  const { SWIPEONE_API_KEY } = process.env;
-  let workspaceId = process.env.SWIPEONE_WORKSPACE_ID || '';
-
-  const wsMatch = workspaceId.match(/workspaces\/([a-f0-9]+)/);
-  if (wsMatch) workspaceId = wsMatch[1];
-
-  if (!SWIPEONE_API_KEY || !workspaceId) {
-    console.error('Missing SwipeOne credentials');
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server configuration error' }) };
-  }
-
-  const contactPayload = {
-    firstName: data.firstName || '',
-    lastName: data.lastName || '',
-    email: data.email,
-    phone: data.phone || '',
-    address: { zipcode: data.zipCode || '' },
-  };
-
-  if (data.signupType === 'info_session' && data.infoSessionDate) {
-    contactPayload.subscription_created_date = new Date(data.infoSessionDate).toISOString();
-  }
-
-  try {
-    const contactRes = await fetch(
-      `https://api.swipeone.com/api/workspaces/${workspaceId}/contacts`,
-      {
-        method: 'POST',
-        headers: { 'x-api-key': SWIPEONE_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactPayload),
-      }
-    );
-
-    const contactData = await contactRes.json();
-
-    if (!contactRes.ok) {
-      console.error('SwipeOne contact creation failed:', contactData);
-      return { statusCode: contactRes.status, headers, body: JSON.stringify({ error: 'Failed to create contact', detail: contactData.message }) };
-    }
-
-    const contactId = contactData.data?.contact?._id;
-
-    if (contactId) {
-      let existingTags = [];
-      try {
-        const tagsRes = await fetch(
-          `https://api.swipeone.com/api/workspaces/${workspaceId}/tags`,
-          { headers: { 'x-api-key': SWIPEONE_API_KEY } }
-        );
-        const tagsData = await tagsRes.json();
-        existingTags = tagsData.data?.tags || [];
-      } catch (e) {
-        console.error('Failed to fetch tags (non-blocking):', e.message);
-      }
-
-      const existingTagNames = new Map(existingTags.map(t => [t.label, t.name]));
-      function resolveTag(label, color) {
-        const existing = existingTagNames.get(label);
-        return existing ? existing : { label, color };
-      }
-
-      const tagLabel = data.signupType === 'info_session' ? 'Info Session Lead' : 'Application Lead';
-      const tags = [
-        resolveTag(tagLabel, 'red'),
-        resolveTag('Landing Page', 'blue'),
-      ];
-
-      if (data.signupType === 'info_session' && data.infoSessionDate) {
-        const d = new Date(data.infoSessionDate);
-        const dateLabel = `Session: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-        tags.push(resolveTag(dateLabel, 'cyan'));
-      }
-
-      await fetch(
-        `https://api.swipeone.com/api/contacts/${contactId}/tags`,
-        { method: 'POST', headers: { 'x-api-key': SWIPEONE_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ tags }) }
-      ).catch(err => console.error('Tag assignment failed (non-blocking):', err.message));
-
-      const eventType = data.signupType === 'info_session' ? 'info_session_registered' : 'application_submitted';
-      const eventPayload = {
-        type: eventType,
-        contact: { email: data.email },
-        properties: {
-          lead_source: data.leadSource || 'Landing Page',
-          utm_source: data.utmSource || '',
-          utm_medium: data.utmMedium || '',
-          utm_campaign: data.utmCampaign || '',
-          utm_content: data.utmContent || '',
-          utm_term: data.utmTerm || '',
-          zip_code: data.zipCode || '',
-          submitted_at: data.submittedAt || new Date().toISOString(),
-        },
-      };
-      if (data.signupType === 'info_session' && data.infoSessionDate) {
-        eventPayload.properties.info_session_date = data.infoSessionDate;
-      }
-
-      await fetch(
-        `https://api.swipeone.com/api/workspaces/${workspaceId}/events`,
-        { method: 'POST', headers: { 'x-api-key': SWIPEONE_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(eventPayload) }
-      ).catch(err => console.error('Event firing failed (non-blocking):', err.message));
-    }
-
-    return { statusCode: 200, headers, body: JSON.stringify({ status: 'success', contactId }) };
-  } catch (err) {
-    console.error('SwipeOne API error:', err);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal server error' }) };
-  }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExternalClientApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <contactEmail>domotosho@ulem.org</contactEmail>
+    <description>n8n (n8n.viz.li) Salesforce credential "Salesforce - ULEM". JWT bearer flow as integration@ulem.org; certificate CN=ulem-n8n-integration, expires 2029-10-18. Pre-authorized via the MSIMBO n8n Integration permission set.</description>
+    <distributionState>Local</distributionState>
+    <isProtected>false</isProtected>
+    <label>n8n Integration (MSIMBO)</label>
+</ExternalClientApplication>
