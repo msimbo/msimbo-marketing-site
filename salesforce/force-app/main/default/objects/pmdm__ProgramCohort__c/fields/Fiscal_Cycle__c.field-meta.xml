@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fiscal_Cycle__c</fullName>
+    <description>Order of this cohort among the program's cohorts starting in the same ULEM fiscal year (C1, C2...). Filled by the Program Cohort Naming flow when blank; type a value to override it.</description>
+    <inlineHelpText>The cohort's order within the fiscal year. Filled automatically when blank; type a number to override.</inlineHelpText>
+    <externalId>false</externalId>
+    <label>Fiscal Cycle</label>
+    <precision>2</precision>
+    <scale>0</scale>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

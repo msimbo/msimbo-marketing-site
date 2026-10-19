@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reporting_Code__c</fullName>
+    <description>Short code for reports and other systems (Moodle, n8n, file names), e.g. RTS-FY27-C1.</description>
+    <externalId>false</externalId>
+    <formula>IF(OR(ISBLANK(Short_Code__c), ISBLANK(pmdm__StartDate__c), ISBLANK(Fiscal_Cycle__c)), NULL,
+  UPPER(TRIM(Short_Code__c)) &amp; &quot;-&quot; &amp; Fiscal_Year__c &amp; &quot;-C&quot; &amp; TEXT(Fiscal_Cycle__c))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Reporting Code</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -46,11 +46,11 @@ call("PATCH", f"/sobjects/RTS_Cohort__c/{RTS_COHORT_2}", {"Start_Date__c": str(S
 call("PATCH", f"/sobjects/pmdm__ProgramCohort__c/{PMM_COHORT_2}", {"pmdm__StartDate__c": str(START), "pmdm__EndDate__c": str(END),
      "Instructor__c": INSTRUCTOR, "Class_Days__c": "Monday;Tuesday;Wednesday;Thursday;Friday"})
 update_many("pmdm__ServiceSchedule__c", [{"Id": s["Id"], "Program_Cohort__c": PMM_COHORT_1}
-            for s in q("SELECT Id FROM pmdm__ServiceSchedule__c WHERE Name LIKE '%Cohort 1 (migrated)'")])
+            for s in q("SELECT Id FROM pmdm__ServiceSchedule__c WHERE Name LIKE 'RTS Cohort 1 · %'")])
 
 for name, sid, ds in by_phase:
     sched = insert_many("pmdm__ServiceSchedule__c", [{
-        "Name": f"{name} - Cohort 2", "pmdm__Service__c": sid, "Program_Cohort__c": PMM_COHORT_2,
+        "Name": f"RTS Cohort 2 · {name.removeprefix('RTS ')}", "pmdm__Service__c": sid, "Program_Cohort__c": PMM_COHORT_2,
         "pmdm__Frequency__c": "Weekly", "pmdm__DaysOfWeek__c": "2;3;4;5;6", "pmdm__CreateServiceSessionRecords__c": False,
         "pmdm__FirstSessionStart__c": at(ds[0], 10), "pmdm__FirstSessionEnd__c": at(ds[0], 16),
         "pmdm__ServiceScheduleEnds__c": "On", "pmdm__ServiceScheduleEndDate__c": str(ds[-1]),

@@ -1,7 +1,7 @@
 """Migrate one legacy Program_Class__c (with its Class Registrations and Attendance) into a PMM Program Cohort.
 Usage: SFAUTH=auth.json python3 migrate_class.py <ProgramClassId> <ProgramCohortId> [--apply]
 auth.json = {"accessToken","instanceUrl"} from `sf org display -o ulem --json`. Without --apply it is a dry run.
-PROGRAM_ID/SERVICES are set for MSIMBO Tech Academy / RTS Cohort 1 (MSIMBO-FY26-CY2, migrated 2026-10-16).
+PROGRAM_ID/SERVICES are set for MSIMBO Academy / RTS Cohort 1 (MSIMBO-FY26-CY2, migrated 2026-10-16).
 After --apply, PMM attendance rollups only recalculate when Attendance Status changes; blank and restore it."""
 import sys, json, collections, datetime
 import os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +23,7 @@ def service_for(d):
 pc = q(f"SELECT Id, Name, Start_Date__c, End_Date__c, Stipend__c, Instructor__c, Class_Days__c FROM Program_Class__c WHERE Id='{PC_ID}'")[0]
 regs = q(f"SELECT Id, Student__c, Student__r.Name, Student__r.PersonContactId, Status__c, Date__c, Completion_Date__c, Attempt_1_Date__c, Attempt_1_Outcome__c, Attempt_1_Total_Score__c, Attempt_2_Date__c, Attempt_2_Outcome__c, Attempt_2_Total_Score__c, Requirements__c FROM Class_Registration__c WHERE Program_Class__c='{PC_ID}'")
 att = q(f"SELECT Id, Student__c, Class_Registration__c, Date__c, Time_In__c, Time_Out__c, Time__c, Status__c, Excused_Reason__c FROM Attendance__c WHERE Program_Class__c='{PC_ID}' ORDER BY Date__c")
+cohort = q(f"SELECT Short_Code__c, Cohort_Number__c FROM pmdm__ProgramCohort__c WHERE Id='{COHORT_ID}'")[0]
 pes = q(f"SELECT Id, Name, pmdm__Contact__c, pmdm__Contact__r.Name, pmdm__Contact__r.AccountId, pmdm__Stage__c, Legacy_Class_Registration_Id__c FROM pmdm__ProgramEngagement__c WHERE pmdm__ProgramCohort__c='{COHORT_ID}'")
 
 def norm(n): return " ".join(w for w in n.lower().replace(".", "").split() if len(w) > 1)
@@ -32,7 +33,7 @@ report = collections.defaultdict(list)
 
 # --- 1. program, cohort, services
 if APPLY:
-    call("PATCH", f"/sobjects/pmdm__Program__c/{PROGRAM_ID}", {"Name": "MSIMBO Tech Academy"})
+    call("PATCH", f"/sobjects/pmdm__Program__c/{PROGRAM_ID}", {"Name": "MSIMBO Academy"})
     call("PATCH", f"/sobjects/pmdm__ProgramCohort__c/{COHORT_ID}", {
         "Legacy_Program_Class_Id__c": pc["Id"], "Instructor__c": pc["Instructor__c"],
         "Class_Days__c": pc["Class_Days__c"], "Stipend__c": pc["Stipend__c"]})
@@ -65,7 +66,7 @@ for r in regs:
         if not contact:
             report["skipped: legacy student is not a person account"].append(r["Student__r"]["Name"]); continue
         stage = STAGE.get(r["Status__c"], "Enrolled")
-        new_pes.append((r["Id"], dict(Name=f'{r["Student__r"]["Name"]} {pc["Start_Date__c"]}: MSIMBO Tech Academy'[:80],
+        new_pes.append((r["Id"], dict(Name=f'{r["Student__r"]["Name"]} {pc["Start_Date__c"]}: MSIMBO Academy'[:80],
             pmdm__Program__c=PROGRAM_ID, pmdm__ProgramCohort__c=COHORT_ID, pmdm__Contact__c=contact, pmdm__Role__c="Client",
             pmdm__Stage__c=stage, pmdm__StartDate__c=r["Date__c"] or pc["Start_Date__c"], pmdm__EndDate__c=r["Completion_Date__c"], **legacy)))
         report["new engagement (stage from legacy, provisional)"].append(f'{r["Student__r"]["Name"]}: {r["Status__c"]} -> {stage}')
@@ -89,7 +90,8 @@ if APPLY:
         dates = [d for d in sorted(by_date) if service_for(d)[0] == sid]
         if not dates: continue
         sched_ids[sid] = insert_many("pmdm__ServiceSchedule__c", [{
-            "Name": f"{name} - Cohort 1 (migrated)", "pmdm__Service__c": sid, "pmdm__Frequency__c": "Weekly",
+            "Name": f"{cohort['Short_Code__c']} Cohort {int(cohort['Cohort_Number__c'])} · {name.removeprefix('RTS ')}",
+            "pmdm__Service__c": sid, "Program_Cohort__c": COHORT_ID, "pmdm__Frequency__c": "Weekly",
             "pmdm__DaysOfWeek__c": "2;3;4", "pmdm__CreateServiceSessionRecords__c": False,
             "pmdm__FirstSessionStart__c": dates[0] + "T14:00:00.000Z", "pmdm__FirstSessionEnd__c": dates[0] + "T20:00:00.000Z",
             "pmdm__ServiceScheduleEnds__c": "On", "pmdm__ServiceScheduleEndDate__c": dates[-1]}])[0]

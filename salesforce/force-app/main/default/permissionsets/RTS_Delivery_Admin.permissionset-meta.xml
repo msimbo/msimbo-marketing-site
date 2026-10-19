@@ -111,6 +111,31 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Short_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Cohort_Number__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Fiscal_Cycle__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>pmdm__ProgramCohort__c.Fiscal_Year__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>pmdm__ProgramCohort__c.Reporting_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>pmdm__ServiceSchedule__c.Delivery_Mode__c</field>
         <readable>true</readable>
     </fieldPermissions>

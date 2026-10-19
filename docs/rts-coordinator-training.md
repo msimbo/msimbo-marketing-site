@@ -10,12 +10,17 @@
 
 **If something looks different on screen:** The system may have been updated since this guide was written. When in doubt, ask Dele.
 
+> **What changed on October 19, 2026**
+>
+> - **Cohorts have a new naming pattern:** `{Code} Cohort {n} · {Season} {Year} · FY{yy}-C{c}`, e.g. **RTS Cohort 2 · Fall 2026 · FY27-C1**. "Cohort 2" is the program's running count; "FY27-C1" is ULEM's reporting cycle (the first cohort starting in fiscal year 2027, which runs July-June). Salesforce builds the name for you, see [Setting up a new cohort's name](#setting-up-a-new-cohorts-name) and the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
+> - **The program is now called MSIMBO Academy** (it was briefly MSIMBO Tech Academy).
+
 > **What changed on October 16, 2026**
 >
 > - **You no longer convert Leads.** When you move a Lead to `Offer Confirmed`, Salesforce converts it to a student record (a Person Account), carries over their intake answers, and enrols them in their cohort and its three phases, all within a minute. The Lead moves to `Converted-RTS` on its own. See [Section 6.9](#69-checking-a-new-students-enrolment).
 > - **Your task changes from "Convert Lead to Contact" to "Check enrolment".** It takes a few seconds: open the student, check the cohort is right, mark the task Complete.
 > - **If the automatic step can't finish, you get an "Enrol by hand" task** with the reason. [Section 6.9](#69-checking-a-new-students-enrolment) has the steps.
-> - **The program is now called MSIMBO Tech Academy in Salesforce.** RTS is a track of MSIMBO; cohorts keep their RTS names.
+> - **The program is now called MSIMBO Academy in Salesforce.** RTS is a track of MSIMBO.
 
 > **What changed on October 7, 2026**
 >
@@ -78,7 +83,7 @@
 |---|---|
 | **Lead** | An applicant. Every person who applies becomes a Lead record. |
 | **Person Account (student)** | A confirmed, enrolled student. Salesforce turns the Lead into a Person Account automatically when you move it to `Offer Confirmed`. It's the same kind of record as ULEM's other students, so a returning ULEM client keeps one record. |
-| **Program Engagement** | The record linking a student to the program (**MSIMBO Tech Academy**) and to their cohort. Salesforce creates it at the same time (see [Section 6.9](#69-checking-a-new-students-enrolment)). |
+| **Program Engagement** | The record linking a student to the program (**MSIMBO Academy**) and to their cohort. Salesforce creates it at the same time (see [Section 6.9](#69-checking-a-new-students-enrolment)). |
 | **Cohort** | A single run of the program. Every Lead is tagged automatically to the cohort that is recruiting when they apply. Dates are in [Cohort key dates](#cohort-key-dates). |
 | **Task** | A to-do item Salesforce creates for you (e.g., "follow up with applicant"). You'll see these in your Home page or on the Lead record. |
 
@@ -481,7 +486,7 @@ When you move a Lead to `Offer Confirmed`, Salesforce does the rest within a min
 
 - **Converts the Lead into a student record** (a Person Account), with no Opportunity. If the applicant is already a ULEM client with the same email, they're added to that record instead of getting a duplicate.
 - **Carries over their intake answers:** date of birth, ZIP code, employment status, barriers, granted supports and wraparound notes.
-- **Creates their Program Engagement:** Program **MSIMBO Tech Academy**, their cohort, Stage **Enrolled**, Start Date = the cohort start.
+- **Creates their Program Engagement:** Program **MSIMBO Academy**, their cohort, Stage **Enrolled**, Start Date = the cohort start.
 - **Enrols them in the three phases** (RTS Foundations, RTS Specialization, RTS Career Launch) and puts them on the cohort's class schedules, so they appear on every class day's attendance list.
 - **Moves the Lead to `Converted-RTS`.**
 
@@ -489,7 +494,7 @@ When you move a Lead to `Offer Confirmed`, Salesforce does the rest within a min
 
 1. Open the task and click the student's name. (If you open the old Lead instead, it shows "This lead was converted" with a link to the student.)
 2. On the student's record, open **Related → Program Engagements**.
-3. Check there is one row for the right cohort (e.g. **RTS - Cohort 2 - Fall 2026**) with Stage **Enrolled**.
+3. Check there is one row for the right cohort (e.g. **RTS Cohort 2 · Fall 2026 · FY27-C1**) with Stage **Enrolled**.
 4. Mark the task Complete.
 
 **If the Lead is still at `Offer Confirmed` after a few minutes,** the automatic step didn't run. You'll also get an "Enrol by hand" task.
@@ -499,7 +504,7 @@ When you move a Lead to `Offer Confirmed`, Salesforce does the rest within a min
 1. Open the Lead. Clear the **Company** field (web applications arrive with "N/A"; if it's filled in, Salesforce creates the wrong kind of record). Save.
 2. Click **Convert**. Under Account, choose **Create New** (or pick the person's existing record if they're already a ULEM client). Tick **Don't create an opportunity**. Converted Status: **Converted-RTS**. Click **Convert**.
 3. On the new student, go to **Related → Program Engagements → New**:
-   - Program: **MSIMBO Tech Academy**
+   - Program: **MSIMBO Academy**
    - Program Cohort: the cohort they were accepted into
    - Stage: **Enrolled**
    - Role: **Client**
@@ -776,15 +781,28 @@ Here's the quick map:
 | Foundations Nov 2-20, Specialization Nov 23-Dec 23, Career Launch Jan 4-Feb 19 | Phases in Salesforce |
 | 15 seats | Target enrollment |
 
-In Salesforce this cohort is called **RTS - Cohort 2 - Fall 2026**, and the dashboard is **Recruitment Tracker - RTS Cohort 2**.
+In Salesforce this cohort is called **RTS Cohort 2 · Fall 2026 · FY27-C1** (reporting code **RTS-FY27-C1**), and the dashboard is **Recruitment Tracker - RTS Cohort 2 · FY27-C1**.
 
 **Past cohorts**
 
 | Cohort | Program starts | Program ends | Target enrollment |
 |---|---|---|---|
-| Cohort 1 (RTS - Cohort 1 - May 2026) | May 11, 2026 (Monday) | August 10, 2026 (Monday), including the Career Launch capstone | 15 seats |
+| Cohort 1 (RTS Cohort 1 · Spring 2026 · FY26-C2) | May 11, 2026 (Monday) | August 10, 2026 (Monday), including the Career Launch capstone | 15 seats |
 
 When a new cohort opens, move the current table down into **Past cohorts** and fill in the new dates here. Nothing else in this guide needs to change.
+
+#### Setting up a new cohort's name
+
+You don't type the cohort name. On the **Program Cohort** record, fill in:
+
+| Field | What to enter | Example |
+|---|---|---|
+| Start Date | The first class day | 11/2/2026 |
+| Short Code | The program's code, the same every cohort | RTS |
+| Cohort Number | The program's running count (it never resets) | 2 |
+| Fiscal Cycle | Leave blank: Salesforce counts the program's cohorts that start earlier in the same fiscal year. Type a number only to correct it. | 1 |
+
+The Name field is required when you create the record, so type anything (e.g. `new`); Salesforce replaces it on save with **RTS Cohort 2 · Fall 2026 · FY27-C1**. **Fiscal Year** and **Reporting Code** (RTS-FY27-C1) fill themselves in, and the linked RTS Cohort gets the same name. The season comes from the start month (Dec-Feb Winter, Mar-May Spring, Jun-Aug Summer, Sep-Nov Fall). After a new cohort is named, ask Dele to point the cohort's Lead list views at the new name. The full rules are in the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
 
 ### Key email addresses
 
@@ -809,3 +827,10 @@ Better to ask than to push a bad change through. Salesforce records everything, 
 **You've got this.** The system does the heavy lifting on emails and scheduling. Your job is the judgment calls — who gets an interview, who gets accepted, who needs a nudge. That's the work that matters, and it's why this program will be good.
 
 Keep this guide open, and reach out anytime something doesn't match what you see on screen.
+
+## Related guides
+
+- [RTS Program Instructor's Guide](https://wiki.ulem.org/doc/rts-program-instructors-guide-pG7eMa5SxO): class list, attendance, hours and outcomes in Salesforce
+- [RTS Automatic Enrolment: Edge Cases and Components](https://wiki.ulem.org/doc/rts-automatic-enrolment-edge-cases-and-components-huu7yiT2iq): how accepted applicants are enrolled, and setting up the next cohort
+- [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w): how programs, cohorts and schedules are named, and why
+- [New Cohort Naming Checklist](https://wiki.ulem.org/doc/new-cohort-naming-checklist-I5dtUaGkgB): step-by-step naming when a new cohort opens

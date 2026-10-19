@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fiscal_Year__c</fullName>
+    <description>ULEM fiscal year (July-June) the cohort starts in, e.g. FY27 for Jul 2026-Jun 2027.</description>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(pmdm__StartDate__c), NULL,
+  &quot;FY&quot; &amp; RIGHT(TEXT(YEAR(pmdm__StartDate__c) + IF(MONTH(pmdm__StartDate__c) &gt;= 7, 1, 0)), 2))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Fiscal Year</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
