@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Program_Cohort__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The cohort (class) this schedule belongs to. New Service Participants whose engagement is in this cohort are put on this schedule automatically, so they appear on its attendance lists.</description>
+    <label>Program Cohort</label>
+    <referenceTo>pmdm__ProgramCohort__c</referenceTo>
+    <relationshipLabel>Service Schedules</relationshipLabel>
+    <relationshipName>Service_Schedules</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

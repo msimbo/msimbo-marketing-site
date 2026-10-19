@@ -1,12 +1,35 @@
 # Ignore retrieved NPSP + PMM managed-package metadata on pull
 **/*.profile-meta.xml
 **/npsp__*
-**/pmdm__*
+**/pmdm__*.*-meta.xml
+**/pmdm__*/listViews/**
+**/pmdm__*/compactLayouts/**
+**/pmdm__*/webLinks/**
+**/pmdm__*/recordTypes/**
 
 # But DO track our custom RTS_* fields and stub object-meta files we add
 # to managed-package objects for delivery-side tracking.
 !**/pmdm__*/fields/RTS_*.field-meta.xml
 !**/pmdm__*/pmdm__*.object-meta.xml
 
+# Our own (non-namespaced) fields and field sets on PMM objects, plus the two
+# managed picklists we extend (subscriber-added values) and the attendance
+# bucket records for those values.
+!**/pmdm__ServiceDelivery__c/fields/pmdm__AttendanceStatus__c.field-meta.xml
+!**/pmdm__Service__c/fields/pmdm__AttendanceFieldSet__c.field-meta.xml
+!**/pmdm__*/fieldSets/RTS_*.fieldSet-meta.xml
+!**/customMetadata/pmdm__BucketedValue.Late.md-meta.xml
+!**/customMetadata/pmdm__BucketedValue.LeftEarly.md-meta.xml
+# PMM attendance rollups (off by default in the package)
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceDeliveriesToProgramEngagement.md-meta.xml
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceDeliveriesToServiceSession.md-meta.xml
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceDeliveriesToServiceSchedule.md-meta.xml
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceDeliveriesToContact.md-meta.xml
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceDeliveriesToService.md-meta.xml
+!**/customMetadata/pmdm__FeatureGate.pmdm__ServiceParticipantsToServiceSchedule.md-meta.xml
+
 # OS cruft
 .DS_Store
+
+# PMM page layouts we extend with our fields
+!**/layouts/pmdm__*.layout-meta.xml

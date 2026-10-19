@@ -1,5 +1,7 @@
 # RTS Cohort 1 — Salesforce Delivery Management Guide
 
+> **Superseded (October 16, 2026).** Enrolment is now automatic (`rts-automatic-enrolment.md`) and attendance runs on PMM sessions (`rts-instructor-guide.md`). Parts of this guide, including the Flow 4 conversion steps, no longer apply.
+
 **Audience:** Program Coordinator, Case Manager, Lead Instructor
 **Cohort:** RTS Cohort 1 (May 11 – July 20, 2026)
 **Last updated:** 2026-05-08

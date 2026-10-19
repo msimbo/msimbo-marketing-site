@@ -10,14 +10,13 @@
 .idea/
 # Salesforce CLI local state
 salesforce/.sf/
-# Local-only reference docs (not tracked in git)
-docs/Urban League of Eastern MA_contacts_*.csv
-docs/\[ULEM\] Invite to RTS Info Session.json
-docs/info-session-calendar-description.txt
-docs/EmailLog_*.csv
-docs/*Transcription*.txt
-docs/ConditionalAcceptanceLetterMSIMBO.md
+# Local-only reference docs: nothing new in docs/ is tracked.
+# (The .md files already committed stay tracked.)
+docs/
 
 # Salesforce wholesale settings retrieve dump (not RTS-related)
 salesforce/force-app/main/default/settings/
 .envrc
+
+# Python bytecode
+__pycache__/

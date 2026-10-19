@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>pmdm__ServiceDelivery__c.pmdm__Contact__c</field>
+    </columns>
+    <columns>
+        <field>pmdm__ServiceDelivery__c.pmdm__AttendanceStatus__c</field>
+    </columns>
+    <columns>
+        <field>pmdm__ServiceDelivery__c.Attendance_Mode__c</field>
+    </columns>
+    <columns>
+        <field>pmdm__ServiceDelivery__c.Time_In__c</field>
+    </columns>
+    <columns>
+        <field>pmdm__ServiceDelivery__c.Time_Out__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>pmdm__ServiceDelivery__c.pmdm__Quantity__c</field>
+    </columns>
+    <description>Who attended each class session: status, in person/remote, time in/out and hours. Most recent sessions first.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>pmdm__ServiceDelivery__c.pmdm__DeliveryDate__c</field>
+        <sortOrder>Desc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>pmdm__ServiceDelivery__c.pmdm__ServiceSession__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Attendance by Session</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$pmdm__ServiceDelivery__c</reportType>
+    <scope>user</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>pmdm__ServiceDelivery__c.pmdm__DeliveryDate__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

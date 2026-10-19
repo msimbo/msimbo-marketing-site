@@ -1,12 +1,29 @@
 # RTS Program Coordinator Training Guide
 
-**Your role:** Program Coordinator for the ULEM Revenue Technology Specialist (RTS) program, Cohort 1.
+**Your role:** Program Coordinator for the ULEM Revenue Technology Specialist (RTS) program.
+
+**About "Cohort X":** This guide is written to work for every cohort. Wherever you see **Cohort X**, read it as the cohort that is recruiting right now. The only cohort-specific details are the dates in [Cohort key dates](#cohort-key-dates) at the end.
 
 **What you'll find here:** Everything you need to run recruitment from the first application to the first day of class. Step-by-step, screen-by-screen.
 
 **How to use this:** Read it once end-to-end so you see the full picture. Then keep it open next to Salesforce as a reference. Each section answers a question: "When this happens, what do I do?"
 
 **If something looks different on screen:** The system may have been updated since this guide was written. When in doubt, ask Dele.
+
+> **What changed on October 16, 2026**
+>
+> - **You no longer convert Leads.** When you move a Lead to `Offer Confirmed`, Salesforce converts it to a student record (a Person Account), carries over their intake answers, and enrols them in their cohort and its three phases, all within a minute. The Lead moves to `Converted-RTS` on its own. See [Section 6.9](#69-checking-a-new-students-enrolment).
+> - **Your task changes from "Convert Lead to Contact" to "Check enrolment".** It takes a few seconds: open the student, check the cohort is right, mark the task Complete.
+> - **If the automatic step can't finish, you get an "Enrol by hand" task** with the reason. [Section 6.9](#69-checking-a-new-students-enrolment) has the steps.
+> - **The program is now called MSIMBO Tech Academy in Salesforce.** RTS is a track of MSIMBO; cohorts keep their RTS names.
+
+> **What changed on October 7, 2026**
+>
+> - **Interview invitations are now automatic.** When a Lead is at `Assess Complete`, `Assessment Status = Passed` and all three scores (CLIK, CCAT, CBST2) are filled in, Salesforce moves it to `Interview Requested` and sends the interview invitation right away. You no longer change the Status to `Interview Requested` yourself. See [Section 6.5](#65-advancing-a-qualified-applicant-to-the-interview).
+> - **Double-check before you save.** Whichever you save last (the Status, `Passed`, or the third score) sends the email. `Retake Required` and `Did Not Pass` stay at `Assess Complete` for you to decide.
+> - **Returning applicants** who passed the assessment in the last 12 months skip it and go straight to `Interview Requested`. See [Someone re-applies](#someone-re-applies-returning-applicants).
+> - **Two new tasks** may appear in your queue: "Returning RTS applicant" and "Possible duplicate RTS applicant". See [Section 8](#8-tasks-in-your-queue-what-they-mean).
+> - **Don't delete duplicate Leads.** Send Dele the links and he'll merge them. See [Someone re-applies under a different email](#someone-re-applies-under-a-different-email).
 
 ---
 
@@ -33,17 +50,19 @@
 - When an applicant submits the form on msimbo.org, **a Lead record is created in Salesforce** within seconds.
 - The Lead is **assigned to you**. You'll see it in your Leads queue.
 - An email with the **skills assessment link** goes to the applicant right away.
-- The Lead status advances to **`RTS - Assessment Pending`** so you know the applicant owes us an assessment score.
-- When an applicant books an Instructor or Case Manager interview via Lunacal, the **interview time is written to the Lead automatically** and the status advances.
-- When you move a Lead to certain statuses (Interview 1 Requested, Accepted, Waitlisted, Declined), the **right email to the applicant goes out automatically**.
-- When the email goes out, the system creates any **follow-up tasks** you need (e.g., "follow up on offer confirmation in 5 days").
+- The Lead status advances to **`Assess Pending`** so you know the applicant owes us an assessment score.
+- When an applicant has `Assessment Status = Passed` and all three scores filled in at `Assess Complete`, the Lead **moves to `Interview Requested` and the interview invitation goes out**.
+- When an applicant books their interview via Lunacal, the **interview time is written to the Lead automatically** and the status advances.
+- When you move a Lead to certain statuses (Interview Requested, Offer Sent, Waitlisted, Declined), the **right email to the applicant goes out automatically**.
+- When the email goes out, the system creates any **follow-up tasks** you need (e.g., "follow up on offer confirmation" the next day).
+- When you move a Lead to `Offer Confirmed`, the applicant is **converted to a student record and enrolled in their cohort** automatically, and the Lead moves to `Converted-RTS`.
 
 ### You do this manually
 
 - **Review** each application and assessment score.
 - **Decide** each status transition (advance to interview? waitlist? decline?).
-- **Log interview outcomes** after Dele or Wanda finishes an interview.
-- **Convert the Lead to a Contact** once an applicant confirms enrollment (Salesforce asks you to do this with a task — you click through).
+- **Move the Lead forward** once Dele has logged his interview outcome.
+- **Check the new student's enrolment** once an applicant confirms (Salesforce gives you a "Check enrolment" task). You only enrol someone by hand if Salesforce tells you it couldn't.
 
 ### The golden rule
 
@@ -58,52 +77,52 @@
 | Term | What it is |
 |---|---|
 | **Lead** | An applicant. Every person who applies becomes a Lead record. |
-| **Contact** | A confirmed enrolled student. A Lead becomes a Contact after they confirm the offer and you convert the record. |
-| **Program Engagement** | A Nonprofit Cloud record linking a Contact to the RTS program. Created automatically during Lead conversion. |
-| **Cohort** | A single run of the program. Cohort 1 starts May 11, 2026. Every Lead is tagged to a cohort. |
+| **Person Account (student)** | A confirmed, enrolled student. Salesforce turns the Lead into a Person Account automatically when you move it to `Offer Confirmed`. It's the same kind of record as ULEM's other students, so a returning ULEM client keeps one record. |
+| **Program Engagement** | The record linking a student to the program (**MSIMBO Tech Academy**) and to their cohort. Salesforce creates it at the same time (see [Section 6.9](#69-checking-a-new-students-enrolment)). |
+| **Cohort** | A single run of the program. Every Lead is tagged automatically to the cohort that is recruiting when they apply. Dates are in [Cohort key dates](#cohort-key-dates). |
 | **Task** | A to-do item Salesforce creates for you (e.g., "follow up with applicant"). You'll see these in your Home page or on the Lead record. |
 
 ### The people
 
 | Role | Who | What they do |
 |---|---|---|
-| **Program Coordinator** | Betzaida Guzman (you) | Owns every decision in the pipeline. Runs recruitment. Reviews assessments, logs interviews, makes accept/waitlist/decline calls. |
-| **Lead Instructor / Acting Director** | Dele Omotosho | Interviews applicants in Round 1. Manages the technical curriculum. |
-| **Case Manager** | William (Wanda) Watkins | Interviews applicants in Round 2 to understand wraparound support needs. |
-| **Applicant** | Anyone who submits the form on msimbo.org | Completes the assessment, takes the two interviews, accepts or declines the offer. |
+| **Program Coordinator** | Betzaida Guzman (you) | Owns every decision in the pipeline. Runs recruitment. Reviews assessments, moves applicants through the stages, makes accept/waitlist/decline calls. All automatic tasks are assigned to you. |
+| **Lead Instructor** | Dele Omotosho | Interviews every applicant. Logs the interview outcome, notes and any wraparound support the applicant needs. Manages the technical curriculum. |
+| **Applicant** | Anyone who submits the form on msimbo.org | Completes the assessment, takes one interview, accepts or declines the offer. |
 
 ### The status pipeline (the heart of the system)
 
-Every Lead has a **Status** field that tells you where they are in recruitment. There are 15 possible statuses. You'll move Leads through them by clicking the Status field and picking the next one.
+Every Lead has a **Status** field that tells you where they are in recruitment. There are 11 possible statuses. You'll move Leads through them by clicking the Status field and picking the next one.
 
 Think of the pipeline like a funnel:
 
 ```
-RTS - Assessment Pending
+Assess Pending
       ↓
-RTS - Assessment Complete
+Assess Complete
       ↓
-RTS - Interview 1 Requested  →  RTS - Interview 1 Scheduled  →  RTS - Interview 1 Complete
+Interview Requested  →  Interview Scheduled  →  Interview Complete
       ↓
-RTS - Interview 2 Requested  →  RTS - Interview 2 Scheduled  →  RTS - Interview 2 Complete
+Offer Sent
       ↓
-RTS - Accepted - Offer Sent
-      ↓
-RTS - Accepted - Confirmed  →  RTS - Converted
-      
+Offer Confirmed  →  Converted-RTS
+
       (alternate endings)
-      ├─ RTS - Waitlisted
-      ├─ RTS - Declined - Not Qualified
-      └─ RTS - Declined - Withdrew
+      ├─ Waitlisted
+      ├─ Declined-NotQual
+      └─ Declined-Withdrew
 ```
+
+There is **one interview**, with the Lead Instructor. It covers fit for the program and any wraparound support the applicant needs.
 
 **What you need to know:**
 
-- **You change the status manually** for every transition except three that the system handles:
-  - `New` → `RTS - Assessment Pending` (fires on Lead creation)
-  - `Interview 1 Requested` → `Interview 1 Scheduled` (fires when Lunacal booking arrives)
-  - `Interview 2 Requested` → `Interview 2 Scheduled` (fires when Lunacal booking arrives)
-- **Status changes trigger emails.** Moving to `Interview 1 Requested` sends the Instructor booking email. Moving to `Accepted - Offer Sent` sends the offer letter. And so on.
+- **You change the status manually** for every transition except four that the system handles:
+  - New application → `Assess Pending` (fires when the Lead is created). A returning applicant who passed the assessment in the last 12 months skips it and goes on to `Interview Requested` (or `Assess Complete` if their scores are missing). See [Someone re-applies](#someone-re-applies-returning-applicants).
+  - `Assess Complete` → `Interview Requested` (fires when `Assessment Status = Passed` and all three scores are filled in). See [Section 6.5](#65-advancing-a-qualified-applicant-to-the-interview).
+  - `Interview Requested` → `Interview Scheduled` (fires when the Lunacal booking arrives)
+  - `Offer Confirmed` → `Converted-RTS` (fires a few seconds after you set `Offer Confirmed`, once the student is enrolled). See [Section 6.9](#69-checking-a-new-students-enrolment).
+- **Status changes trigger emails.** Moving to `Interview Requested` sends the interview booking email. Moving to `Offer Sent` sends the offer letter. And so on.
 - **Always change Status last.** Fill in notes, scores, outcomes first. The moment you change the Status, the email goes out. You can't take it back.
 
 ---
@@ -129,13 +148,15 @@ If you don't see "Leads" in the top menu, click the **grid icon (9 dots) in the 
 |---|---|---|
 | **Leads list** | Click **Leads** tab in top nav | See every applicant |
 | **Individual Lead** | Click any applicant's name | Where you do everything — review, log notes, change status |
-| **Dashboard** | App Launcher → **Dashboards** → **RTS Cohort 1 — Recruitment Tracker** | Quick overview of how recruitment is going |
+| **Dashboard** | App Launcher → **Dashboards** → **Recruitment Tracker - RTS Cohort X** | Quick overview of how recruitment is going |
 | **Reports** | App Launcher → **Reports** → folder **RTS - Recruitment Reports** | Deeper slices of the data |
+| **Applicants board** | **Leads** tab → list view **RTS Cohort X - Applicants** | Every applicant for the current cohort. Switch the display to **Kanban** to see them as cards by stage. |
+| **Program Engagements** | App Launcher → **Program Management** → **Program Engagements** tab (or the **Related** tab on any student) | Where enrolled students live once they're enrolled |
 | **Your Home / Tasks** | Click **Home** in top nav | See your open tasks for the day |
 
 ### Favorite the dashboard right now
 
-1. Open the RTS Cohort 1 — Recruitment Tracker dashboard
+1. Open the Recruitment Tracker - RTS Cohort X dashboard
 2. Click the **star icon** next to the dashboard name at the top
 3. Now it's available from the Favorites star icon in the top nav on every page
 
@@ -149,9 +170,9 @@ Open Salesforce once a day (twice a day once applications are flowing heavily). 
 
 ### 1. Open the dashboard
 
-App Launcher → **Dashboards** → **RTS Cohort 1 — Recruitment Tracker**
+App Launcher → **Dashboards** → **Recruitment Tracker - RTS Cohort X**
 
-Click **Refresh** (circular arrow icon top-right) to load fresh numbers.
+The dashboard refreshes itself every hour. Click **Refresh** (circular arrow icon top-right) if you need numbers from the last few minutes.
 
 **Look at:**
 - **Applications Received** — how many total applicants so far
@@ -165,7 +186,7 @@ Click **Home** in the top nav.
 
 You'll see a list of tasks assigned to you. Each task is tied to a Lead. Typical tasks you'll see:
 - "Follow up on offer confirmation — [Name]"
-- "Convert Lead to Contact — [Name]"
+- "Check enrolment — [Name]"
 - "Instructor interview rescheduled — [Name]"
 - "Instructor interview cancelled — [Name]"
 
@@ -175,17 +196,17 @@ You'll see a list of tasks assigned to you. Each task is tied to a Lead. Typical
 
 Click the **Leads** tab.
 
-Filter to **All Open Leads** (dropdown at top-left next to "Recently Viewed") to see everyone who hasn't been closed out yet.
+Pick the list view **RTS Cohort X - Applicants** (dropdown at top-left next to "Recently Viewed") to see every applicant for the current cohort.
 
 **Look for:**
-- New Leads at `RTS - Assessment Pending` — are they >3 days old without completing the assessment? Time to nudge them.
-- Leads at `RTS - Assessment Complete` waiting for your review
-- Leads at `RTS - Interview 1 Requested` where `Invite Sent = true` but the booking hasn't come in after 5 days
-- Leads at `RTS - Accepted - Offer Sent` where the offer has been out 5+ days with no confirmation
+- New Leads at `Assess Pending` — are they >3 days old without completing the assessment? Time to nudge them.
+- Leads at `Assess Complete` waiting for your review
+- Leads at `Interview Requested` where `Invite Sent = true` but the booking hasn't come in after 5 days
+- Leads at `Offer Sent` where the offer has been out 3+ business days with no confirmation
 
 ### 4. Handle anything Criteria Core sent overnight
 
-You'll get email notifications from Criteria Corp (ondemandassessment.com) with each applicant's scores. For Cohort 1, **you enter these scores into Salesforce by hand** — one of the few fully manual steps.
+You'll get email notifications from Criteria Corp (ondemandassessment.com) with each applicant's scores. **You enter these scores into Salesforce by hand** — one of the few fully manual steps.
 
 Skip ahead to [Section 6.3](#63-when-an-applicant-completes-the-criteria-core-assessment) for exact instructions.
 
@@ -202,12 +223,14 @@ This is the end-to-end flow from one applicant's point of view, so you can see h
 ### Day 0 — Applicant submits the form on msimbo.org
 
 - System creates the Lead in Salesforce automatically.
-- Lead Status is set to **`RTS - Assessment Pending`**.
+- Lead Status is set to **`Assess Pending`**.
 - Lead Owner is **you**.
 - System emails the applicant the **Criteria Core assessment link** from `program-rts@ulem.org`.
 - You see a new row in the Leads list.
 
 **You do:** nothing yet. Wait for them to complete the assessment.
+
+**Returning applicants are different.** If the person passed the assessment in the last 12 months, they skip the assessment and go straight to **`Interview Requested`**: they get the interview invitation instead of the assessment email. See [Someone re-applies](#someone-re-applies-returning-applicants).
 
 ### Day 1-3 — Applicant takes the Criteria Core assessment
 
@@ -222,67 +245,54 @@ This is the end-to-end flow from one applicant's point of view, so you can see h
 
 See [Section 6.3](#63-when-an-applicant-completes-the-criteria-core-assessment) for the score thresholds.
 
-Then move Lead Status to **`RTS - Assessment Complete`**.
+Then move Lead Status to **`Assess Complete`**.
 
-### Day 2-5 — You review and decide to interview
+### Day 2-5 — The applicant is invited to interview
 
-You read the application, scores, and motivation statement. If you want to move them forward, change Status to **`RTS - Interview 1 Requested`**.
+If you set `Assessment Status = Passed` and all three scores are filled in, **the system moves the Lead straight to `Interview Requested`** as soon as it reaches `Assess Complete`. You don't change the Status yourself.
 
-**System then:** sends the Instructor interview booking email with the Lunacal link. Sets the `Invite Sent` flag to prevent duplicate emails.
+**System then:** sends the interview booking email with the Lunacal link. Sets the `Invite Sent` flag to prevent duplicate emails.
 
-### Day 4-8 — Applicant books their Instructor interview
+If they're at `Retake Required` or `Did Not Pass`, they stay at `Assess Complete` and you decide what happens next.
+
+### Day 4-8 — Applicant books their interview
 
 Applicant clicks the Lunacal link, picks a time with Dele, books it.
 
-**System then:** automatically writes the interview time into the Lead's `Instructor Interview Date/Time` field AND changes Status to **`RTS - Interview 1 Scheduled`**. You don't do anything.
+**System then:** automatically writes the interview time into the Lead's `Instructor Interview Date/Time` field AND changes Status to **`Interview Scheduled`**. You don't do anything.
 
 ### Day ~8 — Dele interviews the applicant
 
-After the interview, Dele writes notes and picks an outcome in Salesforce:
-- **Advance to Case Manager** — applicant moves forward
+After the interview, Dele writes notes in Salesforce, records any wraparound support the applicant needs (transportation, meals, laptop), and picks an outcome:
+- **Advance** — recommend an offer
 - **Hold for Review** — needs discussion
 - **Decline** — not a fit
 
-**You do:** once Dele has logged the outcome, you change the Lead's Status to **`RTS - Interview 1 Complete`**. If the outcome is "Advance to Case Manager", you then change Status to **`RTS - Interview 2 Requested`**.
-
-**System then:** sends the Case Manager interview booking email with Wanda's Lunacal link.
-
-### Day ~10 — Applicant books their Case Manager interview
-
-Same as the Instructor booking — automatic. Status moves to **`RTS - Interview 2 Scheduled`** when they book.
-
-### Day ~13 — Wanda interviews the applicant
-
-Wanda logs notes, any wraparound supports requested (transportation, childcare, laptop, meals, emergency fund), and an outcome:
-- **Recommend Accept**
-- **Recommend Waitlist**
-- **Recommend Decline**
-
-**You do:** once Wanda has logged it, you change Status to **`RTS - Interview 2 Complete`**. Then you make the final call:
+**You do:** once Dele has logged the outcome, you change the Lead's Status to **`Interview Complete`**. Then you make the final call:
 
 | Final call | Your action |
 |---|---|
-| Accept | Set `Decision = Accept`, Status → **`RTS - Accepted - Offer Sent`** |
-| Waitlist | Set `Decision = Waitlist`, Status → **`RTS - Waitlisted`** |
-| Decline | Set `Decision = Decline`, Status → **`RTS - Declined - Not Qualified`** |
+| Accept | Set `Decision = Accept`, Status → **`Offer Sent`** |
+| Waitlist | Set `Decision = Waitlist`, Status → **`Waitlisted`** |
+| Decline | Set `Decision = Decline`, Status → **`Declined-NotQual`** |
 
 **System then sends the right email** based on which Status you chose.
 
-### Day ~14 — Applicant responds to the offer
+### Day ~10 — Applicant responds to the offer
 
 They reply to the offer email saying "I confirm" (or they don't).
 
 **You do:**
-- If confirmed within 5 days: Status → **`RTS - Accepted - Confirmed`**
-- If no response after 5 days: you'll get a task reminder. Follow up. If still no response, move to Waitlisted or Declined.
+- If confirmed within 3 business days: Status → **`Offer Confirmed`**
+- You get a task reminder the day after the offer goes out. If they have not replied, follow up. If still no response, move to Waitlisted or Declined.
 
-**System then:** (on Accepted - Confirmed) sends the Enrollment Confirmation email with program start details, AND creates a task for you titled "Convert Lead to Contact".
+**System then:** (on Offer Confirmed) sends the Enrollment Confirmation email with program start details, converts the Lead into a student record, enrols them in Cohort X and its three phases, moves the Lead to `Converted-RTS`, and creates a task for you titled "Check enrolment".
 
-### Day ~15 — You convert the Lead to a Contact
+### Day ~10 — You check the enrolment
 
-Click the **Convert** button at the top of the Lead page. Walk through the guided conversion (see [Section 6.10](#610-converting-an-accepted-applicant-to-a-contact-and-program-engagement)). Change Status to **`RTS - Converted`**.
+Open the student from the task and check they're in the right cohort (see [Section 6.9](#69-checking-a-new-students-enrolment)). Mark the task Complete.
 
-You're done with that applicant's recruitment cycle. They're now a Contact and a Program Engagement record has been created for their participation in RTS.
+You're done with that applicant's recruitment cycle. They're now a student with a Program Engagement for Cohort X, and they appear on every class day's attendance list.
 
 ---
 
@@ -302,10 +312,9 @@ Below that, you'll see sections:
 - **Applicant Info** — name, email, phone, age, zip, etc.
 - **Motivation** — what they wrote about their goals
 - **Assessment Results** — CLIK/CCAT/CBST2 scores and the Assessment Status field
-- **Instructor Interview** — date/time, notes, outcome
-- **Case Manager Interview** — date/time, notes, outcome, wraparound notes
-- **Decision & Offer** — your final call
-- **Wraparound Support Granted** — which supports the applicant was approved for
+- **Interview** — date/time, notes, outcome
+- **Decision** — your final call
+- **Barriers & Wraparound** — barriers the applicant reported, wraparound notes, and which supports they were approved for
 
 To edit any field, **click the pencil icon next to it**, type your value, click **Save**.
 
@@ -333,7 +342,7 @@ Either way works. Path bar is faster. Direct field edit is more precise.
 
 You'll get an email from Criteria Corp with their scores. Here's what to do:
 
-**Score thresholds (for Cohort 1):**
+**Score thresholds:**
 
 | Assessment | Pass threshold | Retake-worthy range | Did Not Pass |
 |---|---|---|---|
@@ -355,7 +364,9 @@ You'll get an email from Criteria Corp with their scores. Here's what to do:
    - **Did Not Pass** if any score is below the retake-worthy range, or multiple scores are borderline
 6. Optionally add a note in **Assessment Notes** (e.g., "Strong CLIK, weak CCAT — may benefit from retake").
 7. **Save**.
-8. Change Lead Status to **`RTS - Assessment Complete`** (or straight to `RTS - Declined - Not Qualified` if they did not pass and you've decided to cut them).
+8. Change Lead Status to **`Assess Complete`** (or straight to `Declined-NotQual` if they did not pass and you've decided to cut them).
+
+> **Heads up:** if `Assessment Status = Passed` and all three scores are filled in, reaching `Assess Complete` moves the Lead on to `Interview Requested` **and sends the interview invitation right away**. That happens whichever you save last: the Status, the Passed status or the third score. Double-check the scores and `Passed` before you save.
 
 ### 6.4 When you trigger an assessment retake
 
@@ -368,13 +379,11 @@ If you set `Assessment Status = Retake Required`, the system automatically:
 
 **If you try to set `Retake Required` again on the same Lead:** the system does nothing. No email goes out. No duplicate attempt. That's by design.
 
-### 6.5 Advancing a qualified applicant to the Instructor interview
+### 6.5 Advancing a qualified applicant to the interview
 
-Applicant has `Assessment Status = Passed` and you want them to move forward.
+**This is automatic.** When a Lead is at `Assess Complete`, `Assessment Status = Passed` and the CLIK, CCAT and CBST2 scores are all filled in, the system moves it to **`Interview Requested`** in the same save.
 
-1. Open the Lead.
-2. Change Status to **`RTS - Interview 1 Requested`**.
-3. Save.
+You only change Status to `Interview Requested` by hand when a score is missing (for example, a returning applicant with no scores on file) and you want them to move forward anyway.
 
 **What the system does:**
 - Sends the "Schedule your RTS Instructor interview" email with Dele's Lunacal booking link.
@@ -383,61 +392,49 @@ Applicant has `Assessment Status = Passed` and you want them to move forward.
 **What you do next:** nothing. Wait for the applicant to book.
 
 **When they book:**
-- Status auto-advances to `RTS - Interview 1 Scheduled`.
+- Status auto-advances to `Interview Scheduled`.
 - `Instructor Interview Date/Time` gets filled in automatically.
 
-**If they don't book within 5 days:** reach out via email or phone to nudge. You'll see them in Report 4 (Interview Pipeline).
+**If they don't book within 5 days:** reach out via email or phone to nudge. You'll see them in the Interview Pipeline report.
 
-### 6.6 After the Instructor interview
+### 6.6 After the interview
 
-Dele interviews the applicant and logs his notes + outcome. Once he's done:
+Dele interviews the applicant and logs his notes, the outcome, and any wraparound support the applicant needs. Once he's done:
 
 1. Open the Lead.
-2. Verify the **Instructor Interview** section has:
+2. Verify the **Interview** section has:
    - `Instructor Interview Notes` filled in
-   - `Instructor Interview Outcome` set to one of: Advance to Case Manager / Hold for Review / Decline
-3. Change Lead Status to **`RTS - Interview 1 Complete`**.
-4. Save.
-
-**If outcome is "Advance to Case Manager":** change Status to **`RTS - Interview 2 Requested`**. This triggers the Case Manager invitation email. Done.
-
-**If outcome is "Hold for Review":** leave at `Interview 1 Complete`, discuss with Dele, and then either advance or decline.
-
-**If outcome is "Decline":** set `Decision = Decline`, pick a `Decision Reason`, change Status to **`RTS - Declined - Not Qualified`**. System sends the decline email.
-
-### 6.7 After the Case Manager interview
-
-Wanda interviews the applicant and logs notes. Once she's done:
-
-1. Open the Lead.
-2. Verify the **Case Manager Interview** section has:
-   - `Case Manager Interview Notes` filled in
-   - `Case Manager Interview Outcome` set
-   - `Wraparound Notes` — any supports they need (transportation, meals, laptop, childcare, emergency funds)
-3. Check any **Wraparound Granted** boxes that apply (Transportation Granted, Childcare Granted, Laptop Granted, Meals Granted, Emergency Fund Granted).
-4. Change Lead Status to **`RTS - Interview 2 Complete`**.
+   - `Instructor Interview Outcome` set to one of: Advance / Hold for Review / Decline
+3. Check the **Barriers & Wraparound** section: `Wraparound Notes` describes any supports they need, and the matching **Granted** boxes are ticked (Transportation, Meals, Laptop, Childcare, Emergency Fund).
+4. Change Lead Status to **`Interview Complete`**.
 5. Save.
 
-### 6.8 Making the final decision
+**If outcome is "Advance":** go straight to [Section 6.7](#67-making-the-final-decision) and make the offer.
 
-Based on both interview outcomes and any other context:
+**If outcome is "Hold for Review":** leave at `Interview Complete`, discuss with Dele, and then either accept, waitlist or decline.
+
+**If outcome is "Decline":** set `Decision = Decline`, pick a `Decision Reason`, change Status to **`Declined-NotQual`**. System sends the decline email.
+
+### 6.7 Making the final decision
+
+Based on the interview outcome and any other context:
 
 **To ACCEPT:**
 1. Set `Decision = Accept`.
 2. Set `Decision Date = today`.
-3. Change Status to **`RTS - Accepted - Offer Sent`**.
+3. Change Status to **`Offer Sent`**.
 4. Save.
 
 **System then:**
 - Sends the Offer of Admission email from `program-rts@ulem.org`.
 - Stamps `Offer Sent Date = today` and `Offer Response = Pending`.
-- Creates a high-priority task for you: **"Follow up on offer confirmation — [Name]"** due in 5 days.
+- Creates a high-priority task for you: **"Follow up on offer confirmation — [Name]"** due the next day.
 
 **To WAITLIST:**
 1. Set `Decision = Waitlist`.
 2. Set `Decision Date = today`.
 3. Set `Decision Reason` (see list below).
-4. Change Status to **`RTS - Waitlisted`**.
+4. Change Status to **`Waitlisted`**.
 5. Save.
 
 **System then:** sends the Waitlist Notification email.
@@ -446,7 +443,7 @@ Based on both interview outcomes and any other context:
 1. Set `Decision = Decline`.
 2. Set `Decision Date = today`.
 3. Set `Decision Reason`.
-4. Change Status to **`RTS - Declined - Not Qualified`**.
+4. Change Status to **`Declined-NotQual`**.
 5. Save.
 
 **System then:** sends the Application Status Update (decline) email.
@@ -460,50 +457,60 @@ Based on both interview outcomes and any other context:
 - Waitlisted — Pending Seat Availability
 - Other
 
-### 6.9 When an accepted applicant confirms their seat
+### 6.8 When an accepted applicant confirms their seat
 
-Within 5 days of the offer email, the applicant should reply "I confirm". When they do:
+Within 3 business days of the offer email, the applicant should reply "I confirm". When they do:
 
 1. Open the Lead.
-2. Change Status to **`RTS - Accepted - Confirmed`**.
+2. Change Status to **`Offer Confirmed`**.
 3. Save.
 
 **System then:**
 - Sends the Enrollment Confirmation email (program start date, what to bring, etc.).
 - Stamps `Offer Response = Confirmed` and `Offer Response Date = today`.
-- Creates a high-priority task for you: **"Convert Lead to Contact — [Name]"** due today.
+- Within a minute: converts the Lead into a student record (Person Account), enrols them in their cohort and its three phases, and moves the Lead to `Converted-RTS`.
+- Creates a task for you: **"Check enrolment — [Name]"** due today.
 
-**If the 5-day deadline passes with no response:** you'll see the "Follow up on offer confirmation" task fire in your queue. Call or email the applicant. If still no response:
-- Change Status to `RTS - Waitlisted` (put them on hold) OR
-- Change Status to `RTS - Declined - Withdrew` (move on, offer their seat to waitlist)
+**If there is no response:** the "Follow up on offer confirmation" task lands in your queue the day after the offer goes out. Call or email the applicant, and keep following up until the 3-business-day deadline. If still no response:
+- Change Status to `Waitlisted` (put them on hold) OR
+- Change Status to `Declined-Withdrew` (move on, offer their seat to waitlist)
 
-### 6.10 Converting an accepted applicant to a Contact and Program Engagement
+### 6.9 Checking a new student's enrolment
 
-Once Status is `RTS - Accepted - Confirmed`:
+When you move a Lead to `Offer Confirmed`, Salesforce does the rest within a minute:
 
-1. Open the Lead.
-2. Click the **Convert** button at the top right.
-3. Salesforce shows a conversion wizard. Fill in:
-   - **Account:** if the applicant has an existing Account (rare for individuals), pick it. Otherwise, create a new Account using their full name OR link to the default "Individual" account your org uses for students.
-   - **Contact:** keep all the defaults. Salesforce carries over name, email, phone, address from the Lead.
-   - **Opportunity:** if the form asks to create one, you can check "Don't create an opportunity".
-4. Click **Convert**.
-5. After conversion, open the new Contact record.
-6. On the Contact, add a **Program Engagement** record:
-   - Click the **Related** tab
-   - Find the **Program Engagements** section
-   - Click **New**
-   - Program: **Revenue Technology Specialist**
+- **Converts the Lead into a student record** (a Person Account), with no Opportunity. If the applicant is already a ULEM client with the same email, they're added to that record instead of getting a duplicate.
+- **Carries over their intake answers:** date of birth, ZIP code, employment status, barriers, granted supports and wraparound notes.
+- **Creates their Program Engagement:** Program **MSIMBO Tech Academy**, their cohort, Stage **Enrolled**, Start Date = the cohort start.
+- **Enrols them in the three phases** (RTS Foundations, RTS Specialization, RTS Career Launch) and puts them on the cohort's class schedules, so they appear on every class day's attendance list.
+- **Moves the Lead to `Converted-RTS`.**
+
+**What you do (the "Check enrolment" task):**
+
+1. Open the task and click the student's name. (If you open the old Lead instead, it shows "This lead was converted" with a link to the student.)
+2. On the student's record, open **Related → Program Engagements**.
+3. Check there is one row for the right cohort (e.g. **RTS - Cohort 2 - Fall 2026**) with Stage **Enrolled**.
+4. Mark the task Complete.
+
+**If the Lead is still at `Offer Confirmed` after a few minutes,** the automatic step didn't run. You'll also get an "Enrol by hand" task.
+
+**If you get an "Enrol by hand" task:** the task description says why. The usual reason is that the Lead has no cohort, or its cohort isn't set up for classes yet. Fix the cohort on the Lead if it's wrong, then ask Dele to re-run it. If you need to enrol the person yourself:
+
+1. Open the Lead. Clear the **Company** field (web applications arrive with "N/A"; if it's filled in, Salesforce creates the wrong kind of record). Save.
+2. Click **Convert**. Under Account, choose **Create New** (or pick the person's existing record if they're already a ULEM client). Tick **Don't create an opportunity**. Converted Status: **Converted-RTS**. Click **Convert**.
+3. On the new student, go to **Related → Program Engagements → New**:
+   - Program: **MSIMBO Tech Academy**
+   - Program Cohort: the cohort they were accepted into
    - Stage: **Enrolled**
-   - Start Date: cohort start date (May 11, 2026)
-   - End Date: cohort end date (July 20, 2026)
-   - Role: **Participant**
+   - Role: **Client**
+   - Start Date: the cohort's start date from [Cohort key dates](#cohort-key-dates)
    - Save
-7. Go back to the old Lead (it's now marked as Converted). Change its Status to **`RTS - Converted`** to close the loop.
 
-Done. That applicant is now officially a student.
+Salesforce then enrols them in the three phases and the class schedules, as above.
 
-### 6.11 If an applicant withdraws on their own
+**Where to find Program Engagements later:** App Launcher (grid icon, top-left) → **Program Management** → **Program Engagements** tab shows every enrolled student. To see one cohort's students together, open the **Program Cohorts** tab in the same app and click the cohort.
+
+### 6.10 If an applicant withdraws on their own
 
 The applicant emails you saying they can't do the program anymore.
 
@@ -511,7 +518,7 @@ The applicant emails you saying they can't do the program anymore.
 2. Set `Decision = Decline`.
 3. Set `Decision Reason = Applicant Withdrew`.
 4. Set `Decision Date = today`.
-5. Change Status to **`RTS - Declined - Withdrew`**.
+5. Change Status to **`Declined-Withdrew`**.
 6. Save.
 
 **System does NOT send an email for this status** — intentional. The applicant already knows; a rejection email would feel wrong.
@@ -520,19 +527,19 @@ The applicant emails you saying they can't do the program anymore.
 
 ## 7. The dashboard: what each widget means
 
-Open: App Launcher → **Dashboards** → **RTS Cohort 1 — Recruitment Tracker**
+Open: App Launcher → **Dashboards** → **Recruitment Tracker - RTS Cohort X**
 
-Click **Refresh** at the top right to load fresh data.
+It refreshes automatically every hour. Click **Refresh** at the top right for up-to-the-minute data.
 
 ### Widget by widget
 
 **Applications Received** (big number, top-left)
 
-Total number of applicants in Cohort 1 so far. Watch this climb as marketing runs.
+Total number of applicants in Cohort X so far. Watch this climb as marketing runs.
 
 **Funnel by Stage** (horizontal bar chart)
 
-Shows how many applicants are currently sitting at each Lead Status. A big bar on `Assessment Pending` means lots of people have applied but haven't taken the assessment yet — time to send nudges. A big bar on `Interview 1 Requested` means lots of invites are out but people haven't booked — nudge them.
+Shows how many applicants are currently sitting at each Lead Status. A big bar on `Assessment Pending` means lots of people have applied but haven't taken the assessment yet — time to send nudges. A big bar on `Interview Requested` means lots of invites are out but people haven't booked — nudge them.
 
 **Applications by Source** (donut chart)
 
@@ -544,11 +551,11 @@ Of the applicants who completed the assessment, how many Passed vs. needed Retak
 
 **Confirmed Enrolled** (gauge)
 
-How many applicants have reached `RTS - Accepted - Confirmed` status. The gauge goes red (0-10), yellow (10-13), green (13-15). Target is 15 seats. When the gauge is green, we're close to full.
+How many applicants have reached `Offer Confirmed` status. The gauge goes red (0-10), yellow (10-13), green (13-15). Target is 15 seats. When the gauge is green, we're close to full.
 
 **Interview Pipeline** (bar chart)
 
-Applicants currently somewhere in the two-interview process. Helps you see who's stuck where.
+Applicants currently somewhere in the interview step (requested, scheduled or complete). Helps you see who's stuck where.
 
 **Decisions Breakdown** (horizontal bar chart)
 
@@ -556,22 +563,23 @@ Accept vs. Waitlist vs. Decline counts. Useful for end-of-cohort review and gran
 
 **Barrier Summary** (table)
 
-Lists applicants with barrier flags (transportation, childcare, internet). Informs the wraparound budget and the Case Manager's prep.
+Lists applicants with barrier flags (transportation, childcare, internet). Informs the wraparound budget and Dele's interview prep.
 
 ---
 
 ## 8. Tasks in your queue: what they mean
 
-When certain things happen, Salesforce creates a task and assigns it to you. These show up on your **Home** page under "My Tasks" and on each Lead record.
+When certain things happen, Salesforce creates a task and assigns it to you (the Program Coordinator), whoever owns the Lead. These show up on your **Home** page under "My Tasks" and on each Lead record.
 
 | Task subject | Why it was created | What you should do |
 |---|---|---|
-| **Follow up on offer confirmation — [Name]** | Flow 4 fires when you move a Lead to `Accepted - Offer Sent`. Due 5 days out. High priority. | Call or email the applicant to remind them to reply "I confirm" to the offer email. If they've already confirmed, mark task Complete. |
-| **Convert Lead to Contact — [Name]** | Flow 7 fires when Lead hits `Accepted - Confirmed`. Due same day. High priority. | Click through to the Lead, click Convert, follow [Section 6.10](#610-converting-an-accepted-applicant-to-a-contact-and-program-engagement). |
+| **Follow up on offer confirmation — [Name]** | Flow 4 fires when you move a Lead to `Offer Sent`. Due the day after the offer is sent. High priority. | Call or email the applicant to remind them to reply "I confirm" to the offer email. If they've already confirmed, mark task Complete. |
+| **Check enrolment — [Name]** | Flow 7 fires when Lead hits `Offer Confirmed`. Due same day. | Open the student and check the cohort, as in [Section 6.9](#69-checking-a-new-students-enrolment). Mark Complete. |
+| **Enrol by hand — [Name]** | Salesforce couldn't enrol the applicant automatically. The task description says why. Due same day. High priority. | Follow "If you get an Enrol by hand task" in [Section 6.9](#69-checking-a-new-students-enrolment), or send Dele the link. |
 | **Instructor interview rescheduled — [Name]** | n8n creates this when the applicant reschedules their Lunacal booking. Normal priority. | Note the new time. Follow up with Dele if he needs to reschedule his calendar. |
 | **Instructor interview cancelled — [Name]** | n8n creates this when the applicant cancels. High priority. | Check in with the applicant. If they want to rebook, point them at the same Lunacal link (it still works). If they're out, decide whether to decline or waitlist them. |
-| **Case Manager interview rescheduled — [Name]** | Same pattern as the Instructor reschedule, for the Case Manager event type. | Same action. |
-| **Case Manager interview cancelled — [Name]** | Same pattern as the Instructor cancel. | Same action. |
+| **Returning RTS applicant: assessment already passed** | The website creates this when someone who passed the assessment in the last 12 months applies again. If their scores are on file, they've already been moved to `Interview Requested` and sent the invitation. Due the next day. | Read their previous application at the top of the **Description** field. If the task says scores are missing, enter them (or move the Lead to `Interview Requested` yourself). If the task also lists possible earlier records, handle those as in the next row. |
+| **Possible duplicate RTS applicant: review** | The website creates this when a new application looks like someone already in Salesforce: another RTS Lead with the same email, an RTS Lead with the same phone and last name, or an earlier RTS application that was converted. Due the next day. | Open each linked record. If it's the same person, follow [Someone re-applies under a different email](#someone-re-applies-under-a-different-email). If it's a family member who shares the phone, mark the task Complete and do nothing. |
 
 ### How to mark a task complete
 
@@ -591,16 +599,9 @@ Or from the tasks list on Home: click the **checkbox** next to the task.
 1. Ask them to check spam/promotions folders.
 2. Ask for the email address they used on the form — make sure it matches their Lead.
 3. In Salesforce, open the Lead and **click their email address** to send them a manual message. In the body, paste the assessment link: `https://go.ulem.org/rts-assessment`
-4. If they still don't get it, the email address on file might have a typo. Edit the Lead's email field to the correct one. Then re-trigger the flow: change `Assessment Status` back to `Not Started`, save, then move Lead Status back to `RTS - Assessment Pending` and save again — this will re-fire the Application Received email (alternately, send manually).
+4. If they still don't get it, the email address on file might have a typo. Edit the Lead's email field to the correct one. Then re-trigger the flow: change `Assessment Status` back to `Not Started`, save, then move Lead Status back to `Assess Pending` and save again — this will re-fire the Application Received email (alternately, send manually).
 
-### The applicant booked the wrong interview event type
 
-Applicant books the Case Manager event when they should have booked the Instructor, or vice versa.
-
-1. Ask them to cancel the booking via the cancellation link in their Lunacal email.
-2. Send them the correct link (Instructor: `https://go.ulem.org/rts-book-instructor`, Case Manager: `https://go.ulem.org/rts-book-casemanager`).
-3. When they rebook correctly, Salesforce auto-updates.
-4. The wrong booking created a cancellation task in your queue — mark it complete.
 
 ### You accidentally move a Lead to the wrong Status
 
@@ -615,8 +616,8 @@ No undo button. But:
 If the applicant lost their Lunacal link and needs it re-sent:
 
 1. Open the Lead.
-2. Check the `Instructor Invite Sent` checkbox (or `Case Mgr Invite Sent` for Interview 2). Uncheck it, save.
-3. Change Status back from `Interview 1 Scheduled` (or wherever they are) to `Interview 1 Requested`. Save. This will re-fire the invite email because the "Sent" flag is now false.
+2. Find the `Instructor Invite Sent` checkbox. Uncheck it, save.
+3. Change Status back from `Interview Scheduled` (or wherever they are) to `Interview Requested`. Save. This will re-fire the invite email because the "Sent" flag is now false.
 4. Once they book, it will advance forward normally.
 
 ### An applicant's contact info changes
@@ -625,13 +626,38 @@ Edit the Lead directly. Name, email, phone, address are all standard editable fi
 
 **Caveat:** if you change their email, future emails from the system go to the new address but any Lunacal bookings they've already made are tied to the old email. If they book again, the webhook may not match the Lead. In that case, manually update the interview date/time on the Lead.
 
-### Someone applies twice with the same email
+### Someone re-applies (returning applicants)
 
-The form now blocks duplicate applications for the same email in the active cohort. If somehow a duplicate gets through:
+When someone applies with an email that's already in Salesforce, the website reuses their existing Lead instead of creating a new one. It moves the Lead onto the current cohort and puts it in the right place automatically:
 
-1. Open the newer Lead.
-2. Copy any new info from it (if any) into the older Lead.
-3. Delete the newer Lead (or set Status to `RTS - Declined - Withdrew` with Decision Reason "Other" and a note).
+| Who re-applies | Where they land | Email they get | Task for you |
+|---|---|---|---|
+| Already applied to the **current** cohort | Nothing changes. The form tells them they've already applied. | None | None |
+| Came to an info session, now applying | `Assess Pending` | Assessment link | None |
+| Applied before and **passed the assessment in the last 12 months** | `Interview Requested` (or `Assess Complete` if their scores are missing) | Interview invitation (none if scores are missing) | "Returning RTS applicant" |
+| Applied before and passed **more than 12 months ago** | `Assess Pending` | Assessment link | None |
+| Applied before and **did not pass**, or never took it | `Assess Pending`, with a fresh 2 attempts (1 + 1 retake) | Assessment link | None |
+| Was waitlisted, declined or withdrew | Same rules as above, based on their assessment | Depends on assessment | Depends on assessment |
+
+**What happens to their old application:** the website copies the old interview notes, decision, offer and assessment results to the **top of the Description field**, then clears those fields so the Lead looks like a new application. The `Invite Sent` checkboxes are cleared too, so the interview booking email goes out again when you move them to `Interview Requested`.
+
+**You do:**
+- Read the Description before you interview a returning applicant. Old notes (for example, a scheduling concern last time) may still apply.
+- A returning applicant who passed is invited to interview automatically. If one is stuck at `Assess Complete`, their scores are missing: enter them, or move them to `Interview Requested` yourself.
+- The 12-month rule is automatic. If you want someone to re-take the assessment anyway, set `Assessment Status = Retake Required` as in [Section 6.4](#64-when-you-trigger-an-assessment-retake).
+
+**Matching only works on email.** If several Leads share the email, the website reuses the RTS Applicant record first, then an Info Session record. It never turns a Donor or Student Lead into an applicant when an RTS record exists.
+
+### Someone re-applies under a different email
+
+A returning applicant sometimes uses a new email address. The website can't safely tell whether that's the same person, because family members often share a phone number. So it creates a new Lead and gives you a **"Possible duplicate RTS applicant"** task listing the records that look like the same person.
+
+1. Open each linked record from the task.
+2. Confirm it's the same person (name, date of birth, address, phone).
+3. **Decide which Lead to keep.** Keep the one with the current application: the newest Lead on the current cohort, or the one furthest along the pipeline.
+4. **Don't delete the others.** Deleting loses their notes, emails and tasks. Send Dele the links of the Lead to keep and the ones to merge into it, and he'll merge them. Merging moves all tasks, emails and campaign history onto the Lead you keep.
+5. Leave **Donor** and **Student** Leads alone. Those are a different relationship with ULEM, not a duplicate application.
+6. Mark the task Complete.
 
 ### You want to bulk-email multiple applicants
 
@@ -662,7 +688,7 @@ If it's urgent, send the email manually from your personal inbox.
 
 1. Go to Leads → search the applicant's email in the search box.
 2. If not found, the form submission may have failed. Ask Dele to check Netlify function logs for errors.
-3. As a fallback, create the Lead manually: Leads → **New** → fill in all fields → set RecordType to **RTS Applicant** → save. Then change Status to `RTS - Assessment Pending` to kick off automation.
+3. As a fallback, create the Lead manually: Leads → **New** → fill in all fields → set RecordType to **RTS Applicant** → save. Then change Status to `Assess Pending` to kick off automation.
 
 ### "The dashboard numbers look wrong"
 
@@ -675,21 +701,21 @@ This is a known quirk with Web-to-Lead. Flow 1c should correct it within a secon
 
 Fix: click the pencil on the Lead record → scroll to **Record Type** → change to **RTS Applicant** → save. Path will switch to the full RTS pipeline.
 
+**Check first that it's really an application.** Info session sign-ups also arrive as "Open - Not Contacted". They have an **Info Session Date** but no **Date of Birth**, and their correct Record Type is **RTS Info Session**. Leave those alone. They become applicants automatically if they fill in the application form.
+
 ### "I can't find the Leads tab"
 
 You may be in the wrong Salesforce app. Click the grid icon (top-left) → App Launcher → pick the app that lists Leads, Contacts, Dashboards.
 
 ### "Applicant says the booking link is broken"
 
-1. Confirm they're on the right URL. Expected links:
-   - Instructor: `https://go.ulem.org/rts-book-instructor`
-   - Case Manager: `https://go.ulem.org/rts-book-casemanager`
-2. Try the link yourself in a new browser tab. If it 404s, the URL redirect in Cloudflare may be down — alert Dele.
-3. As a fallback, send them the direct Lunacal URL: `https://app.lunacal.ai/deletosh/rts-instructor` (or `rts-casemanager`).
+1. Confirm they're on the right URL: `https://go.ulem.org/rts-book-instructor`
+2. Try the link yourself in a new browser tab. If it 404s, the URL redirect may be down — alert Dele.
+3. As a fallback, send them the direct Lunacal URL: `https://meet.viz.li/deletosh/rts-instructor`
 
 ### "I think a duplicate Lead got created"
 
-Open both records side by side. Pick the one with the most complete info. Update it with any info from the duplicate. Delete the duplicate (or set its Status to `RTS - Declined - Withdrew` with note "duplicate").
+Don't delete either record. Follow [Someone re-applies under a different email](#someone-re-applies-under-a-different-email): pick the Lead with the current application and send Dele both links to merge.
 
 ### "When I try to save a Lead, I get a validation error"
 
@@ -701,49 +727,64 @@ Here's the quick map:
 
 | Status change | Email that goes out |
 |---|---|
-| → `RTS - Assessment Pending` (on Lead create, by automation) | Application Received |
-| → `RTS - Interview 1 Requested` | Instructor Interview Invitation |
-| → `RTS - Interview 2 Requested` | Case Manager Interview Invitation |
-| → `RTS - Accepted - Offer Sent` | Offer of Admission |
-| → `RTS - Waitlisted` | Waitlist Notification |
-| → `RTS - Declined - Not Qualified` | Application Status Update (decline) |
-| → `RTS - Accepted - Confirmed` | Enrollment Confirmation |
+| → `Assess Pending` (on Lead create, by automation) | Application Received |
+| → `Interview Requested` | Interview Invitation |
+| → `Offer Sent` | Offer of Admission |
+| → `Waitlisted` | Waitlist Notification |
+| → `Declined-NotQual` | Application Status Update (decline) |
+| → `Offer Confirmed` | Enrollment Confirmation |
 | Assessment Status → `Retake Required` (on the Lead, not Status) | Assessment Retake Invitation |
-| → `RTS - Assessment Complete` | No email. |
-| → `RTS - Interview 1 Complete` | No email. |
-| → `RTS - Interview 2 Complete` | No email. |
-| → `RTS - Declined - Withdrew` | No email (intentional). |
-| → `RTS - Converted` | No email. |
+| → `Assess Complete` | No email, unless `Assessment Status = Passed` and all three scores are filled in. Then the system moves the Lead to `Interview Requested` and the Interview Invitation goes out. |
+| → `Interview Complete` | No email. |
+| → `Declined-Withdrew` | No email (intentional). |
+| → `Converted-RTS` | No email. Set by the system after `Offer Confirmed`. |
 
 ---
 
 ## 11. Appendix: cheat sheets
 
-### The 4 transitions you'll make most often
+### The 3 transitions you'll make most often
 
-1. **Qualify for Interview 1:** new applicant passed the assessment and looks like a fit → Status = `RTS - Interview 1 Requested`. Email goes out. You're done.
-2. **Advance to Case Manager:** after Dele logs a positive Instructor interview outcome → Status = `RTS - Interview 1 Complete`, then `RTS - Interview 2 Requested`. Email goes out. You're done.
-3. **Accept:** after Wanda's interview and final decision → set Decision = Accept, Status = `RTS - Accepted - Offer Sent`. Offer email goes out. You're done.
-4. **Confirm and convert:** applicant replied "I confirm" → Status = `RTS - Accepted - Confirmed`. Task fires to convert to Contact. Click Convert, follow the wizard.
+1. **Invite to interview:** enter the three scores, set `Assessment Status = Passed`, Status = `Assess Complete`. The system moves them to `Interview Requested` and the email goes out. You're done.
+2. **Accept:** after Dele logs a positive interview outcome → Status = `Interview Complete`, then set Decision = Accept and Status = `Offer Sent`. Offer email goes out. You're done.
+3. **Confirm:** applicant replied "I confirm" → Status = `Offer Confirmed`. Salesforce enrols them. Open the "Check enrolment" task, check the cohort, mark it Complete.
 
 ### Short URL cheat sheet
 
 | Short URL | Where it goes |
 |---|---|
 | `go.ulem.org/rts-assessment` | Criteria Core assessment for new applicants or retakes |
-| `go.ulem.org/rts-book-instructor` | Dele's Instructor interview Lunacal page |
-| `go.ulem.org/rts-book-casemanager` | Wanda's Case Manager interview Lunacal page |
+| `go.ulem.org/rts-book-instructor` | Dele's interview Lunacal page |
 
-### Cohort 1 key dates
+### Cohort key dates
+
+**Current cohort: Cohort 2 (Fall 2026)**
 
 | Date | Milestone |
 |---|---|
-| May 11, 2026 (Monday) | Program starts |
-| July 20, 2026 (Monday) | Program ends |
-| 10 weeks | Full duration |
+| Oct 6, 8, 13, 14, 15 at 6:00 PM; Oct 9 at 12:00 PM | Info sessions (online) |
+| November 2, 2026 (Monday) | Program starts |
+| November 25-27, 2026 | No class (Thanksgiving) |
+| December 24, 2026 - January 1, 2027 | No class (winter break) |
+| January 18, 2027 (Monday) | No class (MLK Day) |
+| January 19 - February 19, 2027 | Client capstone (Weeks 11-15) |
+| February 15, 2027 (Monday) | No class (Presidents' Day) |
+| February 19, 2027 (Friday) | Graduation and showcase; program ends. Applicant emails, the offer letter and the website say "through January 25" on purpose; the capstone then continues to February 19. |
+| 15 weeks (68 class days) | Full duration: 10 weeks of teaching + 5-week capstone |
 | Mon-Wed 10 AM-4 PM | In-person at ULEM Boston, 88 Warren Street, Roxbury |
-| Thu-Fri | Remote, self-paced + project work |
+| Thu-Fri 10 AM-4 PM | Remote |
+| Foundations Nov 2-20, Specialization Nov 23-Dec 23, Career Launch Jan 4-Feb 19 | Phases in Salesforce |
 | 15 seats | Target enrollment |
+
+In Salesforce this cohort is called **RTS - Cohort 2 - Fall 2026**, and the dashboard is **Recruitment Tracker - RTS Cohort 2**.
+
+**Past cohorts**
+
+| Cohort | Program starts | Program ends | Target enrollment |
+|---|---|---|---|
+| Cohort 1 (RTS - Cohort 1 - May 2026) | May 11, 2026 (Monday) | August 10, 2026 (Monday), including the Career Launch capstone | 15 seats |
+
+When a new cohort opens, move the current table down into **Past cohorts** and fill in the new dates here. Nothing else in this guide needs to change.
 
 ### Key email addresses
 
@@ -751,8 +792,7 @@ Here's the quick map:
 |---|---|
 | `program-rts@ulem.org` | System sends all automated emails from this address. Applicants reply here. You monitor this inbox. |
 | `bguzman@ulem.org` | Your Salesforce login + personal work email |
-| `domotosho@ulem.org` | Dele (Lead Instructor + Acting Director) |
-| `wwatkins@ulem.org` | Wanda (Case Manager) |
+| `domotosho@ulem.org` | Dele (Lead Instructor) |
 
 ### When to call Dele
 

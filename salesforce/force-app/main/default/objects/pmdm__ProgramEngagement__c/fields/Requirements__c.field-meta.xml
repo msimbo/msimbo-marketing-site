@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requirements__c</fullName>
+    <description>Certifications/requirements for this registration (same values as the legacy Class Registration Requirements field).</description>
+    <label>Requirements</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>NCRC - Platinum Plus</fullName>
+                <default>false</default>
+                <label>NCRC - Platinum Plus</label>
+            </value>
+            <value>
+                <fullName>NRF</fullName>
+                <default>false</default>
+                <label>NRF</label>
+            </value>
+            <value>
+                <fullName>Microsoft</fullName>
+                <default>false</default>
+                <label>Microsoft</label>
+            </value>
+            <value>
+                <fullName>7 Habits</fullName>
+                <default>false</default>
+                <label>7 Habits</label>
+            </value>
+            <value>
+                <fullName>Coding</fullName>
+                <default>false</default>
+                <label>Coding</label>
+            </value>
+            <value>
+                <fullName>NCRC - Platinum</fullName>
+                <default>false</default>
+                <label>NCRC - Platinum</label>
+            </value>
+            <value>
+                <fullName>NCRC - Gold Plus</fullName>
+                <default>false</default>
+                <label>NCRC - Gold Plus</label>
+            </value>
+            <value>
+                <fullName>NCRC - Gold</fullName>
+                <default>false</default>
+                <label>NCRC - Gold</label>
+            </value>
+            <value>
+                <fullName>NCRC - Silver Plus</fullName>
+                <default>false</default>
+                <label>NCRC - Silver Plus</label>
+            </value>
+            <value>
+                <fullName>NCRC - Silver</fullName>
+                <default>false</default>
+                <label>NCRC - Silver</label>
+            </value>
+            <value>
+                <fullName>NCRC - Bronze Plus</fullName>
+                <default>false</default>
+                <label>NCRC - Bronze Plus</label>
+            </value>
+            <value>
+                <fullName>NCRC - Bronze</fullName>
+                <default>false</default>
+                <label>NCRC - Bronze</label>
+            </value>
+            <value>
+                <fullName>Microsoft Outlook, Excel, Word - Specialist</fullName>
+                <default>false</default>
+                <label>Microsoft Outlook, Excel, Word - Specialist</label>
+            </value>
+            <value>
+                <fullName>Microsoft Outlook, Excel, Word - Expert</fullName>
+                <default>false</default>
+                <label>Microsoft Outlook, Excel, Word - Expert</label>
+            </value>
+            <value>
+                <fullName>Microsoft Outlook, Excel, Word - Master</fullName>
+                <default>false</default>
+                <label>Microsoft Outlook, Excel, Word - Master</label>
+            </value>
+            <value>
+                <fullName>Financial Literacy</fullName>
+                <default>false</default>
+                <label>Financial Literacy</label>
+            </value>
+            <value>
+                <fullName>Microsoft Digital Literacy</fullName>
+                <default>false</default>
+                <label>Microsoft Digital Literacy</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

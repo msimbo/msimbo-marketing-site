@@ -18,11 +18,11 @@
     <description>Each RTS participant's Stage, Completion Status and Job Placement Status changes in date order, by cohort. From Program Engagement field history, which started Oct 7, 2026.</description>
     <filter>
         <criteriaItems>
-            <column>pmdm__ProgramEngagement__c.pmdm__Program__c</column>
+            <column>pmdm__ProgramEngagement__c.pmdm__ProgramCohort__c</column>
             <columnToColumn>false</columnToColumn>
             <isUnlocked>true</isUnlocked>
             <operator>contains</operator>
-            <value>Revenue Technology</value>
+            <value>RTS</value>
         </criteriaItems>
     </filter>
     <format>Summary</format>

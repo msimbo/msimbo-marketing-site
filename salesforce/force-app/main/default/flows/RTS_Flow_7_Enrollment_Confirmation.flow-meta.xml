@@ -20,12 +20,12 @@
         <nameSegment>Lead.RTS_Send_Enrollment_Confirmation</nameSegment>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
-    <description>Fires when Coordinator moves a Lead to Status = RTS - Accepted - Confirmed. Sends the Enrollment Confirmation email, stamps Offer_Response = Confirmed with today&apos;s date, and creates a same-day task for the Program Coordinator to convert the Lead to Contact + Program Engagement.</description>
+    <description>Fires when Coordinator moves a Lead to Status = RTS - Accepted - Confirmed. Sends the Enrollment Confirmation email, stamps Offer_Response = Confirmed with today&apos;s date, and creates a same-day task for the Program Coordinator to check the enrolment that RTS Flow 10 sets up.</description>
     <environments>Default</environments>
     <formulas>
         <name>TaskSubject</name>
         <dataType>String</dataType>
-        <expression>&quot;Convert Lead to Contact — &quot; &amp; {!$Record.FirstName} &amp; &quot; &quot; &amp; {!$Record.LastName}</expression>
+        <expression>&quot;Check enrolment — &quot; &amp; {!$Record.FirstName} &amp; &quot; &quot; &amp; {!$Record.LastName}</expression>
     </formulas>
     <interviewLabel>RTS Flow 7 — Enrollment Confirmation {!$Flow.CurrentDateTime}</interviewLabel>
     <label>RTS Flow 7 — Enrollment Confirmation</label>
@@ -50,7 +50,7 @@
     <processType>AutoLaunchedFlow</processType>
     <recordCreates>
         <name>Create_Convert_Task</name>
-        <label>Create Convert Lead Task</label>
+        <label>Create Check Enrolment Task</label>
         <locationX>176</locationX>
         <locationY>408</locationY>
         <inputAssignments>
@@ -62,7 +62,7 @@
         <inputAssignments>
             <field>Description</field>
             <value>
-                <stringValue>Convert lead and create Program Engagement in NPC. Then set Status = RTS - Converted.</stringValue>
+                <stringValue>Salesforce converts this applicant to a Person Account and enrols them in their cohort automatically (RTS Flow 10), within a minute of the status change. Open the Lead (it now links to the Person Account), check Related → Program Engagements shows the cohort with Stage = Enrolled, then mark this task Complete. If you also have an &quot;Enrol by hand&quot; task for this person, follow Section 6.9 of the coordinator guide.</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -74,7 +74,7 @@
         <inputAssignments>
             <field>Priority</field>
             <value>
-                <stringValue>High</stringValue>
+                <stringValue>Normal</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>

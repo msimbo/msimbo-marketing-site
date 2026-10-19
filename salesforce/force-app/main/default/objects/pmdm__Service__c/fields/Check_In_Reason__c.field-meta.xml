@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Check_In_Reason__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Offer this Service as a "reason for your visit" on the check-in app for its program (e.g. ERC: Job Search, Resume Help). The visit is recorded against the chosen Service.</description>
+    <label>Offer as Check-In Reason</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
