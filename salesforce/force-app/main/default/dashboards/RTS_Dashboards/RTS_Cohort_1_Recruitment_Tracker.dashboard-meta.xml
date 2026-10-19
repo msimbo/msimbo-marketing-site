@@ -129,7 +129,7 @@
                 <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
                 <componentType>Gauge</componentType>
                 <displayUnits>Auto</displayUnits>
-                <footer>Goal: 15 seats</footer>
+                <footer>Enrolled in PMM · Goal: 15 seats</footer>
                 <gaugeMax>15.0</gaugeMax>
                 <gaugeMin>0.0</gaugeMin>
                 <groupingSortProperties/>
@@ -139,7 +139,7 @@
                 <indicatorHighColor>#00716B</indicatorHighColor>
                 <indicatorLowColor>#C23934</indicatorLowColor>
                 <indicatorMiddleColor>#E2CE7D</indicatorMiddleColor>
-                <report>RTS_Recruitment_Reports/RTS_Enrolled_vs_Target</report>
+                <report>RTS_Recruitment_Reports/RTS_Cohort_Enrollment</report>
                 <showPercentage>false</showPercentage>
                 <showRange>false</showRange>
                 <showTotal>false</showTotal>
