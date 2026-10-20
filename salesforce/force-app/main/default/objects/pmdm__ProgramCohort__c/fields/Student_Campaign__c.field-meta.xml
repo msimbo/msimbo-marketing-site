@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Student_Campaign__c</fullName>
+    <description>Campaign holding this cohort's students, for List Email. Created and kept in sync by the Program Engagement Cohort Campaign flow: Client engagements at Enrolled, Active or Completed are members; any other stage removes them.</description>
+    <inlineHelpText>Students in this cohort. Open the campaign, select its members and click Send List Email.</inlineHelpText>
+    <label>Student Campaign</label>
+    <required>false</required>
+    <type>Lookup</type>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>Campaign</referenceTo>
+    <relationshipLabel>Program Cohorts</relationshipLabel>
+    <relationshipName>Program_Cohorts</relationshipName>
+</CustomField>

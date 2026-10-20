@@ -1,62 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>RTS Delivery Admin</label>
     <description>Field-level access to all RTS delivery-side custom fields on PMM ProgramEngagement and the PMM_Cohort lookup on RTS_Cohort. Assign to anyone managing trainee delivery.</description>
-    <hasActivationRequired>false</hasActivationRequired>
-    <license>Salesforce</license>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__ServiceSchedule__c.Program_Cohort__c</field>
+        <field>RTS_Cohort__c.PMM_Cohort__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__ServiceSchedule__c.Remote_Days__c</field>
+        <field>pmdm__ProgramCohort__c.Class_Days__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__Service__c.Check_In_Reason__c</field>
+        <field>pmdm__ProgramCohort__c.Cohort_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__ServiceSchedule__c.Drop_In__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ServiceDelivery__c.Attendance_Mode__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ServiceDelivery__c.Time_In__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ServiceDelivery__c.Time_Out__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ServiceDelivery__c.Legacy_Attendance_Id__c</field>
+        <field>pmdm__ProgramCohort__c.Fiscal_Cycle__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>pmdm__ProgramEngagement__c.Hours_Attended__c</field>
+        <field>pmdm__ProgramCohort__c.Fiscal_Year__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__ProgramEngagement__c.Legacy_Class_Registration_Id__c</field>
+        <field>pmdm__ProgramCohort__c.Instructor__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>pmdm__ProgramEngagement__c.Requirements__c</field>
+        <field>pmdm__ProgramCohort__c.Legacy_Program_Class_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>pmdm__ProgramCohort__c.Reporting_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Short_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Student_Campaign__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramCohort__c.Stipend__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -90,48 +87,88 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Legacy_Program_Class_Id__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Instructor__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Class_Days__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Stipend__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Short_Code__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Cohort_Number__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>pmdm__ProgramCohort__c.Fiscal_Cycle__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>false</editable>
-        <field>pmdm__ProgramCohort__c.Fiscal_Year__c</field>
+        <field>pmdm__ProgramEngagement__c.Hours_Attended__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>pmdm__ProgramCohort__c.Reporting_Code__c</field>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.Legacy_Class_Registration_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Completion_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Completion_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Final_Capstone_Score__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Google_AI_Cert_Earned__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_HubSpot_Cert_Earned__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Employer__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Salary__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.RTS_Withdrawal_Reason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ProgramEngagement__c.Requirements__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceDelivery__c.Attendance_Mode__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceDelivery__c.Legacy_Attendance_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceDelivery__c.Time_In__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceDelivery__c.Time_Out__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -141,62 +178,30 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>pmdm__ServiceSchedule__c.Drop_In__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceSchedule__c.Program_Cohort__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>pmdm__ServiceSchedule__c.Remote_Days__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>pmdm__ServiceSession__c.Delivery_Mode__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <field>RTS_Cohort__c.PMM_Cohort__c</field>
-        <readable>true</readable>
         <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Completion_Status__c</field>
+        <field>pmdm__Service__c.Check_In_Reason__c</field>
         <readable>true</readable>
-        <editable>true</editable>
     </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Completion_Date__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Final_Capstone_Score__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_HubSpot_Cert_Earned__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Google_AI_Cert_Earned__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Status__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Date__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Employer__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Job_Placement_Salary__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <field>pmdm__ProgramEngagement__c.RTS_Withdrawal_Reason__c</field>
-        <readable>true</readable>
-        <editable>true</editable>
-    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>RTS Delivery Admin</label>
+    <license>Salesforce</license>
 </PermissionSet>

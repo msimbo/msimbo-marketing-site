@@ -12,7 +12,7 @@
 
 > **What changed on October 19, 2026**
 >
-> - **Cohorts have a new naming pattern:** `{Code} Cohort {n} · {Season} {Year} · FY{yy}-C{c}`, e.g. **RTS Cohort 2 · Fall 2026 · FY27-C1**. "Cohort 2" is the program's running count; "FY27-C1" is ULEM's reporting cycle (the first cohort starting in fiscal year 2027, which runs July-June). Salesforce builds the name for you, see [Setting up a new cohort's name](#setting-up-a-new-cohorts-name) and the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
+> - **Cohorts have a new naming pattern:** `{Code} Cohort {n} · {Season} {Year} · FY{yy}-CY{c}`, e.g. **RTS Cohort 2 · Fall 2026 · FY27-CY1**. "Cohort 2" is the program's running count; "FY27-CY1" is ULEM's reporting cycle (the first cohort starting in fiscal year 2027, which runs July-June). Salesforce builds the name for you, see [Setting up a new cohort's name](#setting-up-a-new-cohorts-name) and the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
 > - **The program is now called MSIMBO Academy** (it was briefly MSIMBO Tech Academy).
 
 > **What changed on October 16, 2026**
@@ -494,7 +494,7 @@ When you move a Lead to `Offer Confirmed`, Salesforce does the rest within a min
 
 1. Open the task and click the student's name. (If you open the old Lead instead, it shows "This lead was converted" with a link to the student.)
 2. On the student's record, open **Related → Program Engagements**.
-3. Check there is one row for the right cohort (e.g. **RTS Cohort 2 · Fall 2026 · FY27-C1**) with Stage **Enrolled**.
+3. Check there is one row for the right cohort (e.g. **RTS Cohort 2 · Fall 2026 · FY27-CY1**) with Stage **Enrolled**.
 4. Mark the task Complete.
 
 **If the Lead is still at `Offer Confirmed` after a few minutes,** the automatic step didn't run. You'll also get an "Enrol by hand" task.
@@ -527,6 +527,17 @@ The applicant emails you saying they can't do the program anymore.
 6. Save.
 
 **System does NOT send an email for this status** — intentional. The applicant already knows; a rejection email would feel wrong.
+
+### 6.11 Emailing everyone in a cohort
+
+Each cohort has a **Student Campaign** (e.g. **RTS Cohort 2 · Fall 2026 · FY27-CY1 · Students**) that Salesforce keeps up to date for you. A student is a member while their Program Engagement Stage is **Enrolled**, **Active** or **Completed**. Changing it to **Withdrawn** (or any other stage) takes them off. The campaign is created automatically when the cohort's first student enrols.
+
+1. Open the cohort (Program Management → **Program Cohorts**) and click its **Student Campaign**, or find the campaign on the **Campaigns** tab.
+2. Open **Related → Campaign Members → View All**.
+3. Select all the members and click **Send List Email**.
+4. Write the email, or click the template icon to use one. Use **Insert Merge Field** for the first name. Send.
+
+The email is logged on each student's activity timeline. Don't add or remove campaign members by hand: change the student's Program Engagement stage instead, or the next change will undo yours.
 
 ---
 
@@ -781,13 +792,13 @@ Here's the quick map:
 | Foundations Nov 2-20, Specialization Nov 23-Dec 23, Career Launch Jan 4-Feb 19 | Phases in Salesforce |
 | 15 seats | Target enrollment |
 
-In Salesforce this cohort is called **RTS Cohort 2 · Fall 2026 · FY27-C1** (reporting code **RTS-FY27-C1**), and the dashboard is **Recruitment Tracker - RTS Cohort 2 · FY27-C1**.
+In Salesforce this cohort is called **RTS Cohort 2 · Fall 2026 · FY27-CY1** (reporting code **RTS-FY27-CY1**), and the dashboard is **Recruitment Tracker - RTS Cohort 2 · FY27-CY1**.
 
 **Past cohorts**
 
 | Cohort | Program starts | Program ends | Target enrollment |
 |---|---|---|---|
-| Cohort 1 (RTS Cohort 1 · Spring 2026 · FY26-C2) | May 11, 2026 (Monday) | August 10, 2026 (Monday), including the Career Launch capstone | 15 seats |
+| Cohort 1 (RTS Cohort 1 · Spring 2026 · FY26-CY2) | May 11, 2026 (Monday) | August 10, 2026 (Monday), including the Career Launch capstone | 15 seats |
 
 When a new cohort opens, move the current table down into **Past cohorts** and fill in the new dates here. Nothing else in this guide needs to change.
 
@@ -802,7 +813,7 @@ You don't type the cohort name. On the **Program Cohort** record, fill in:
 | Cohort Number | The program's running count (it never resets) | 2 |
 | Fiscal Cycle | Leave blank: Salesforce counts the program's cohorts that start earlier in the same fiscal year. Type a number only to correct it. | 1 |
 
-The Name field is required when you create the record, so type anything (e.g. `new`); Salesforce replaces it on save with **RTS Cohort 2 · Fall 2026 · FY27-C1**. **Fiscal Year** and **Reporting Code** (RTS-FY27-C1) fill themselves in, and the linked RTS Cohort gets the same name. The season comes from the start month (Dec-Feb Winter, Mar-May Spring, Jun-Aug Summer, Sep-Nov Fall). After a new cohort is named, ask Dele to point the cohort's Lead list views at the new name. The full rules are in the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
+The Name field is required when you create the record, so type anything (e.g. `new`); Salesforce replaces it on save with **RTS Cohort 2 · Fall 2026 · FY27-CY1**. **Fiscal Year** and **Reporting Code** (RTS-FY27-CY1) fill themselves in, and the linked RTS Cohort gets the same name. The season comes from the start month (Dec-Feb Winter, Mar-May Spring, Jun-Aug Summer, Sep-Nov Fall). After a new cohort is named, ask Dele to point the cohort's Lead list views at the new name. The full rules are in the [Program and Cohort Naming Guide](https://wiki.ulem.org/doc/program-and-cohort-naming-guide-D4tdVU103w).
 
 ### Key email addresses
 

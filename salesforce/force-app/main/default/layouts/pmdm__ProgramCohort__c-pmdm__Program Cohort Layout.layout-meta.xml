@@ -96,24 +96,28 @@
         <editHeading>true</editHeading>
         <label>Class Details</label>
         <layoutColumns>
-                <layoutItems>
-                    <behavior>Edit</behavior>
-                    <field>Instructor__c</field>
-                </layoutItems>
-                <layoutItems>
-                    <behavior>Edit</behavior>
-                    <field>Stipend__c</field>
-                </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Instructor__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Stipend__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Student_Campaign__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
-                <layoutItems>
-                    <behavior>Edit</behavior>
-                    <field>Class_Days__c</field>
-                </layoutItems>
-                <layoutItems>
-                    <behavior>Readonly</behavior>
-                    <field>Legacy_Program_Class_Id__c</field>
-                </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Class_Days__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Legacy_Program_Class_Id__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>
     </layoutSections>
