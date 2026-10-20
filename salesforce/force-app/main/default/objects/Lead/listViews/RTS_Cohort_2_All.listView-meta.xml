@@ -14,7 +14,7 @@
     <filters>
         <field>RTS_Cohort__c</field>
         <operation>equals</operation>
-        <value>RTS Cohort 2 · Fall 2026 · FY27-C1</value>
+        <value>RTS Cohort 2 · Fall 2026 · FY27-CY1</value>
     </filters>
-    <label>RTS Cohort 2 · FY27-C1 · All Leads</label>
+    <label>RTS Cohort 2 · FY27-CY1 · All Leads</label>
 </ListView>

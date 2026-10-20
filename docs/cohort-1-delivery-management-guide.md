@@ -17,7 +17,7 @@ The recruiting side (Lead pipeline, applications, interviews, offers) is documen
 **Live in production:**
 
 - Program record: `Revenue Technology Specialist`
-- ProgramCohort record: `RTS Cohort 1 · Spring 2026 · FY26-C2` (linked to RTS_Cohort__c via `PMM_Cohort__c`)
+- ProgramCohort record: `RTS Cohort 1 · Spring 2026 · FY26-CY2` (linked to RTS_Cohort__c via `PMM_Cohort__c`)
 - 3 Service records: `RTS Foundations`, `RTS Specialization`, `RTS Career Launch` (shared by every cohort; each cohort has its own Service Schedules, e.g. `RTS Cohort 1 · Foundations`)
 - 11 custom fields (10 outcome fields on ProgramEngagement, 1 cohort bridge on RTS_Cohort__c)
 - 1 permission set: `RTS Delivery Admin` (assigned to Dele, Betzaida, William)
@@ -49,7 +49,7 @@ Flow 4 ("RTS Flow 4 — Offer Letter") is the one that matters here. When a Lead
 3. Within ~10 seconds, check the Contact has a related `Program Engagements` list with one row
 4. Open that ProgramEngagement and confirm:
    - `pmdm__Program__c` = `Revenue Technology Specialist`
-   - `pmdm__ProgramCohort__c` = `RTS Cohort 1 · Spring 2026 · FY26-C2`
+   - `pmdm__ProgramCohort__c` = `RTS Cohort 1 · Spring 2026 · FY26-CY2`
    - `pmdm__Contact__c` is the trainee
    - **3 ServiceParticipants** are visible in the related list (one per Service)
    - `RTS Completion Status` = `Enrolled` (the Path shows the first stage)
@@ -187,7 +187,7 @@ Columns:
 - `RTS_Google_AI_Cert_Earned__c`
 - `RTS_Job_Placement_Status__c`
 
-Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-C2"`
+Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-CY2"`
 
 Use this for daily standups, weekly check-ins, and the Demo Day attendee list.
 
@@ -204,7 +204,7 @@ Columns:
 - `RTS_Job_Placement_Status__c` (count by value)
 - `RTS_Job_Placement_Salary__c` (median)
 
-Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-C2"`
+Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-CY2"`
 
 Use this for the funder report. Median salary stays in this report only — never share individual salary data outside funder context.
 
@@ -217,7 +217,7 @@ Columns:
 - `RTS_Completion_Date__c`
 - `RTS_Withdrawal_Reason__c`
 
-Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-C2"` AND `RTS_Completion_Status__c equals "Withdrew"`
+Filter: `pmdm__ProgramCohort__c equals "RTS Cohort 1 · Spring 2026 · FY26-CY2"` AND `RTS_Completion_Status__c equals "Withdrew"`
 
 Use this for cohort retrospectives and Cohort 2 recruiting strategy. Patterns in withdrawal reasons inform application screening.
 
@@ -269,9 +269,9 @@ Pin these somewhere — they show up everywhere.
 | Record | ID |
 |---|---|
 | Program: Revenue Technology Specialist | `a1DUV000006Jlnl2AC` |
-| ProgramCohort: RTS Cohort 1 · Spring 2026 · FY26-C2 | `a1BUV000002OSV32AO` |
-| RTS_Cohort__c (recruiting): RTS Cohort 1 · Spring 2026 · FY26-C2 | `a1JUV000005GKMT2A4` |
-| RTS_Cohort__c (recruiting): RTS Cohort 2 · Fall 2026 · FY27-C1 | `a1JUV000005JhMX2A0` |
+| ProgramCohort: RTS Cohort 1 · Spring 2026 · FY26-CY2 | `a1BUV000002OSV32AO` |
+| RTS_Cohort__c (recruiting): RTS Cohort 1 · Spring 2026 · FY26-CY2 | `a1JUV000005GKMT2A4` |
+| RTS_Cohort__c (recruiting): RTS Cohort 2 · Fall 2026 · FY27-CY1 | `a1JUV000005JhMX2A0` |
 | Service: RTS Foundations | `a1IUV000004DSSP2A4` |
 | Service: RTS Specialization | `a1IUV000004DSU12AO` |
 | Service: RTS Career Launch | `a1IUV000004DSVd2AO` |

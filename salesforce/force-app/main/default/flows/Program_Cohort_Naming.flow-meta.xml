@@ -112,7 +112,7 @@
             <label>Yes</label>
         </rules>
     </decisions>
-    <description>Before-save flow. Names a Program Cohort &quot;{Short Code} Cohort {n} · {Season} {Year} · FY{yy}-C{c}&quot;, e.g. RTS Cohort 2 · Fall 2026 · FY27-C1. Season and year come from the start date (Dec-Feb Winter, Mar-May Spring, Jun-Aug Summer, Sep-Nov Fall); the fiscal year runs July-June. A blank Fiscal Cycle is filled with 1 + the number of the program's cohorts that start earlier in the same fiscal year; a typed value is kept. The name is only set when Short Code, Cohort Number, Start Date and Fiscal Cycle are all filled. Sends no email.</description>
+    <description>Before-save flow. Names a Program Cohort &quot;{Short Code} Cohort {n} · {Season} {Year} · FY{yy}-CY{c}&quot;, e.g. RTS Cohort 2 · Fall 2026 · FY27-CY1. Season and year come from the start date (Dec-Feb Winter, Mar-May Spring, Jun-Aug Summer, Sep-Nov Fall); the fiscal year runs July-June. A blank Fiscal Cycle is filled with 1 + the number of the program's cohorts that start earlier in the same fiscal year; a typed value is kept. The name is only set when Short Code, Cohort Number, Start Date and Fiscal Cycle are all filled. Sends no email.</description>
     <environments>Default</environments>
     <formulas>
         <name>fCycle</name>
@@ -135,7 +135,7 @@
         <dataType>String</dataType>
         <expression>UPPER(TRIM({!$Record.Short_Code__c})) &amp; &quot; Cohort &quot; &amp; TEXT({!$Record.Cohort_Number__c})
 &amp; &quot; · &quot; &amp; {!fSeason} &amp; &quot; &quot; &amp; TEXT(YEAR({!$Record.pmdm__StartDate__c}))
-&amp; &quot; · &quot; &amp; {!fFiscalYear} &amp; &quot;-C&quot; &amp; TEXT({!$Record.Fiscal_Cycle__c})</expression>
+&amp; &quot; · &quot; &amp; {!fFiscalYear} &amp; &quot;-CY&quot; &amp; TEXT({!$Record.Fiscal_Cycle__c})</expression>
     </formulas>
     <formulas>
         <name>fSeason</name>

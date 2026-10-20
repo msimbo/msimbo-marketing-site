@@ -22,7 +22,7 @@
             <columnToColumn>false</columnToColumn>
             <isUnlocked>true</isUnlocked>
             <operator>equals</operator>
-            <value>RTS Cohort 2 · Fall 2026 · FY27-C1</value>
+            <value>RTS Cohort 2 · Fall 2026 · FY27-CY1</value>
         </criteriaItems>
         <criteriaItems>
             <column>pmdm__ProgramEngagement__c.pmdm__Stage__c</column>
