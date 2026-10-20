@@ -905,15 +905,18 @@
   // ──────────────────────────────────────────────
   // DIRECT LINKS
   // /info-session (Netlify rewrite) and /#info-session land on the form.
+  // While the info session section is hidden, they land on the application.
   // Re-scroll after load so fonts and the date picker don't shift the target.
   // ──────────────────────────────────────────────
+  var infoSection = document.getElementById("info-session");
+  var infoTarget = infoSection && !infoSection.hidden ? "info-session" : "apply";
   var DIRECT_LINK_PATHS = {
-    "/info-session": "info-session",
-    "/info-sessions": "info-session",
+    "/info-session": infoTarget,
+    "/info-sessions": infoTarget,
   };
   var directTargetId =
     DIRECT_LINK_PATHS[location.pathname.replace(/\/+$/, "")] ||
-    location.hash.slice(1);
+    (location.hash === "#info-session" ? infoTarget : location.hash.slice(1));
   var directTarget = directTargetId && document.getElementById(directTargetId);
   if (directTarget) {
     var scrollToDirectTarget = function () {

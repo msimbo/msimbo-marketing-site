@@ -1358,3 +1358,6 @@ em { font-family: var(--font-display); font-style: italic; }
   pointer-events: none;
 }
 
+
+/* Sections switched off with the hidden attribute (e.g. info sessions). */
+section[hidden] { display: none !important; }

@@ -16,6 +16,7 @@
 
 # Shareable direct link to the info session form. Rewrite (not redirect) so
 # UTM params survive; app.js scrolls to #info-session on these paths.
+# While the info session section is hidden, app.js scrolls to #apply instead.
 [[redirects]]
   from = "/info-session"
   to = "/index.html"
