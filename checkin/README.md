@@ -80,12 +80,26 @@ adding that program's sessions in PMM.
 
   The function caches the token for 50 minutes and, if Salesforce rejects it sooner, logs in again
   and retries the request once.
-- **PIN guessing:** a 4-digit PIN has 10,000 combinations. Add a lockout (e.g. 5 wrong tries locks
-  that person for 15 minutes), stored in Netlify Blobs or a Contact field. Consider a dedicated PIN
+- **PIN guessing:** done. 5 wrong PINs lock that person for 15 minutes (`lib/lockout.js`, Netlify
+  Blobs store `pin-lockout`; in memory when run locally). Still worth considering a dedicated PIN
   field instead of the phone's last 4, which classmates may know.
-- **Public class list:** anyone with the URL sees today's first names + last initials. Optionally
-  gate the front-desk URL with a device key, and give remote students a personal link.
+- **Class list behind a link:** done. With `CHECKIN_ACCESS_KEY` set, the API answers only requests
+  carrying that key. The page takes it from the link `https://checkin.ulem.org/#k=<key>` (`?k=` also works, but Safari can strip it), saves it on
+  the device and removes it from the address bar. Give that link to the front-desk tablet and to
+  students (not on public pages). To revoke, change the env var and redeploy; every device then
+  needs the new link. Unset, the app is open (local dev).
+- **In-person days are desk-only:** done. `CHECKIN_DESK_KEY` is a second key held only by the
+  front-desk iPad (open `https://checkin.ulem.org/#k=<desk key>` on it). Sessions with Delivery Mode
+  **In Person** reject check-in/out from any other key (the roster shows "check in at the front
+  desk"); **Remote** sessions accept either key. Students get only the `CHECKIN_ACCESS_KEY` link.
+  Every check-in stores `Check_In_Source__c` (Front Desk / Own Device) on the Service Delivery, so
+  staff can report on in-person attendance that came from an Own Device. Sessions with a blank
+  Delivery Mode are not restricted. Rotate the desk key by changing the env var, redeploying and
+  re-opening the link on the iPad.
 - **Kiosk device:** iPad in Guided Access mode, with the page saved to the Home Screen.
-- **Hosting:** deploy as its own Netlify site (e.g. checkin.ulem.org), separate from msimbo.org.
+- **Hosting:** Netlify site `ulem-checkin` (team deletosh), deployed from this folder with
+  `netlify deploy --prod` (the folder is linked). Custom domain `checkin.ulem.org` needs a DNS-only
+  CNAME to `ulem-checkin.netlify.app` in Cloudflare. Env vars: `SF_CLIENT_ID`, `SF_CLIENT_SECRET`,
+  `SF_LOGIN_URL`, `CHECKIN_ACCESS_KEY`, `CHECKIN_DESK_KEY`.
 - **Cohort 2:** needs its schedule (Mon–Wed in person, Thu–Fri remote) with participants linked;
   this app only lists people linked to the session's schedule.

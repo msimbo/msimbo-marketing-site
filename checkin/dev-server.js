@@ -15,7 +15,7 @@ http.createServer(async (req, res) => {
     let body = '';
     for await (const chunk of req) body += chunk;
     const out = await handler({
-      path: url.pathname, httpMethod: req.method, body,
+      path: url.pathname, httpMethod: req.method, body, headers: req.headers,
       queryStringParameters: Object.fromEntries(url.searchParams),
     });
     res.writeHead(out.statusCode, out.headers);

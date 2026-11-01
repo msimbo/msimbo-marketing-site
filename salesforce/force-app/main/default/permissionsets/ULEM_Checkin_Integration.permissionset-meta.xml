@@ -45,6 +45,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>pmdm__ServiceDelivery__c.Check_In_Source__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>pmdm__ServiceDelivery__c.Time_In__c</field>
         <readable>true</readable>
     </fieldPermissions>

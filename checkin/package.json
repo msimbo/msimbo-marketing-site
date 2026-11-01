@@ -1,0 +1,8 @@
+{
+  "name": "ulem-checkin",
+  "private": true,
+  "description": "ULEM self-serve check-in (Netlify site checkin.ulem.org)",
+  "dependencies": {
+    "@netlify/blobs": "8.1.0"
+  }
+}

@@ -12,9 +12,22 @@
  *
  * A check-in creates a pmdm__ServiceDelivery__c with Time In; check-out sets
  * Time Out. Hours and In Person/Remote are filled by RTS_AttendanceService
- * in Salesforce. The PIN is the last 4 digits of the phone on the Contact.
+ * in Salesforce. The PIN is the last 4 digits of the phone on the Contact. Five wrong PINs lock
+ * that person for 15 minutes (lib/lockout.js).
+ *
+ * If CHECKIN_ACCESS_KEY is set, every request must send it in the X-Checkin-Key header. The page
+ * picks it up from the ?k= link it was opened with and keeps it, so only devices given that link
+ * (the front-desk tablet, students' own devices) can see the lists.
+ *
+ * If CHECKIN_DESK_KEY is also set, it is a second key held only by the front-desk device. Sessions
+ * whose Delivery Mode is "In Person" accept check-in/out only from a request carrying the desk key,
+ * so students who have the student link can't check in from home on an in-person day. Remote
+ * sessions accept either key. Each check-in records which kind of device it came from in
+ * Check_In_Source__c (Front Desk / Own Device).
  */
+const crypto = require('crypto');
 const { sf, query, soqlId } = require('./lib/salesforce');
+const lockout = require('./lib/lockout');
 
 const TZ = process.env.CHECKIN_TIMEZONE || 'America/New_York';
 const LATE_AFTER_MIN = 10;      // checked in more than 10 min after start -> Late
@@ -24,9 +37,13 @@ const SEARCH_OVER = 20;         // longer lists switch to name search
 exports.handler = async (event) => {
   const route = (event.path || '').replace(/^.*\/(api|\.netlify\/functions\/checkin)/, '');
   try {
+    if (event.httpMethod === 'GET' && route === '/manifest') return manifest(event.queryStringParameters || {});
+    const device = deviceFor(event.headers || {});
+    if (!device) return json(403, { error: 'This page needs the check-in link. Please ask the front desk.', needKey: true });
+    lockout.connect(event);
     if (event.httpMethod === 'GET' && route === '/today') return ok(await today());
-    if (event.httpMethod === 'GET' && route === '/roster') return ok(await roster(event.queryStringParameters.session, event.queryStringParameters.q));
-    if (event.httpMethod === 'POST' && route === '/check') return await check(JSON.parse(event.body || '{}'));
+    if (event.httpMethod === 'GET' && route === '/roster') return ok(await roster(event.queryStringParameters.session, event.queryStringParameters.q, device));
+    if (event.httpMethod === 'POST' && route === '/check') return await check(JSON.parse(event.body || '{}'), device);
     return json(404, { error: 'Not found' });
   } catch (err) {
     console.error(err);
@@ -106,8 +123,9 @@ async function reasons(session) {
   return rows.map((r) => ({ id: r.Id, name: r.Name }));
 }
 
-async function roster(sessionId, search) {
+async function roster(sessionId, search, device) {
   const session = await loadSession(sessionId);
+  if (deskOnly(session, device)) return { session: sessionSummary(session), deskOnly: true, message: DESK_ONLY_MESSAGE, people: [], reasons: [] };
   const [people, delivered, reasonList] = await Promise.all([participants(session), deliveries(sessionId), reasons(session)]);
   let list = [...people.values()].map((p) => {
     const d = delivered.get(p.pmdm__Contact__c);
@@ -134,21 +152,32 @@ async function roster(sessionId, search) {
 
 // ---------- check in / out ----------
 
-async function check({ session: sessionId, contact: contactId, pin, action, reason }) {
+async function check({ session: sessionId, contact: contactId, pin, action, reason }, device) {
   if (!['in', 'out'].includes(action) || !/^\d{4}$/.test(pin || '')) return json(400, { error: 'Enter your 4-digit PIN.' });
   const session = await loadSession(sessionId);
+  if (deskOnly(session, device)) return json(403, { error: DESK_ONLY_MESSAGE, deskOnly: true });
   const person = (await participants(session)).get(contactId);
   if (!person) return json(404, { error: "You're not on today's list. Please see the front desk." });
 
+  const lockedUntil = await lockout.lockedUntil(contactId);
+  if (lockedUntil) return json(429, { error: `Too many wrong PINs. Try again after ${clock(lockedUntil)}, or see the front desk.` });
+
   const [contact] = await query(`SELECT FirstName, MobilePhone, Phone, HomePhone FROM Contact WHERE Id = ${soqlId(contactId)}`);
   const phone = (contact.MobilePhone || contact.Phone || contact.HomePhone || '').replace(/\D/g, '');
-  if (phone.length < 4 || phone.slice(-4) !== pin) return json(401, { error: "That PIN doesn't match. Try again or see the front desk." });
+  if (phone.length < 4 || phone.slice(-4) !== pin) {
+    const until = await lockout.fail(contactId);
+    return until
+      ? json(429, { error: `Too many wrong PINs. Try again after ${clock(until)}, or see the front desk.` })
+      : json(401, { error: "That PIN doesn't match. Try again or see the front desk." });
+  }
+  await lockout.clear(contactId);
 
   const existing = (await deliveries(sessionId)).get(contactId);
   const now = new Date();
   const start = new Date(session.pmdm__SessionStart__c);
   const end = new Date(session.pmdm__SessionEnd__c);
   const dropIn = session.pmdm__ServiceSchedule__r.Drop_In__c;
+  const source = device === 'desk' ? 'Front Desk' : 'Own Device';
 
   if (action === 'in') {
     if (existing && existing.Time_In__c) return json(409, { error: `You already checked in at ${clock(existing.Time_In__c)}.` });
@@ -156,6 +185,15 @@ async function check({ session: sessionId, contact: contactId, pin, action, reas
     const chosen = reasonList.find((r) => r.id === reason);
     if (reasonList.length && !chosen) return json(400, { error: 'Choose what brings you in today.' });
     const late = !dropIn && now - start > LATE_AFTER_MIN * 60000;
+    // An absence the student reported through the MSIMBO Assistant: they came after all.
+    if (existing) {
+      await sf('PATCH', `/sobjects/pmdm__ServiceDelivery__c/${existing.Id}`, {
+        pmdm__AttendanceStatus__c: late ? 'Late' : 'Present',
+        Time_In__c: now.toISOString(),
+        Check_In_Source__c: source,
+      });
+      return ok({ firstName: contact.FirstName, action, time: now.toISOString(), status: late ? 'Late' : 'Present' });
+    }
     await sf('POST', '/sobjects/pmdm__ServiceDelivery__c', {
       Name: `${chosen ? chosen.name : session.pmdm__ServiceSchedule__r.pmdm__Service__r.Name} ${localDate(now)}`.slice(0, 80),
       pmdm__Service__c: chosen ? chosen.id : session.pmdm__ServiceSchedule__r.pmdm__Service__c,
@@ -165,6 +203,7 @@ async function check({ session: sessionId, contact: contactId, pin, action, reas
       pmdm__DeliveryDate__c: localDate(now),
       pmdm__AttendanceStatus__c: late ? 'Late' : 'Present',
       Time_In__c: now.toISOString(),
+      Check_In_Source__c: source,
     });
     return ok({ firstName: contact.FirstName, action, time: now.toISOString(), status: late ? 'Late' : 'Present', reason: chosen && chosen.name });
   }
@@ -178,7 +217,54 @@ async function check({ session: sessionId, contact: contactId, pin, action, reas
   return ok({ firstName: contact.FirstName, action, time: now.toISOString(), hours: after.pmdm__Quantity__c });
 }
 
+// ---------- installable web app manifest ----------
+
+/**
+ * Web app manifest for "Add to Home Screen". A home-screen app has its own storage, so the key has to
+ * travel in start_url (as #k=..., which is never sent to the server). The key is only echoed back from
+ * the request, never read from env or checked here, so this route reveals nothing.
+ */
+function manifest(query) {
+  const k = String(query.k || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+  const body = {
+    id: '/', name: 'ULEM Check-In', short_name: 'Check-In',
+    start_url: k ? `/#k=${k}` : '/', scope: '/', display: 'standalone', orientation: 'any',
+    background_color: '#1A1A1A', theme_color: '#1A1A1A',
+    icons: [
+      { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    ],
+  };
+  return { statusCode: 200, headers: { 'Content-Type': 'application/manifest+json', 'Cache-Control': 'no-store' }, body: JSON.stringify(body) };
+}
+
 // ---------- helpers ----------
+
+const DESK_ONLY_MESSAGE = 'This is an in-person class. Please check in at the front desk.';
+
+/**
+ * Which kind of device sent the request: 'desk' (carries CHECKIN_DESK_KEY), 'student' (carries
+ * CHECKIN_ACCESS_KEY, or no key is needed), or null (wrong or missing key).
+ * With neither variable set (local dev) every device counts as the desk.
+ */
+function deviceFor(headers) {
+  const student = process.env.CHECKIN_ACCESS_KEY;
+  const desk = process.env.CHECKIN_DESK_KEY;
+  if (!student && !desk) return 'desk';
+  const sent = headers['x-checkin-key'] || headers['X-Checkin-Key'] || '';
+  const same = (expected) => {   // case-insensitive, so word keys are easy to type
+    const digest = (s) => crypto.createHash('sha256').update(s.trim().toLowerCase()).digest();
+    return crypto.timingSafeEqual(digest(sent), digest(expected));
+  };
+  if (desk && same(desk)) return 'desk';
+  if (!student || same(student)) return 'student';
+  return null;
+}
+
+/** In-person sessions are the front desk's alone, once a desk key is configured. */
+function deskOnly(session, device) {
+  return !!process.env.CHECKIN_DESK_KEY && session.Delivery_Mode__c === 'In Person' && device !== 'desk';
+}
 
 function sessionSummary(s) {
   return {

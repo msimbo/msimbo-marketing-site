@@ -11,9 +11,12 @@
   <meta name="apple-mobile-web-app-title" content="Check-In">
   <meta name="format-detection" content="telephone=no">
   <title>ULEM Check-In</title>
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="manifest" id="manifest" href="/api/manifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif&display=swap">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <header class="bar">
@@ -74,8 +77,18 @@
       <p class="sub" id="done-sub"></p>
       <button class="secondary" data-go="roster">Done</button>
     </section>
+
+    <!-- opened without the check-in link -->
+    <section id="screen-locked" class="screen center" hidden>
+      <h1 class="title">Check-in link needed</h1>
+      <p class="sub">Open this page from the check-in link ULEM gave you, or type the check-in key below. Otherwise please see the front desk.</p>
+      <form id="key-form" class="key-form" autocomplete="off">
+        <input id="key-input" type="text" placeholder="Check-in key" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Check-in key">
+        <button type="submit">Save key</button>
+      </form>
+    </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

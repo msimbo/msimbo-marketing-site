@@ -9,9 +9,48 @@
   const time = (iso) => new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  // The access key arrives in the check-in link as #k=... (Safari can strip query strings) or ?k=...,
+  // or is typed on the locked screen. It is kept on this device, and left in the #hash so that
+  // "Add to Home Screen" captures a link that still carries it.
+  const KEY_STORE = 'checkinKey';
+  const installed = window.navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  let accessKey = '';
+  try { accessKey = localStorage.getItem(KEY_STORE) || ''; } catch (e) { /* storage blocked */ }
+  const params = new URLSearchParams(location.search);
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const linkKey = hash.get('k') || params.get('k');
+  // In the installed app the launch link holds whatever key it was installed with, which goes stale
+  // when the key changes, so a key saved on the device wins there. In a browser a new link always wins.
+  if (linkKey && !(installed && accessKey)) setKey(linkKey);
+  else if (accessKey) setKey(accessKey);
+  params.delete('k');
+
+  function setKey(k) {
+    accessKey = k.trim();
+    try { localStorage.setItem(KEY_STORE, accessKey); } catch (e) { /* keeps working for this visit */ }
+    params.delete('k');
+    hash.set('k', accessKey);
+    history.replaceState(null, '', location.pathname + (params.toString() ? `?${params}` : '') + `#${hash}`);
+    // The home-screen app is built from this manifest, so it needs the key (start_url carries it).
+    $('manifest').href = `/api/manifest?k=${encodeURIComponent(accessKey)}`;
+  }
+
+  $('key-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const k = $('key-input').value.trim();
+    if (!k) return;
+    setKey(k);
+    $('key-input').value = '';
+    loadPrograms();
+  });
+
   async function api(path, body) {
-    const res = await fetch(`/api${path}`, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+    const headers = { 'X-Checkin-Key': accessKey };
+    const res = await fetch(`/api${path}`, body
+      ? { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      : { headers });
     const data = await res.json().catch(() => ({}));
+    if (data.needKey) { show('locked'); throw Object.assign(new Error(data.error), { status: res.status }); }
     if (!res.ok) throw Object.assign(new Error(data.error || 'Something went wrong.'), { status: res.status });
     return data;
   }
@@ -75,6 +114,11 @@
     try {
       const data = await api(`/roster?session=${encodeURIComponent(state.session.id)}&q=${encodeURIComponent(term)}`);
       if (term !== $('q').value.trim()) return;   // a newer search is on its way
+      if (data.deskOnly) {
+        state.people = []; $('search').hidden = true; $('here-label').hidden = $('people-label').hidden = true; $('here').innerHTML = '';
+        $('people').innerHTML = `<div class="empty">${esc(data.message)}</div>`;
+        return;
+      }
       state.people = data.people;
       state.reasons = data.reasons || [];
       $('search').hidden = !data.searchMode;
